@@ -1,0 +1,90 @@
+{
+  "name": "region_bet_risk_expression_bridge_v1",
+  "title": "Region Bet risk-to-expression bridge v1",
+  "baselineBranch": "main",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Autobuilder backlog order 09 after merged order 08 and merged expression-fit replacement PR #5454.",
+    "purpose": "Turn a Region Bet and simple risk limits into a small, explainable set of paper expression choices."
+  },
+  "productScope": {
+    "direction": "Region Bet / Options Made Simple",
+    "job": "09",
+    "stableId": "region_bet_risk_expression_bridge_v1",
+    "summary": "Bridge the guided Region Bet shell to existing deterministic expression-fit ranking primitives.",
+    "paperOnly": true
+  },
+  "acceptanceCriteria": [
+    "Capture bounded max-loss, premium, and payoff preferences inside the guided Region Bet flow.",
+    "Map those preferences to the expression-fit primitives already on current main; do not recreate or cherry-pick draft PR #5428.",
+    "Explain safer or more likely, best-fit, and higher-payout or convex choices without advice, expected-return, or execution claims.",
+    "Persist only the selected expression reference and stated constraints on the Region Bet draft.",
+    "Cover deterministic mapping, selection persistence, empty candidates, and invalid constraints with focused tests."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBet.ts",
+      "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+      "apps/msos-web/src/lib/regionBetRiskExpression.ts",
+      "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+      "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+      "apps/msos-web/src/components/RegionBetRiskExpressionPanel.tsx",
+      "tests/test_msos_web_region_bet_risk_expression_bridge.py"
+    ],
+    "forbiddenPaths": [
+      "DanielTabakman/msos-autobuilder",
+      "src/engine/options_expression_fit_ranking.py",
+      "src/viz/options_expression_fit_ranking_boundary.py",
+      "live brokerage, order placement, or financial-advice behavior",
+      "product-main write outside the controlled publisher"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "RegionBet-RiskExpression-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-RiskExpression-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RegionBet-RiskExpression-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "buildBranch": "build/auto/RegionBet-RiskExpression-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+        "apps/msos-web/src/lib/regionBetRiskExpression.ts",
+        "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+        "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+        "apps/msos-web/src/components/RegionBetRiskExpressionPanel.tsx",
+        "tests/test_msos_web_region_bet_risk_expression_bridge.py"
+      ]
+    },
+    {
+      "sliceId": "RegionBet-RiskExpression-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-RiskExpression-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "region_bet_risk_expression_bridge_v1",
+        "chapterTitle": "Region Bet risk-to-expression bridge v1",
+        "chapterStatus": "COMPLETE",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}

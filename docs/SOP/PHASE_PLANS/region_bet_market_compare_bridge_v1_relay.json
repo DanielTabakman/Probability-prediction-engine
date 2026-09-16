@@ -17,6 +17,13 @@
     "summary": "Guided-shell compare step that reuses #5427 horizon comparison rows for the current Region Bet snapshot.",
     "paperOnly": true
   },
+  "acceptanceCriteria": [
+    "Show deterministic comparison rows for the current Region Bet using the already-merged Options Horizon comparison primitive.",
+    "Preserve the selected asset, expiry window, and region while moving forward and back through Compare.",
+    "Label missing or stale comparison inputs honestly and do not rewrite the merged comparison math.",
+    "Keep the bridge simulation-only with no recommendation, brokerage, or order-placement behavior.",
+    "Cover comparison mapping, guided-shell integration, persistence, and degraded inputs with focused tests."
+  ],
   "authority": {
     "allowedProductPaths": [
       "apps/msos-web/src/lib/regionBetMarketCompare.ts",

@@ -1,0 +1,89 @@
+{
+  "name": "region_bet_manage_adjust_v1",
+  "title": "Region Bet manage and adjust v1",
+  "baselineBranch": "main",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Autobuilder backlog order 16 after region_bet_monitor_value_v1; orders 14 and 15 remain archive-gated and deferred.",
+    "purpose": "Add a paper-only management journal without blocking on unrelated historical replay work."
+  },
+  "productScope": {
+    "direction": "Region Bet monitoring",
+    "job": "16",
+    "stableId": "region_bet_manage_adjust_v1",
+    "summary": "Record educational Region Bet state and paper management decisions in Monitor.",
+    "paperOnly": true
+  },
+  "acceptanceCriteria": [
+    "Classify a saved Region Bet as alive, improving, deteriorating, invalidated, or expired from explicit user input and observable state.",
+    "Record hold, paper-exit, paper-roll, paper-adjust, and note actions as journal entries without placing or simulating broker orders.",
+    "Require a timestamp and optional rationale for every state or management update and retain prior entries immutably.",
+    "Keep all copy educational and descriptive; do not recommend an action or imply live execution.",
+    "Cover valid transitions, invalid transitions, journal ordering, owner isolation, and Monitor rendering with focused tests."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBet.ts",
+      "apps/msos-web/src/lib/regionBetManagement.ts",
+      "apps/msos-web/src/lib/msosWorkflowStore.ts",
+      "apps/msos-web/src/components/RegionBetManagementPanel.tsx",
+      "apps/msos-web/src/components/MonitorContent.tsx",
+      "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+      "tests/test_msos_web_region_bet_manage_adjust.py"
+    ],
+    "forbiddenPaths": [
+      "DanielTabakman/msos-autobuilder",
+      "live brokerage or order placement",
+      "automatic financial recommendations",
+      "mutable or cross-owner journal history"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "RegionBet-ManageAdjust-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-ManageAdjust-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RegionBet-ManageAdjust-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "buildBranch": "build/auto/RegionBet-ManageAdjust-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/regionBetManagement.ts",
+        "apps/msos-web/src/lib/msosWorkflowStore.ts",
+        "apps/msos-web/src/components/RegionBetManagementPanel.tsx",
+        "apps/msos-web/src/components/MonitorContent.tsx",
+        "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+        "tests/test_msos_web_region_bet_manage_adjust.py"
+      ]
+    },
+    {
+      "sliceId": "RegionBet-ManageAdjust-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-ManageAdjust-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "region_bet_manage_adjust_v1",
+        "chapterTitle": "Region Bet manage and adjust v1",
+        "chapterStatus": "COMPLETE",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}

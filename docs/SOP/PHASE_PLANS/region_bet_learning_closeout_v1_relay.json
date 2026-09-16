@@ -1,0 +1,85 @@
+{
+  "name": "region_bet_learning_closeout_v1",
+  "title": "Region Bet learning closeout v1",
+  "baselineBranch": "main",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Autobuilder backlog order 17 after region_bet_monitor_value_v1.",
+    "purpose": "Close the Region Bet loop with a structured, evidence-based paper post-mortem."
+  },
+  "productScope": {
+    "direction": "Region Bet learning",
+    "job": "17",
+    "stableId": "region_bet_learning_closeout_v1",
+    "summary": "Extend the existing review flow with Region Bet view, region, timing, expression, and what-changed fields.",
+    "paperOnly": true
+  },
+  "acceptanceCriteria": [
+    "Capture separate review notes for the original view, selected region, timing, chosen expression, and observed changes.",
+    "When a saved Region Bet is available, anchor the review to its immutable entry snapshot and label unavailable linkage explicitly.",
+    "Allow unknown or unavailable outcomes and avoid hindsight scoring that invents data or implies advice.",
+    "Serialize the structured fields through the existing review-note endpoint and History presentation rather than changing the dynamic API route or creating a second store.",
+    "Cover serialization, validation, existing-review compatibility, owner isolation, and rendered review fields with focused tests."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBetReview.ts",
+      "apps/msos-web/src/components/RegionBetReviewFields.tsx",
+      "apps/msos-web/src/components/SnapshotReviewForm.tsx",
+      "apps/msos-web/src/components/HistoryContent.tsx",
+      "tests/test_msos_web_region_bet_learning_closeout.py"
+    ],
+    "forbiddenPaths": [
+      "DanielTabakman/msos-autobuilder",
+      "a second review persistence store",
+      "fabricated outcomes or hindsight recommendations",
+      "live brokerage or order placement"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "RegionBet-LearningCloseout-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-LearningCloseout-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RegionBet-LearningCloseout-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "buildBranch": "build/auto/RegionBet-LearningCloseout-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBetReview.ts",
+        "apps/msos-web/src/components/RegionBetReviewFields.tsx",
+        "apps/msos-web/src/components/SnapshotReviewForm.tsx",
+        "apps/msos-web/src/components/HistoryContent.tsx",
+        "tests/test_msos_web_region_bet_learning_closeout.py"
+      ]
+    },
+    {
+      "sliceId": "RegionBet-LearningCloseout-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-LearningCloseout-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "region_bet_learning_closeout_v1",
+        "chapterTitle": "Region Bet learning closeout v1",
+        "chapterStatus": "COMPLETE",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}

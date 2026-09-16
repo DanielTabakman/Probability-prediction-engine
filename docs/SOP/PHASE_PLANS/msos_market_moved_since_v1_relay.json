@@ -1,0 +1,89 @@
+{
+  "name": "msos_market_moved_since_v1",
+  "title": "MSOS market moved since v1",
+  "baselineBranch": "main",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Autobuilder backlog order 13 after msos_session_resume_v1.",
+    "purpose": "Explain what observably changed since the owner last viewed a saved Region Bet."
+  },
+  "productScope": {
+    "direction": "MSOS workflow continuity",
+    "job": "13",
+    "stableId": "msos_market_moved_since_v1",
+    "summary": "Add deterministic last-seen versus now summaries to existing Monitor and History surfaces.",
+    "paperOnly": true
+  },
+  "acceptanceCriteria": [
+    "Compare the current observation with the saved or last-seen Region Bet snapshot using deterministic calculations only.",
+    "Show both observation times and label missing, incomparable, or stale inputs explicitly.",
+    "Summarize observable changes without claiming causality, predicting the next move, or recommending a trade.",
+    "Render the same normalized summary in existing Monitor and History surfaces.",
+    "Cover change mapping, timestamps, missing data, stale data, and both render surfaces with focused tests."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBet.ts",
+      "apps/msos-web/src/lib/marketMovedSince.ts",
+      "apps/msos-web/src/lib/monitorHistoryFeed.ts",
+      "apps/msos-web/src/components/MarketMovedSinceCard.tsx",
+      "apps/msos-web/src/components/MonitorContent.tsx",
+      "apps/msos-web/src/components/HistoryContent.tsx",
+      "tests/test_msos_web_market_moved_since.py"
+    ],
+    "forbiddenPaths": [
+      "DanielTabakman/msos-autobuilder",
+      "causal, predictive, or recommendation claims",
+      "fabricated market observations",
+      "live brokerage or order placement"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "MSOS-MarketMovedSince-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/MSOS-MarketMovedSince-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-MarketMovedSince-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "buildBranch": "build/auto/MSOS-MarketMovedSince-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/marketMovedSince.ts",
+        "apps/msos-web/src/lib/monitorHistoryFeed.ts",
+        "apps/msos-web/src/components/MarketMovedSinceCard.tsx",
+        "apps/msos-web/src/components/MonitorContent.tsx",
+        "apps/msos-web/src/components/HistoryContent.tsx",
+        "tests/test_msos_web_market_moved_since.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-MarketMovedSince-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/MSOS-MarketMovedSince-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_market_moved_since_v1",
+        "chapterTitle": "MSOS market moved since v1",
+        "chapterStatus": "COMPLETE",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}

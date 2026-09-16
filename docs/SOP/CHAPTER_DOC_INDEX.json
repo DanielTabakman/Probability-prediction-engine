@@ -1,5 +1,5 @@
 {
-  "active_chapter_count": 20,
+  "active_chapter_count": 27,
   "active_chapters": [
     {
       "archived": false,
@@ -72,6 +72,60 @@
       "queue_status": "PLANNED",
       "selection": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "msos_market_moved_since_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "msos_session_resume_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
     },
     {
       "archived": false,
@@ -537,6 +591,60 @@
     {
       "archived": false,
       "carry_docs": [],
+      "chapter_id": "region_bet_learning_closeout_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_manage_adjust_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
       "chapter_id": "region_bet_market_compare_bridge_v1",
       "do_not_load": [
         "docs/SOP/CURRENT_FRONTIER.md",
@@ -564,6 +672,87 @@
       "queue_status": null,
       "selection": "docs/SOP/POST_REGION_BET_MARKET_COMPARE_BRIDGE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_monitor_value_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_payoff_save_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_risk_expression_bridge_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
     },
     {
       "archived": false,
@@ -943,6 +1132,33 @@
       "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md"
+    },
+    "msos_market_moved_since_v1": {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "msos_market_moved_since_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
     },
     "msos_mcd_production_witness_v1": {
       "archived": true,
@@ -1436,6 +1652,33 @@
       "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md"
+    },
+    "msos_session_resume_v1": {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "msos_session_resume_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
     },
     "msos_storyboard_visual_parity_v1": {
       "archived": true,
@@ -3435,6 +3678,60 @@
       "selection": "docs/SOP/POST_REGION_BET_GUIDED_SHELL_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_REGION_BET_GUIDED_SHELL_V1.md"
     },
+    "region_bet_learning_closeout_v1": {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_learning_closeout_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    "region_bet_manage_adjust_v1": {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_manage_adjust_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
     "region_bet_market_compare_bridge_v1": {
       "archived": false,
       "carry_docs": [],
@@ -3465,6 +3762,87 @@
       "queue_status": null,
       "selection": "docs/SOP/POST_REGION_BET_MARKET_COMPARE_BRIDGE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md"
+    },
+    "region_bet_monitor_value_v1": {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_monitor_value_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    "region_bet_payoff_save_v1": {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_payoff_save_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    "region_bet_risk_expression_bridge_v1": {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_risk_expression_bridge_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
     },
     "repo_between_chapter_housekeeping": {
       "archived": false,
@@ -3563,7 +3941,7 @@
     }
   },
   "canon": "docs/SOP/AGENT_ROUTING_V1.md",
-  "chapter_count": 87,
+  "chapter_count": 94,
   "chapters": [
     {
       "archived": true,
@@ -3879,6 +4257,33 @@
       "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "msos_market_moved_since_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
     },
     {
       "archived": true,
@@ -4372,6 +4777,33 @@
       "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "msos_session_resume_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
     },
     {
       "archived": true,
@@ -6374,6 +6806,60 @@
     {
       "archived": false,
       "carry_docs": [],
+      "chapter_id": "region_bet_learning_closeout_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_manage_adjust_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
       "chapter_id": "region_bet_market_compare_bridge_v1",
       "do_not_load": [
         "docs/SOP/CURRENT_FRONTIER.md",
@@ -6401,6 +6887,87 @@
       "queue_status": null,
       "selection": "docs/SOP/POST_REGION_BET_MARKET_COMPARE_BRIDGE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_monitor_value_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_payoff_save_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_risk_expression_bridge_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": null,
+      "sprint": null
     },
     {
       "archived": false,
@@ -6498,7 +7065,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-09-11T15:46:40Z",
+  "generated_at": "2026-09-16T03:37:25Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",

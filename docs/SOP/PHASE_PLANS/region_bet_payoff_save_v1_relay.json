@@ -1,0 +1,93 @@
+{
+  "name": "region_bet_payoff_save_v1",
+  "title": "Region Bet payoff and save v1",
+  "baselineBranch": "main",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Autobuilder backlog order 10 after region_bet_risk_expression_bridge_v1.",
+    "purpose": "Explain the selected paper expression and save a monitorable Region Bet with an immutable entry snapshot."
+  },
+  "productScope": {
+    "direction": "Region Bet / Options Made Simple",
+    "job": "10",
+    "stableId": "region_bet_payoff_save_v1",
+    "summary": "Add payoff scenarios, explicit confirmation, and owner-scoped Region Bet persistence.",
+    "paperOnly": true
+  },
+  "acceptanceCriteria": [
+    "Render deterministic payoff and scenario explanations for the selected paper expression.",
+    "Require explicit confirmation before changing a Region Bet from draft to an active monitorable paper object.",
+    "Freeze the entry spot, market observation time, stated constraints, selected region, and selected expression reference at confirmation.",
+    "Persist through the existing owner-scoped Region Bet API and workflow store with no broker or order-ticket behavior.",
+    "Cover payoff mapping, confirmation, frozen snapshot persistence, restore, and rejected malformed input with focused tests."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBet.ts",
+      "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+      "apps/msos-web/src/lib/regionBetPayoff.ts",
+      "apps/msos-web/src/lib/msosWorkflowStore.ts",
+      "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+      "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+      "apps/msos-web/src/components/RegionBetPayoffSavePanel.tsx",
+      "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+      "tests/test_msos_web_region_bet_payoff_save.py"
+    ],
+    "forbiddenPaths": [
+      "DanielTabakman/msos-autobuilder",
+      "live brokerage, order placement, or financial-advice behavior",
+      "mutable entry snapshots after confirmation",
+      "cross-owner workflow state"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "RegionBet-PayoffSave-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-PayoffSave-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RegionBet-PayoffSave-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "buildBranch": "build/auto/RegionBet-PayoffSave-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+        "apps/msos-web/src/lib/regionBetPayoff.ts",
+        "apps/msos-web/src/lib/msosWorkflowStore.ts",
+        "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+        "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+        "apps/msos-web/src/components/RegionBetPayoffSavePanel.tsx",
+        "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+        "tests/test_msos_web_region_bet_payoff_save.py"
+      ]
+    },
+    {
+      "sliceId": "RegionBet-PayoffSave-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-PayoffSave-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "region_bet_payoff_save_v1",
+        "chapterTitle": "Region Bet payoff and save v1",
+        "chapterStatus": "COMPLETE",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}
