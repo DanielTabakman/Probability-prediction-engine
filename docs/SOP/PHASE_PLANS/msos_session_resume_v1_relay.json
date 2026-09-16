@@ -1,0 +1,91 @@
+{
+  "name": "msos_session_resume_v1",
+  "title": "MSOS session resume v1",
+  "baselineBranch": "main",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Autobuilder backlog order 12 after region_bet_payoff_save_v1.",
+    "purpose": "Resume the current owner's most recent valid Region Bet workflow without guessing or leaking state."
+  },
+  "productScope": {
+    "direction": "MSOS workflow continuity",
+    "job": "12",
+    "stableId": "msos_session_resume_v1",
+    "summary": "Restore a saved Region Bet and its last valid guided-flow position for the current owner.",
+    "paperOnly": true
+  },
+  "acceptanceCriteria": [
+    "Resume the most recent valid Region Bet for the authenticated owner and restore its exact asset, window, region, and selected expression reference.",
+    "Restore only a known guided-shell step; fall back to the earliest safe incomplete step when stored navigation state is invalid.",
+    "Ignore malformed, stale, or cross-owner state and present a clean-start path without silently substituting another owner's data.",
+    "Reuse the existing Region Bet API and workflow store rather than introducing a parallel persistence boundary.",
+    "Cover valid resume, malformed state, ownership isolation, stale state, and clean fallback with focused tests."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBet.ts",
+      "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+      "apps/msos-web/src/lib/regionBetResume.ts",
+      "apps/msos-web/src/lib/msosWorkflowStore.ts",
+      "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+      "apps/msos-web/src/components/RegionBetResumeCard.tsx",
+      "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+      "tests/test_msos_web_session_resume.py"
+    ],
+    "forbiddenPaths": [
+      "DanielTabakman/msos-autobuilder",
+      "cross-owner state",
+      "a second session or workflow store",
+      "live brokerage, order placement, or financial-advice behavior"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "MSOS-SessionResume-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/MSOS-SessionResume-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-SessionResume-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "buildBranch": "build/auto/MSOS-SessionResume-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+        "apps/msos-web/src/lib/regionBetResume.ts",
+        "apps/msos-web/src/lib/msosWorkflowStore.ts",
+        "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+        "apps/msos-web/src/components/RegionBetResumeCard.tsx",
+        "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+        "tests/test_msos_web_session_resume.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-SessionResume-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/MSOS-SessionResume-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_session_resume_v1",
+        "chapterTitle": "MSOS session resume v1",
+        "chapterStatus": "COMPLETE",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}

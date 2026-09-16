@@ -826,10 +826,10 @@
     },
     {
       "chapterId": "region_bet_market_compare_bridge_v1",
-      "status": "blocked",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH] Autobuilder catalog order 08. Bridge #5427 Options Horizon comparison into the guided Region Bet shell. Reuse decision: keep merged #5427 (f7229e831); do not rewrite math. #5428 stays parked. Charter ready for JIT after #5441.",
+      "reason": "[DONE] Catalog order 08 merged as PPE PR #5444 (d3fbe76f); the guided Region Bet shell now reuses the merged #5427 Options Horizon comparison primitive.",
       "autobuilderCatalogOrder": 8,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -848,7 +848,7 @@
       "status": "blocked",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH BLOCKED] Autobuilder intent order 09. Connect simple risk constraints to understandable expression choices (more likely/safer, best fit, more payout/convex). Reuse Strategy Lab / ranking primitives. Dependency: region_bet_market_compare_bridge_v1 + PR #5428 resolution/supersession decision.",
+      "reason": "[HIGH READY AFTER 08] Autobuilder order 09. Connect simple Region Bet risk constraints to understandable expression choices (safer or more likely, best fit, higher payout or convexity). Reuse the expression-fit primitives merged by #5454; do not rebuild stale draft #5428.",
       "autobuilderCatalogOrder": 9,
       "eligibility": "blocked_until_predecessor_and_draft_decision",
       "dependsOn": [
@@ -857,7 +857,23 @@
       "relatedPullRequests": [
         "DanielTabakman/Probability-prediction-engine#5428"
       ],
-      "packetization": "just_in_time"
+      "relatedPullRequestResolutions": [
+        {
+          "ref": "DanielTabakman/Probability-prediction-engine#5428",
+          "disposition": "superseded",
+          "replacement": "DanielTabakman/Probability-prediction-engine#5454",
+          "mergeCommit": "0e04b102a90ee311cedc6a0d673ff53fb975ebef",
+          "decidedAt": "2026-09-15T19:28:45+00:00",
+          "decisionSource": "merged_product_pr",
+          "reason": "PR #5454 reused the useful expression-fit work on current main and fixed its build failure; the old draft remains non-mergeable and must not gate order 09."
+        }
+      ],
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-09-16T03:19:31+00:00"
+      }
     },
     {
       "chapterId": "region_bet_payoff_save_v1",
@@ -870,7 +886,12 @@
       "dependsOn": [
         "region_bet_risk_expression_bridge_v1"
       ],
-      "packetization": "just_in_time"
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json",
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-09-16T03:19:31+00:00"
+      }
     },
     {
       "chapterId": "region_bet_monitor_value_v1",
@@ -883,7 +904,12 @@
       "dependsOn": [
         "region_bet_payoff_save_v1"
       ],
-      "packetization": "just_in_time"
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-09-16T03:19:31+00:00"
+      }
     },
     {
       "chapterId": "msos_session_resume_v1",
@@ -896,7 +922,12 @@
       "dependsOn": [
         "region_bet_payoff_save_v1"
       ],
-      "packetization": "just_in_time"
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-09-16T03:19:31+00:00"
+      }
     },
     {
       "chapterId": "msos_market_moved_since_v1",
@@ -909,7 +940,12 @@
       "dependsOn": [
         "msos_session_resume_v1"
       ],
-      "packetization": "just_in_time"
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-09-16T03:19:31+00:00"
+      }
     },
     {
       "chapterId": "region_bet_manage_adjust_v1",
@@ -922,7 +958,12 @@
       "dependsOn": [
         "region_bet_monitor_value_v1"
       ],
-      "packetization": "just_in_time"
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json",
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-09-16T03:19:31+00:00"
+      }
     },
     {
       "chapterId": "region_bet_learning_closeout_v1",
@@ -935,7 +976,12 @@
       "dependsOn": [
         "region_bet_monitor_value_v1"
       ],
-      "packetization": "just_in_time"
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json",
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-09-16T03:19:31+00:00"
+      }
     }
   ]
 }

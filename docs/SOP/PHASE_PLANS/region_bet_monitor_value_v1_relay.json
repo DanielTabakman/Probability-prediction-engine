@@ -1,0 +1,89 @@
+{
+  "name": "region_bet_monitor_value_v1",
+  "title": "Region Bet monitor value v1",
+  "baselineBranch": "main",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Autobuilder backlog order 11 after region_bet_payoff_save_v1.",
+    "purpose": "Teach the difference between the underlying view being right and the selected expression making money."
+  },
+  "productScope": {
+    "direction": "Region Bet monitoring",
+    "job": "11",
+    "stableId": "region_bet_monitor_value_v1",
+    "summary": "Add honest then-versus-now underlying and paper-expression value context to Monitor.",
+    "paperOnly": true
+  },
+  "acceptanceCriteria": [
+    "Show entry and current underlying observations separately from entry and current paper-expression values.",
+    "Label every value with its observation time and distinguish observed, estimated, stale, and unavailable data.",
+    "Explain deterministic value drivers in plain language without claiming causality or recommending an action.",
+    "Reuse the existing Monitor feed and owner-scoped Region Bet record rather than creating a second store.",
+    "Cover mapping, labels, timestamps, stale input, and missing expression value with focused tests."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBet.ts",
+      "apps/msos-web/src/lib/regionBetMonitor.ts",
+      "apps/msos-web/src/lib/monitorHistoryFeed.ts",
+      "apps/msos-web/src/components/RegionBetMonitorCard.tsx",
+      "apps/msos-web/src/components/MonitorContent.tsx",
+      "apps/msos-web/src/app/api/monitor/feed/route.ts",
+      "tests/test_msos_web_region_bet_monitor_value.py"
+    ],
+    "forbiddenPaths": [
+      "DanielTabakman/msos-autobuilder",
+      "fabricated live marks or timestamps",
+      "live brokerage, order placement, or financial-advice behavior",
+      "cross-owner workflow state"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "RegionBet-MonitorValue-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-MonitorValue-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RegionBet-MonitorValue-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "buildBranch": "build/auto/RegionBet-MonitorValue-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/regionBetMonitor.ts",
+        "apps/msos-web/src/lib/monitorHistoryFeed.ts",
+        "apps/msos-web/src/components/RegionBetMonitorCard.tsx",
+        "apps/msos-web/src/components/MonitorContent.tsx",
+        "apps/msos-web/src/app/api/monitor/feed/route.ts",
+        "tests/test_msos_web_region_bet_monitor_value.py"
+      ]
+    },
+    {
+      "sliceId": "RegionBet-MonitorValue-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/RegionBet-MonitorValue-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "region_bet_monitor_value_v1",
+        "chapterTitle": "Region Bet monitor value v1",
+        "chapterStatus": "COMPLETE",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}
