@@ -1,4 +1,5 @@
-# Deploy MSOS staging shell on the VPS (does not touch production msos_web).
+# Deploy the isolated MSOS shell and Options Market Read API staging stack on
+# the VPS. Production containers are not rebuilt or recreated.
 # See docs/DEPLOY/MSOS_STAGING_V1.md
 name: Deploy VPS Staging
 
@@ -105,3 +106,15 @@ jobs:
             exit 1
           fi
           python scripts/verify_msos_web_ship.py --apex-only --base-url https://staging.marketstructureos.com
+
+      - name: Verify isolated Options Market Read staging contract
+        run: |
+          set -euo pipefail
+          python scripts/options_market_read_uptime.py \
+            --omr-url https://staging.marketstructureos.com/v1/options-market-read \
+            --display-url 'https://staging.marketstructureos.com/ppe-display-api/display.json?asset=BTC&depth=full'
+
+      - name: Verify production Options Market Read remains healthy
+        run: |
+          set -euo pipefail
+          python scripts/options_market_read_uptime.py

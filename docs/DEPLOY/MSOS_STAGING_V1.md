@@ -1,14 +1,19 @@
 # MSOS staging environment
 
-**Goal:** Try big MSOS shell changes on **staging** while **production** (`marketstructureos.com`) stays stable for demos.
+**Goal:** Try MSOS shell and Options Market Read API changes on **staging** while
+production (`marketstructureos.com`) stays stable for consumers and demos.
 
 | URL | Backend | Purpose |
 |-----|---------|---------|
 | `https://marketstructureos.com` | `msos_web:3000` | **Production demo** — only `main` deploys here |
 | `https://staging.marketstructureos.com` | `msos_web_staging:3001` | **Staging** — feature branches / experiments |
+| `https://marketstructureos.com/v1/options-market-read` | `ppe_display_api:8765` | **Production API** |
+| `https://staging.marketstructureos.com/v1/options-market-read` | `ppe_display_api_staging:8766` | **Isolated staging API** |
 | `https://app.marketstructureos.com` | `app_full:8501` | Private Streamlit lab (unchanged) |
 
-Shared PPE services (`app_demo`, `ppe_display_api`, snapshots) are the same stack — only the Next.js shell differs.
+The staging shell and API are built from the separate staging checkout. Staging
+has its own API process and cache refresh loop. Production `ppe_display_api` is
+not rebuilt or recreated by a staging deploy.
 
 ## One-time DNS automation (recommended)
 
@@ -68,7 +73,9 @@ cp /opt/marketstructureos/.env .env     # optional — research CTA, etc.
 bash /opt/marketstructureos-staging/scripts/vps_deploy_staging.sh origin/my-feature-branch
 ```
 
-This rebuilds **only** `msos_web_staging`. Production `msos_web` is not recreated.
+This rebuilds **only** `msos_web_staging`, `ppe_display_api_staging`, and
+`ppe_display_cache_refresh_staging`. Production `msos_web` and
+`ppe_display_api` are not recreated.
 
 ## Deploy production (unchanged)
 
@@ -89,11 +96,17 @@ Deploy and uptime workflows fail when the apex homepage serves Streamlit (`stApp
 1. Branch off `main`, push changes.
 2. Run **Deploy VPS Staging** with your branch name.
 3. Test at `https://staging.marketstructureos.com`.
-4. Merge to `main` when ready — production auto-deploys; demo URL stays safe during step 2–3.
+4. Test `https://staging.marketstructureos.com/v1/options-market-read` and its
+   staging display payload.
+5. Merge to `main` when ready — production auto-deploys; production stays safe
+   during feature-branch testing.
 
 ## Verify
 
 ```bash
 python scripts/verify_msos_web_ship.py --apex-only --base-url https://staging.marketstructureos.com
+python scripts/options_market_read_uptime.py \
+  --omr-url https://staging.marketstructureos.com/v1/options-market-read \
+  --display-url 'https://staging.marketstructureos.com/ppe-display-api/display.json?asset=BTC&depth=full'
 python scripts/verify_msos_web_ship.py --base-url https://marketstructureos.com
 ```

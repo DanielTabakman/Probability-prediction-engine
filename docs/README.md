@@ -45,6 +45,7 @@ Start here when navigating the Probability Prediction Engine repo.
 |----------------|-----|
 | **Production VPS** (Caddy, Cloudflare Access, dual Streamlit) | [`DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md`](DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md) |
 | **GitHub Actions → VPS** | [`DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md`](DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md) |
+| **Isolated MSOS/API staging** | [`DEPLOY/MSOS_STAGING_V1.md`](DEPLOY/MSOS_STAGING_V1.md) |
 | **Early / Render-style** (historical) | [`DEPLOY/RUNBOOK_CLOUDFLARE_ACCESS_RENDER.md`](DEPLOY/RUNBOOK_CLOUDFLARE_ACCESS_RENDER.md) |
 
 Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PROTOCOL.md) · Demo checklist: [`SOP/DEMO_UI_RELEASE_CHECKLIST.md`](SOP/DEMO_UI_RELEASE_CHECKLIST.md)
@@ -56,6 +57,7 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 - [`SEMANTIC_CONTRACTS.md`](SEMANTIC_CONTRACTS.md) — market-implied vs belief vs disagreement
 - [`IMPLIED_LAB_SMOKE.md`](IMPLIED_LAB_SMOKE.md) — Playwright UI smoke procedures
 - [`API/OPTIONS_MARKET_READ_V1.md`](API/OPTIONS_MARKET_READ_V1.md) — `GET /v1/options-market-read`
+- [`API/OPTIONS_MARKET_READ_STAGING_PLAN_V1.md`](API/OPTIONS_MARKET_READ_STAGING_PLAN_V1.md) — isolated staging topology and promotion gate
 
 ## Bounded MSOS initiatives
 

@@ -35,6 +35,27 @@
 }
 
 (msos_site_routes) {
+	@staging_ppe_display_api {
+		host staging.marketstructureos.com
+		path /ppe-display-api /ppe-display-api/*
+	}
+	handle @staging_ppe_display_api {
+		uri strip_prefix /ppe-display-api
+		reverse_proxy ppe_display_api_staging:8766 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
+	@staging_options_market_read {
+		host staging.marketstructureos.com
+		path /v1/options-market-read
+	}
+	handle @staging_options_market_read {
+		reverse_proxy ppe_display_api_staging:8766 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
 	@staging host staging.marketstructureos.com
 	handle @staging {
 		header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
