@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `8a3876b3` — Control-plane: dev changelog
 - `02737e99` — Platform: scope deploy lock to mutation jobs (#5470)
 - `88817ab1` — Control-plane: dev changelog
 - `f46a9ec0` — Platform: reset tracked files in staging deploy mirror (#5469) (`scripts/`)
