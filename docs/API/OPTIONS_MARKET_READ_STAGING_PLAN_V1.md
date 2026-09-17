@@ -46,8 +46,10 @@ does not mean a synthetic or private market-data feed.
 5. Merge only after staging passes. The normal production workflow remains the
    production promotion path.
 
-The deployment workflow shares the existing `deploy-vps` concurrency group, so
-production and staging cannot change the shared Caddy container simultaneously.
+The production and staging deployment jobs share the existing `deploy-vps`
+concurrency group, so they cannot change the shared Caddy container
+simultaneously. The optional production witness runs after the production job
+releases that lock and cannot delay staging.
 
 ## Product boundary
 

@@ -121,6 +121,30 @@ def test_production_deploy_bounds_noncritical_cache_warm() -> None:
     assert "timed out after 180s (non-fatal" in workflow
 
 
+def test_shared_deploy_lock_excludes_optional_production_witness() -> None:
+    production = (REPO_ROOT / ".github" / "workflows" / "deploy-vps.yml").read_text(
+        encoding="utf-8"
+    )
+    staging = (
+        REPO_ROOT / ".github" / "workflows" / "deploy-vps-staging.yml"
+    ).read_text(encoding="utf-8")
+
+    production_header, production_jobs = production.split("jobs:\n", 1)
+    production_deploy, production_witness = production_jobs.split(
+        "  production-witness:\n", 1
+    )
+    staging_header, staging_jobs = staging.split("jobs:\n", 1)
+    staging_deploy = staging_jobs.split("  vps-staging-deploy:\n", 1)[1]
+
+    assert "concurrency:" not in production_header
+    assert "group: deploy-vps" in production_deploy
+    assert "cancel-in-progress: true" in production_deploy
+    assert "group: deploy-vps" not in production_witness
+    assert "concurrency:" not in staging_header
+    assert "group: deploy-vps" in staging_deploy
+    assert "cancel-in-progress: false" in staging_deploy
+
+
 def test_staging_bootstrap_uses_detached_checkout() -> None:
     script = (REPO_ROOT / "scripts" / "vps_bootstrap_staging.sh").read_text(
         encoding="utf-8"
@@ -141,5 +165,5 @@ def test_staging_workflow_checks_staging_and_production_contracts() -> None:
     assert workflow.count("python scripts/options_market_read_uptime.py") == 2
     assert 'branches:\n      - "staging/**"' in workflow
     assert "github.event_name == 'push' && github.ref_name || inputs.git_ref" in workflow
-    assert "group: deploy-vps\n  # A staging push must never cancel a production deploy" in workflow
+    assert "group: deploy-vps" in workflow
     assert "cancel-in-progress: false" in workflow
