@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `ca8a8285` — Product: bridge Region Bet risk limits to paper expression-fit ranking (#5463) (`apps/msos-web/`)
+- `07acfbc9` — Control-plane: dev changelog
 - `af5f4ffe` — Control-plane: dev changelog
 - `b3a72c74` — Control-plane: dev changelog
 - `120046d1` — Control-plane: dev changelog
