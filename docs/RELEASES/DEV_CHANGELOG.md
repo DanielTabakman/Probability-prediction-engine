@@ -4,10 +4,14 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `120046d1` — Control-plane: dev changelog
 - `12778528` — Control-plane: dev changelog
 
 ## 2026-09-16
 
+- `ba59e573` — Merge pull request #5459 from DanielTabakman/feat/options-market-read-human-summary-v1-3
+- `f67d1b12` — Merge origin/main into Options Market Read v1.3
+- `21260436` — Product: Options Market Read human-summary v1.3 (`src/viz/`)
 - `72f784ff` — Merge pull request #5458 from DanielTabakman/fix/expression-fit-charter-dispatchable
 - `4e58ace6` — Control-plane: align expression-fit charter test with native dispatchability
 - `d08c2fca` — Control-plane: mark Options Expression Fit product complete for closeout (#5457) (`docs/SOP/`)
