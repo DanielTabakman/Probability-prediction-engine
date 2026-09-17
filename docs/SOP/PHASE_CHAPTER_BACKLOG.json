@@ -545,13 +545,13 @@
     },
     {
       "chapterId": "options_expression_fit_ranking_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_OPTIONS_EXPRESSION_FIT_RANKING_V1_SELECTION.md",
       "canonRef": "docs/SOP/SPRINT_OPTIONS_EXPRESSION_FIT_RANKING_V1.md",
-      "reason": "[HIGH] Options Made Simple job B; Autobuilder draft PR #5428 open (checks unstable) — reconcile before packetizing region_bet_risk_expression_bridge_v1. Not a new backlog build item.",
+      "reason": "[DONE] Options Made Simple job B shipped as PR #5454; closeout 2026-09-17. Draft #5428 superseded. Not a new backlog build item.",
       "relatedPullRequests": [
         "DanielTabakman/Probability-prediction-engine#5428"
       ],
@@ -845,12 +845,12 @@
     },
     {
       "chapterId": "region_bet_risk_expression_bridge_v1",
-      "status": "blocked",
+      "status": "ready",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY AFTER 08] Autobuilder order 09. Connect simple Region Bet risk constraints to understandable expression choices (safer or more likely, best fit, higher payout or convexity). Reuse the expression-fit primitives merged by #5454; do not rebuild stale draft #5428.",
+      "reason": "[HIGH READY] Autobuilder order 09. Connect simple Region Bet risk constraints to understandable expression choices (safer or more likely, best fit, higher payout or convexity). Reuse the expression-fit primitives merged by #5454; do not rebuild stale draft #5428.",
       "autobuilderCatalogOrder": 9,
-      "eligibility": "blocked_until_predecessor_and_draft_decision",
+      "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "region_bet_market_compare_bridge_v1"
       ],
@@ -870,6 +870,8 @@
       ],
       "packetization": "just_in_time",
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/REGION_BET_RISK_EXPRESSION_BRIDGE_V1_EVIDENCE_STATUS.md",
       "autobuilderMergeAuthority": {
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-16T03:19:31+00:00"

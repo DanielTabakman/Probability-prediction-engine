@@ -336,9 +336,15 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json",
-      "status": "ready",
-      "reason": "[HIGH] Founder-approved issue #50 Options Made Simple job B: best-fit expression ranking; no native prerequisite on job A.",
+      "status": "done",
+      "reason": "[HIGH] Founder-approved issue #50 Options Made Simple job B: best-fit expression ranking; product #5454 and closeout 2026-09-17.",
       "selectionPrep": "docs/SOP/POST_OPTIONS_EXPRESSION_FIT_RANKING_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
+      "status": "ready",
+      "reason": "[HIGH] Autobuilder catalog order 09: Region Bet risk-to-expression bridge after terminal 08 and merged #5454.",
+      "selectionPrep": "docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",

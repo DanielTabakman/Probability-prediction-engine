@@ -527,13 +527,14 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Founder-approved issue #50 Options Made Simple job B: deterministic best-fit expression ranking; technically independent from job A and dispatchable from current main.",
       "selectionPrep": "docs/SOP/POST_OPTIONS_EXPRESSION_FIT_RANKING_V1_SELECTION.md",
       "founderPriority": "HIGH",
       "dependencyUnblockValue": 10,
       "workerMode": "local-agent",
-      "focusPlaybookTier": "P1"
+      "focusPlaybookTier": "P1",
+      "doneReason": "product on main via PR #5454; VM closeout Options-ExpressionFit-Closeout-Slice004 2026-09-17"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
@@ -583,6 +584,15 @@
       "workerMode": "local-agent",
       "holdReason": "issue #5374 READY-frontier audit: historically ambiguous/closeout-only; current main has HYPE implementation/tests and Product-Slice004 workflow metric but evidence still CHARTERED/PENDING and no main closeout; reactivation requires evidence reconciliation or founder-approved explicit requeue",
       "reactivationCondition": "founder/operator-approved explicit requeue with refreshed native evidence packet"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
+      "status": "READY",
+      "reason": "[HIGH] Autobuilder catalog order 09: Region Bet risk-to-expression bridge; reuse #5454 expression-fit primitives after terminal orders 06-08.",
+      "selectionPrep": "docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md",
+      "founderPriority": "HIGH",
+      "workerMode": "local-agent",
+      "focusPlaybookTier": "P1"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",

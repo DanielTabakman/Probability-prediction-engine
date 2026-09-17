@@ -10,8 +10,10 @@ from scripts.founder_portfolio import collect_portfolio
 REPO = Path(__file__).resolve().parents[1]
 A_ID = "options_horizon_comparison_v1"
 B_ID = "options_expression_fit_ranking_v1"
+RB_ID = "region_bet_risk_expression_bridge_v1"
 A_PLAN = "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json"
 B_PLAN = "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json"
+RB_PLAN = "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json"
 
 
 def _json(rel: str) -> dict:
@@ -40,41 +42,43 @@ def test_horizon_comparison_queue_row_is_done_after_reuse() -> None:
     assert "terminal backlog" in a["doneReason"]
 
 
-def test_ready_frontier_contains_only_remaining_options_made_simple_job(monkeypatch) -> None:
+def test_expression_fit_queue_row_is_done_after_closeout() -> None:
+    queue = _json("docs/SOP/PHASE_QUEUE.json")
+    b = next(item for item in queue["items"] if item.get("planPath") == B_PLAN)
+    assert b["status"] == "DONE"
+
+
+def test_ready_frontier_is_region_bet_risk_expression_bridge(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     ready = _ready_queue_items()
-    assert [item["planPath"] for item in ready] == [B_PLAN]
+    assert [item["planPath"] for item in ready] == [RB_PLAN]
     assert [item["founderPriority"] for item in ready] == ["HIGH"]
-    assert all("issue #50" in item["reason"] for item in ready)
     joined = "\n".join(item["planPath"] + " " + item["reason"] for item in ready).lower()
     for stale in ("commodity_proxy", "uso", "hyperliquid", "replay_scrubber", "tier1b", "tier1c"):
         assert stale not in joined
 
 
-def test_founder_portfolio_recommends_remaining_expression_fit_job(monkeypatch) -> None:
+def test_founder_portfolio_recommends_region_bet_risk_expression_bridge(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     snapshot = collect_portfolio(REPO)
     ppe = _pipeline(snapshot)
     ready_ids = [item["work_item_id"] for item in ppe["ready_work"]]
 
-    assert ready_ids == [B_ID]
-    assert snapshot["recommended_next_action"]["work_item_id"] == B_ID
-    b_work = next(item for item in ppe["ready_work"] if item["work_item_id"] == B_ID)
-    assert b_work["source_plan"] == B_PLAN
-    assert b_work["selected_native_slice"] == "Options-ExpressionFit-Product-Slice002"
-    assert b_work["selected_native_dispatchable"] is True
-    assert b_work["native_prerequisites"]["dispatch_blockers"] == []
-    assert b_work["allowed_product_paths"] == [
-        "src/engine/options_expression_fit_ranking.py",
-        "src/viz/options_expression_fit_ranking_boundary.py",
-        "scripts/rank_options_expression_fit.py",
-        "apps/msos-web/src/lib/optionsExpressionFitRanking.ts",
-        "apps/msos-web/src/components/OptionsExpressionFitRankingPanel.tsx",
-        "apps/msos-web/src/components/ExpressionPlanningPanel.tsx",
-        "tests/test_options_expression_fit_ranking.py",
-        "tests/test_msos_web_options_expression_fit_ranking.py",
+    assert ready_ids == [RB_ID]
+    assert snapshot["recommended_next_action"]["work_item_id"] == RB_ID
+    work = next(item for item in ppe["ready_work"] if item["work_item_id"] == RB_ID)
+    assert work["source_plan"] == RB_PLAN
+    assert work["selected_native_slice"] == "RegionBet-RiskExpression-Product-Slice002"
+    assert work["allowed_product_paths"] == [
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+        "apps/msos-web/src/lib/regionBetRiskExpression.ts",
+        "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+        "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+        "apps/msos-web/src/components/RegionBetRiskExpressionPanel.tsx",
+        "tests/test_msos_web_region_bet_risk_expression_bridge.py",
     ]
 
 

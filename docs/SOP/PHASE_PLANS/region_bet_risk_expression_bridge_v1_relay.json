@@ -2,6 +2,8 @@
   "name": "region_bet_risk_expression_bridge_v1",
   "title": "Region Bet risk-to-expression bridge v1",
   "baselineBranch": "main",
+  "selectionRecord": "docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/REGION_BET_RISK_EXPRESSION_BRIDGE_V1_EVIDENCE_STATUS.md",
   "founderPriorityOverride": {
     "status": "accepted",
     "source": "Autobuilder backlog order 09 after merged order 08 and merged expression-fit replacement PR #5454.",
