@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `f46a9ec0` — Platform: reset tracked files in staging deploy mirror (#5469) (`scripts/`)
+- `2d2c9feb` — Control-plane: dev changelog
 - `3c31e95c` — Platform: bound display cache warming during deploys (#5468) (`scripts/`)
 - `8e2576b6` — Control-plane: dev changelog
 - `b5d7526e` — Platform: deploy slash-named staging branches safely (#5467) (`scripts/`)

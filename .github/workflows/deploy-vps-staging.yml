@@ -22,12 +22,6 @@ on:
           - "true"
           - "false"
 
-concurrency:
-  group: deploy-vps
-  # A staging push must never cancel a production deploy already holding this lock.
-  # A newer production deploy may still pre-empt staging from deploy-vps.yml.
-  cancel-in-progress: false
-
 jobs:
   ensure-staging-dns:
     name: Staging DNS (optional)
@@ -53,6 +47,11 @@ jobs:
 
   vps-staging-deploy:
     name: VPS staging deploy
+    # Serialize the staging mutation/verification job with production deploys.
+    # Optional production witnesses do not hold this lock.
+    concurrency:
+      group: deploy-vps
+      cancel-in-progress: false
     needs: [ensure-staging-dns]
     if: always() && !cancelled()
     runs-on: ubuntu-latest
