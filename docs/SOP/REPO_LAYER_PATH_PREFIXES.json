@@ -31,8 +31,10 @@
         "tests/test_directional_candidate",
         "tests/test_display_payload_server.py",
         "tests/test_options_market_read.py",
+        "tests/test_options_market_read_uptime.py",
         "docs/API/",
         "fixtures/options_market_read/",
+        "scripts/options_market_read_uptime.py",
         "scripts/run_mvp1_dual_implied_lab_smoke.py",
         "scripts/implied_lab_ui_smoke_harness.py",
         "scripts/run_implied_lab_ui_smoke.py",
@@ -247,7 +249,11 @@
         ".dockerignore",
         ".github/"
       ],
-      "related_paths": ["docs/DEPLOY/"]
+      "related_paths": [
+        "docs/DEPLOY/",
+        "scripts/options_market_read_uptime.py",
+        "tests/test_options_market_read_uptime.py"
+      ]
     },
     "product-canon": {
       "label": "F — Product canon",
@@ -343,8 +349,10 @@
         "tests/test_directional_candidate_strip.py",
         "tests/test_display_payload_server.py",
         "tests/test_options_market_read.py",
+        "tests/test_options_market_read_uptime.py",
         "docs/API/",
         "fixtures/options_market_read/",
+        "scripts/options_market_read_uptime.py",
         "scripts/run_mvp1_dual_implied_lab_smoke.py",
         "scripts/implied_lab_ui_smoke_harness.py",
         "scripts/run_implied_lab_ui_smoke.py",
@@ -386,7 +394,9 @@
         "scripts/",
         "fixtures/research_decision_dashboard/",
         "fixtures/options_market_read/",
+        "scripts/options_market_read_uptime.py",
         "tests/test_options_market_read.py",
+        "tests/test_options_market_read_uptime.py",
         "docs/SOP/",
         "docs/CONTROL_PLANE/",
         "docs/REPOSITORY_BOUNDARIES.md",
@@ -644,7 +654,9 @@
         ".dockerignore",
         ".github/",
         "docs/DEPLOY/",
-        "tests/test_caddy_security.py"
+        "tests/test_caddy_security.py",
+        "scripts/options_market_read_uptime.py",
+        "tests/test_options_market_read_uptime.py"
       ],
       "forbidden_paths": [
         "src/engine/",

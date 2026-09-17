@@ -1,4 +1,6 @@
-# Site probe — was every 5 minutes (minute hog); now every 30 minutes. See docs/DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md.
+# Site probe — homepage every 30 minutes. Options Market Read rides the same
+# workflow so the synthetic API check runs at least hourly and is manually
+# dispatchable. See docs/API/OPTIONS_MARKET_READ_UPTIME_V1.md.
 name: Uptime healthcheck
 
 on:
@@ -27,3 +29,8 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/verify_msos_web_ship.py --apex-only
+
+      - name: Options Market Read and display.json contract
+        run: |
+          set -euo pipefail
+          python scripts/options_market_read_uptime.py
