@@ -105,7 +105,7 @@ def test_staging_deploy_recreates_only_staging_api_services() -> None:
     script = (REPO_ROOT / "scripts" / "vps_deploy_staging.sh").read_text(encoding="utf-8")
     assert "docker compose --profile staging build ppe_display_api_staging" in script
     assert "ppe_display_cache_refresh_staging" in script
-    assert 'git checkout --detach "$REF"' in script
+    assert 'git checkout --detach --force "$REF"' in script
     assert 'git checkout -B "$BRANCH" "$REF"' not in script
     assert "timeout 180s docker compose --profile staging exec" in script
     assert "docker compose build app_demo" not in script

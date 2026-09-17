@@ -34,12 +34,14 @@ if git show-ref --verify --quiet "refs/remotes/${REF}" 2>/dev/null; then
   # Deploy the remote commit directly. A detached checkout avoids local ref
   # namespace collisions such as an existing `staging` branch blocking a
   # remote `staging/my-feature` branch.
-  git checkout --detach "$REF"
+  # This is a dedicated deployment mirror: force tracked files to the selected
+  # revision while leaving ignored/untracked runtime files such as .env intact.
+  git checkout --detach --force "$REF"
 elif git show-ref --verify --quiet "refs/heads/${LOCAL_REF}" 2>/dev/null; then
-  git checkout --detach "$LOCAL_REF"
+  git checkout --detach --force "$LOCAL_REF"
 elif [[ "$REF" != "origin/main" ]] && git show-ref --verify --quiet "refs/remotes/origin/main" 2>/dev/null; then
   echo "vps_deploy_staging: ref ${REF} not found — falling back to origin/main" >&2
-  git checkout --detach origin/main
+  git checkout --detach --force origin/main
 else
   echo "vps_deploy_staging: ref ${REF} not found" >&2
   exit 1
