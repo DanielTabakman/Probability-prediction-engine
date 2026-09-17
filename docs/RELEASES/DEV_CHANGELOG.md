@@ -4,11 +4,17 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `b3a72c74` — Control-plane: dev changelog
 - `120046d1` — Control-plane: dev changelog
 - `12778528` — Control-plane: dev changelog
 
 ## 2026-09-16
 
+- `fdf7dc6d` — Merge pull request #5461 from DanielTabakman/docs/options-market-read-api-staging-plan
+- `5bfe40d3` — Merge pull request #5460 from DanielTabakman/feat/options-market-read-uptime-v1
+- `01d43ee1` — Docs: bounded plan for isolated Options Market Read API staging
+- `e1b6e2f0` — Platform: document OMR uptime without touching deploy topology docs
+- `264e6712` — Platform: add Options Market Read production uptime check (`docs/SOP/`)
 - `ba59e573` — Merge pull request #5459 from DanielTabakman/feat/options-market-read-human-summary-v1-3
 - `f67d1b12` — Merge origin/main into Options Market Read v1.3
 - `21260436` — Product: Options Market Read human-summary v1.3 (`src/viz/`)
