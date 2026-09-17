@@ -28,6 +28,7 @@ export type RegionBetGuidedShellPatch = {
   selected_region?: Partial<RegionBetContract["selected_region"]>;
   market_snapshot?: Partial<RegionBetContract["market_snapshot"]>;
   risk_constraints?: Partial<RegionBetContract["risk_constraints"]>;
+  selected_expression_ref?: RegionBetContract["selected_expression_ref"];
   user_note?: string;
 };
 
@@ -139,6 +140,7 @@ export function createRegionBetGuidedDraft(
       max_loss_usd: seed?.risk_constraints?.max_loss_usd,
       max_premium_usd: seed?.risk_constraints?.max_premium_usd,
       position_size_usd: seed?.risk_constraints?.position_size_usd,
+      payoff_preference: seed?.risk_constraints?.payoff_preference,
       notes: seed?.risk_constraints?.notes,
     },
     selected_expression_ref: seed?.selected_expression_ref ?? null,
@@ -179,6 +181,10 @@ export function applyRegionBetGuidedShellPatch(
     selected_region: { ...regionBet.selected_region, ...patch.selected_region },
     market_snapshot: { ...regionBet.market_snapshot, ...patch.market_snapshot },
     risk_constraints: { ...regionBet.risk_constraints, ...patch.risk_constraints },
+    selected_expression_ref:
+      patch.selected_expression_ref !== undefined
+        ? patch.selected_expression_ref
+        : regionBet.selected_expression_ref,
     lifecycle: {
       ...regionBet.lifecycle,
       status: "draft",

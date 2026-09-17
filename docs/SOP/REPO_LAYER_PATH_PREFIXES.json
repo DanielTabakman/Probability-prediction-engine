@@ -318,6 +318,7 @@
         "tests/test_msos_web_forward_consistency_dashboard.py",
         "tests/test_msos_web_product_usage.py",
         "tests/test_msos_web_feedback.py",
+        "tests/test_msos_web_region_bet_",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",
         "docs/SOP/SPRINT_MSOS_",

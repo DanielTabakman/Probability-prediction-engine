@@ -3,8 +3,10 @@
 import type {
   RegionBetGuidedShellStep,
   RegionBetGuidedShellSnapshot,
+  RegionBetGuidedShellPatch,
 } from "@/lib/regionBetGuidedShell";
 import { RegionBetMarketComparePanel } from "@/components/RegionBetMarketComparePanel";
+import { RegionBetRiskExpressionPanel } from "@/components/RegionBetRiskExpressionPanel";
 import type { RegionBetContract } from "@/lib/regionBet";
 
 export type RegionBetGuidedAssetOption = {
@@ -19,13 +21,7 @@ type RegionBetGuidedShellPanelProps = {
   draft: RegionBetContract;
   snapshot: RegionBetGuidedShellSnapshot;
   assetOptions: RegionBetGuidedAssetOption[];
-  onDraftChange: (patch: {
-    asset?: Partial<RegionBetContract["asset"]>;
-    entry?: Partial<RegionBetContract["entry"]>;
-    target?: Partial<RegionBetContract["target"]>;
-    selected_region?: Partial<RegionBetContract["selected_region"]>;
-    user_note?: string;
-  }) => void;
+  onDraftChange: (patch: RegionBetGuidedShellPatch) => void;
 };
 
 function datetimeValue(value: string | undefined): string {
@@ -229,37 +225,40 @@ export function RegionBetGuidedShellPanel({
   }
 
   return (
-    <div className="panel chart" data-testid="region-bet-guided-shell-panel">
-      <div className="panel-head">
-        <div>
-          <h2>Review the Region Bet</h2>
-          <div className="panel-sub">Draft persistence uses the Region Bet contract.</div>
+    <>
+      <div className="panel chart" data-testid="region-bet-guided-shell-panel">
+        <div className="panel-head">
+          <div>
+            <h2>Review the Region Bet</h2>
+            <div className="panel-sub">Draft persistence uses the Region Bet contract.</div>
+          </div>
+          <span className="tag teal">Ready</span>
         </div>
-        <span className="tag teal">Ready</span>
-      </div>
-      <div className="score" aria-label="Region Bet draft summary">
-        <div className="small-panel">
-          <div className="k">Asset</div>
-          <div className="v teal">{snapshot.symbol ?? snapshot.asset_id}</div>
-        </div>
-        <div className="small-panel">
-          <div className="k">Expiry</div>
-          <div className="v">{snapshot.expiry_utc.slice(0, 10)}</div>
-        </div>
-        <div className="small-panel">
-          <div className="k">Region</div>
-          <div className="v amber">
-            {snapshot.selected_region.price_min_usd} to {snapshot.selected_region.price_max_usd}
+        <div className="score" aria-label="Region Bet draft summary">
+          <div className="small-panel">
+            <div className="k">Asset</div>
+            <div className="v teal">{snapshot.symbol ?? snapshot.asset_id}</div>
+          </div>
+          <div className="small-panel">
+            <div className="k">Expiry</div>
+            <div className="v">{snapshot.expiry_utc.slice(0, 10)}</div>
+          </div>
+          <div className="small-panel">
+            <div className="k">Region</div>
+            <div className="v amber">
+              {snapshot.selected_region.price_min_usd} to {snapshot.selected_region.price_max_usd}
+            </div>
           </div>
         </div>
+        <label>
+          <span>Note</span>
+          <textarea
+            value={draft.user_note ?? ""}
+            onChange={(event) => onDraftChange({ user_note: event.currentTarget.value })}
+          />
+        </label>
       </div>
-      <label>
-        <span>Note</span>
-        <textarea
-          value={draft.user_note ?? ""}
-          onChange={(event) => onDraftChange({ user_note: event.currentTarget.value })}
-        />
-      </label>
-    </div>
+      <RegionBetRiskExpressionPanel draft={draft} onDraftChange={onDraftChange} />
+    </>
   );
 }

@@ -165,7 +165,10 @@ export function RegionBetGuidedShell({
               Retained context: {snapshot.symbol ?? snapshot.asset_id}, expiry{" "}
               {snapshot.expiry_utc.slice(0, 10)}, region{" "}
               {snapshot.selected_region.price_min_usd} to{" "}
-              {snapshot.selected_region.price_max_usd}.
+              {snapshot.selected_region.price_max_usd}
+              {draft.selected_expression_ref
+                ? `, paper expression ${draft.selected_expression_ref.expression_id}`
+                : ""}.
             </p>
           </div>
           <div className="lab-setup-actions">
