@@ -342,9 +342,15 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
-      "status": "ready",
-      "reason": "[HIGH] Autobuilder catalog order 09: Region Bet risk-to-expression bridge after terminal 08 and merged #5454.",
+      "status": "done",
+      "reason": "[DONE] Autobuilder catalog order 09 merged as PPE PR #5463; do not rebuild.",
       "selectionPrep": "docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json",
+      "status": "ready",
+      "reason": "[HIGH] Autobuilder catalog order 10: Region Bet payoff/save after terminal 09 and merged #5463.",
+      "selectionPrep": "docs/SOP/POST_REGION_BET_PAYOFF_SAVE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",

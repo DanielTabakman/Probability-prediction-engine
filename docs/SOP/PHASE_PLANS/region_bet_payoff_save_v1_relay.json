@@ -2,6 +2,9 @@
   "name": "region_bet_payoff_save_v1",
   "title": "Region Bet payoff and save v1",
   "baselineBranch": "main",
+  "selectionRecord": "docs/SOP/POST_REGION_BET_PAYOFF_SAVE_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/REGION_BET_PAYOFF_SAVE_V1_EVIDENCE_STATUS.md",
+  "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_PAYOFF_SAVE_V1.md",
   "founderPriorityOverride": {
     "status": "accepted",
     "source": "Autobuilder backlog order 10 after region_bet_risk_expression_bridge_v1.",
@@ -55,6 +58,7 @@
     {
       "sliceId": "RegionBet-PayoffSave-Product-Slice002",
       "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_PAYOFF_SAVE_V1.md",
       "buildBranch": "build/auto/RegionBet-PayoffSave-Product-Slice002",
       "declaredPlane": "PRODUCT-PLANE",
       "implementationStatus": "PENDING",

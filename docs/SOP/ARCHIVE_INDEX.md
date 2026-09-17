@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-09-17T04:02:21Z · **Archived chapters:** 68
+**Generated:** 2026-09-17T23:54:04Z · **Archived chapters:** 69
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -73,6 +73,7 @@
 | `ppe_sol_bybit_ship_v1` | `docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json` |
 | `ppe_tradeable_universe_v1` | `docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md` | `docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json` |
 | `ppe_trust_surface_v1` | `docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md` | `docs/SOP/PPE_TRUST_SURFACE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json` |
+| `region_bet_risk_expression_bridge_v1` | `docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md` | `docs/SOP/REGION_BET_RISK_EXPRESSION_BRIDGE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json` |
 | `repo_housekeeping_v1` | `docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md` | `docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json` |
 
 Regenerate: `python scripts/generate_chapter_doc_index.py --write` · canon: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)
