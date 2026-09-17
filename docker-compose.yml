@@ -51,12 +51,14 @@ services:
     container_name: msos_web_staging
     environment:
       - PORT=3001
-      - PPE_DISPLAY_API_SERVER_URL=http://ppe_display_api:8765/display.json
+      - PPE_DISPLAY_API_SERVER_URL=http://ppe_display_api_staging:8766/display.json
       - PPE_WEB_FEEDBACK_DIR=/data/staging
       - PPE_PRODUCT_USAGE_DIR=/data/staging
       - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+    depends_on:
+      - ppe_display_api_staging
     volumes:
       - msos_web_staging_data:/data
       - ppe_snapshots:/ppe-snapshots:ro
@@ -105,6 +107,20 @@ services:
     networks:
       - web
 
+  ppe_display_api_staging:
+    profiles: ["staging"]
+    build: .
+    container_name: ppe_display_api_staging
+    command: ["python", "-m", "src.viz.display_payload_server"]
+    environment:
+      - PORT=8766
+      - PPE_DISPLAY_CACHE_ENABLED=1
+      - PPE_DISPLAY_CACHE_TTL_SECONDS=900
+      - PPE_DISPLAY_CACHE_REFRESH_SECONDS=300
+    restart: unless-stopped
+    networks:
+      - web
+
   ppe_display_cache_refresh:
     build: .
     container_name: ppe_display_cache_refresh
@@ -120,6 +136,26 @@ services:
       - PPE_DISPLAY_CACHE_REFRESH_SECONDS=300
     depends_on:
       - ppe_display_api
+    restart: unless-stopped
+    networks:
+      - web
+
+  ppe_display_cache_refresh_staging:
+    profiles: ["staging"]
+    build: .
+    container_name: ppe_display_cache_refresh_staging
+    command:
+      [
+        "python",
+        "scripts/run_display_cache_refresh.py",
+        "--loop",
+        "--base-url",
+        "http://ppe_display_api_staging:8766",
+      ]
+    environment:
+      - PPE_DISPLAY_CACHE_REFRESH_SECONDS=300
+    depends_on:
+      - ppe_display_api_staging
     restart: unless-stopped
     networks:
       - web

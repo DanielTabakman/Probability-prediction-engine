@@ -63,3 +63,60 @@ def test_options_market_read_exact_proxy_preserves_path() -> None:
     display_block = snippets[display_start : snippets.index("@options_market_read")]
     assert "uri strip_prefix /ppe-display-api" in display_block
     assert "reverse_proxy ppe_display_api:8765" in display_block
+
+
+def test_staging_api_exact_routes_precede_staging_shell() -> None:
+    snippets = (REPO_ROOT / "caddy" / "snippets.caddy").read_text(encoding="utf-8")
+    display_matcher = "@staging_ppe_display_api {"
+    options_matcher = "@staging_options_market_read {"
+    shell_matcher = "@staging host staging.marketstructureos.com"
+    assert snippets.index(display_matcher) < snippets.index(shell_matcher)
+    assert snippets.index(options_matcher) < snippets.index(shell_matcher)
+
+    display_block = snippets[
+        snippets.index(display_matcher) : snippets.index(options_matcher)
+    ]
+    assert "host staging.marketstructureos.com" in display_block
+    assert "path /ppe-display-api /ppe-display-api/*" in display_block
+    assert "uri strip_prefix /ppe-display-api" in display_block
+    assert "reverse_proxy ppe_display_api_staging:8766" in display_block
+
+    options_block = snippets[
+        snippets.index(options_matcher) : snippets.index(shell_matcher)
+    ]
+    assert "host staging.marketstructureos.com" in options_block
+    assert "path /v1/options-market-read" in options_block
+    assert "path /v1/*" not in options_block
+    assert "reverse_proxy ppe_display_api_staging:8766" in options_block
+
+
+def test_staging_api_has_separate_process_and_cache() -> None:
+    compose = (REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    assert "container_name: ppe_display_api\n" in compose
+    assert "container_name: ppe_display_api_staging\n" in compose
+    assert "container_name: ppe_display_cache_refresh\n" in compose
+    assert "container_name: ppe_display_cache_refresh_staging\n" in compose
+    assert "PPE_DISPLAY_API_SERVER_URL=http://ppe_display_api_staging:8766/display.json" in compose
+    assert "http://ppe_display_api_staging:8766" in compose
+    assert "PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH" not in compose
+
+
+def test_staging_deploy_recreates_only_staging_api_services() -> None:
+    script = (REPO_ROOT / "scripts" / "vps_deploy_staging.sh").read_text(encoding="utf-8")
+    assert "docker compose --profile staging build ppe_display_api_staging" in script
+    assert "ppe_display_cache_refresh_staging" in script
+    assert "docker compose build app_demo" not in script
+    assert "docker compose build app_full" not in script
+    assert "--force-recreate msos_web app_demo app_full ppe_display_api" not in script
+
+
+def test_staging_workflow_checks_staging_and_production_contracts() -> None:
+    workflow = (REPO_ROOT / ".github" / "workflows" / "deploy-vps-staging.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "https://staging.marketstructureos.com/v1/options-market-read" in workflow
+    assert (
+        "https://staging.marketstructureos.com/ppe-display-api/display.json?asset=BTC&depth=full"
+        in workflow
+    )
+    assert workflow.count("python scripts/options_market_read_uptime.py") == 2

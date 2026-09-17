@@ -8,6 +8,17 @@
 
 Does **not** change `/ppe-display-api/*`. Replaces the earlier `/v1/implied-range` proposal.
 
+## Environments
+
+| Environment | URL | Use |
+|---|---|---|
+| Production | `https://marketstructureos.com/v1/options-market-read` | Stable consumer integration, including Qatom |
+| Isolated staging | `https://staging.marketstructureos.com/v1/options-market-read` | Feature-branch validation before production promotion |
+
+Staging has a separate checkout, API process, refresh process, and in-memory
+cache. It is not a consumer endpoint and may change during development. See
+[`OPTIONS_MARKET_READ_STAGING_PLAN_V1.md`](OPTIONS_MARKET_READ_STAGING_PLAN_V1.md).
+
 ## Query
 
 | Parameter | Required | Rules |
@@ -132,6 +143,7 @@ Production synthetic monitoring rides the existing uptime workflow; see [`OPTION
 This is documentation only. Do not publish to, message, or configure Qatom from this repository without separate authorization.
 
 - **Production URL:** `https://marketstructureos.com/v1/options-market-read`
+- **Do not use for Qatom:** `https://staging.marketstructureos.com/v1/options-market-read` is an unstable engineering environment.
 - **Source payload:** `https://marketstructureos.com/ppe-display-api/display.json?asset=BTC&depth=full`
 - **Query:** `asset` (default BTC) and optional `target_date` (`YYYY-MM-DD`). Omitted `target_date` uses snapshot `as_of` + 30 calendar days.
 - **Supported assets:** BTC only.
