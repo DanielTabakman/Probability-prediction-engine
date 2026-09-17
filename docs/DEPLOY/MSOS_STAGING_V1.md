@@ -81,7 +81,8 @@ bash /opt/marketstructureos-staging/scripts/vps_deploy_staging.sh origin/my-feat
 
 This rebuilds **only** `msos_web_staging`, `ppe_display_api_staging`, and
 `ppe_display_cache_refresh_staging`. Production `msos_web` and
-`ppe_display_api` are not recreated.
+`ppe_display_api` are not recreated. Cache warming is best-effort and capped at
+three minutes so a slow upstream cannot hold the shared deployment lock.
 
 ## Deploy production (unchanged)
 
