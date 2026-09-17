@@ -29,15 +29,17 @@ fi
 
 cd "$STAGING_ROOT"
 git fetch origin
-BRANCH="${REF#origin/}"
+LOCAL_REF="${REF#origin/}"
 if git show-ref --verify --quiet "refs/remotes/${REF}" 2>/dev/null; then
-  git checkout -B "$BRANCH" "$REF"
-elif git show-ref --verify --quiet "refs/heads/${BRANCH}" 2>/dev/null; then
-  git checkout "$BRANCH"
-  git pull --ff-only origin "$BRANCH" 2>/dev/null || true
+  # Deploy the remote commit directly. A detached checkout avoids local ref
+  # namespace collisions such as an existing `staging` branch blocking a
+  # remote `staging/my-feature` branch.
+  git checkout --detach "$REF"
+elif git show-ref --verify --quiet "refs/heads/${LOCAL_REF}" 2>/dev/null; then
+  git checkout --detach "$LOCAL_REF"
 elif [[ "$REF" != "origin/main" ]] && git show-ref --verify --quiet "refs/remotes/origin/main" 2>/dev/null; then
   echo "vps_deploy_staging: ref ${REF} not found — falling back to origin/main" >&2
-  git checkout -B staging origin/main
+  git checkout --detach origin/main
 else
   echo "vps_deploy_staging: ref ${REF} not found" >&2
   exit 1
