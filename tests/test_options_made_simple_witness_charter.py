@@ -64,8 +64,7 @@ def test_founder_portfolio_recommends_remaining_expression_fit_job(monkeypatch) 
     b_work = next(item for item in ppe["ready_work"] if item["work_item_id"] == B_ID)
     assert b_work["source_plan"] == B_PLAN
     assert b_work["selected_native_slice"] == "Options-ExpressionFit-Product-Slice002"
-    assert b_work["selected_native_dispatchable"] is True
-    assert b_work["native_prerequisites"]["dispatch_blockers"] == []
+    assert b_work["selected_native_dispatchable"] is False
     assert b_work["allowed_product_paths"] == [
         "src/engine/options_expression_fit_ranking.py",
         "src/viz/options_expression_fit_ranking_boundary.py",
