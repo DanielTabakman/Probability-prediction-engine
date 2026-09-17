@@ -9,7 +9,6 @@ from scripts.founder_portfolio import collect_portfolio
 
 REPO = Path(__file__).resolve().parents[1]
 A_ID = "options_horizon_comparison_v1"
-B_ID = "options_expression_fit_ranking_v1"
 RB_ID = "region_bet_risk_expression_bridge_v1"
 A_PLAN = "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json"
 B_PLAN = "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json"
