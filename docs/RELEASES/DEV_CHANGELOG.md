@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `f6c42cf9` — Platform: isolated Options Market Read API staging (#5465) (`scripts/`)
+- `f2a4d4a6` — Control-plane: dev changelog
 - `37b84e99` — Control-plane: mark Region Bet risk-expression product complete for closeout. (#5464) (`docs/SOP/`)
 - `a3dad51a` — Control-plane: dev changelog
 - `ca8a8285` — Product: bridge Region Bet risk limits to paper expression-fit ranking (#5463) (`apps/msos-web/`)
