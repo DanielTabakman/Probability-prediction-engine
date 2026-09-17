@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `b5d7526e` — Platform: deploy slash-named staging branches safely (#5467) (`scripts/`)
+- `7240c92a` — Control-plane: dev changelog
 - `529a3f22` — Platform: auto-deploy isolated staging branches (#5466)
 - `bf444d54` — Control-plane: dev changelog
 - `f6c42cf9` — Platform: isolated Options Market Read API staging (#5465) (`scripts/`)
