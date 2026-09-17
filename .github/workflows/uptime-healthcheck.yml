@@ -1,6 +1,6 @@
 # Site probe — homepage every 30 minutes. Options Market Read rides the same
 # workflow so the synthetic API check runs at least hourly and is manually
-# dispatchable. See docs/DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md.
+# dispatchable. See docs/API/OPTIONS_MARKET_READ_UPTIME_V1.md.
 name: Uptime healthcheck
 
 on:

@@ -125,6 +125,8 @@ curl "http://127.0.0.1:8765/v1/options-market-read?asset=BTC&target_date=2026-12
 
 Tests may set `PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH` to a fixture. Production Caddy exposes the exact path `GET /v1/options-market-read` (query preserved, no `/v1/*` wildcard).
 
+Production synthetic monitoring rides the existing uptime workflow; see [`OPTIONS_MARKET_READ_UPTIME_V1.md`](OPTIONS_MARKET_READ_UPTIME_V1.md).
+
 ## Qatom consumer handoff
 
 This is documentation only. Do not publish to, message, or configure Qatom from this repository without separate authorization.
