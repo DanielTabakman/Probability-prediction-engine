@@ -25,7 +25,7 @@ sudo chown -R "${USER}:${USER}" "${STAGING_ROOT}"
 git clone "${REPO_URL}" "${STAGING_ROOT}"
 cd "${STAGING_ROOT}"
 git fetch origin
-git checkout -B staging origin/main
+git checkout --detach origin/main
 if [[ -f "${PROD_ROOT}/.env" ]]; then
   cp "${PROD_ROOT}/.env" .env
   echo "vps_bootstrap_staging: copied .env from ${PROD_ROOT}"
