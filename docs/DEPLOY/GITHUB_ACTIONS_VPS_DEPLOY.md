@@ -20,11 +20,24 @@ We only **throttle the hogs** — everything else stays automated:
 |----------|---------|
 | **CI** | Pull requests + push to `main` |
 | **Deploy VPS** | Every push to `main` (+ manual **Run workflow**) |
-| **Uptime healthcheck** | **Every 30 minutes** (was every 5 — largest minute drain) |
+| **Uptime healthcheck** | **Every 30 minutes** (homepage + Options Market Read synthetic check; manually dispatchable) |
 | **Google Docs sync** / **Dev changelog** | Daily schedule + `main` push (dev changelog) |
 | **Weekly digest** / **Codebase health** | Weekly schedule |
 
 Optional **VPS cron** for uptime if you want zero GitHub runner use for probes (see runbook).
+
+## Options Market Read synthetic check
+
+The same **Uptime healthcheck** workflow also validates production:
+
+- `GET https://marketstructureos.com/v1/options-market-read`
+- `GET https://marketstructureos.com/ppe-display-api/display.json?asset=BTC&depth=full`
+
+It requires HTTP 200 JSON, present schema/ruleset versions, BTC, a nonempty answer, a resolved expiry, `as_of` no older than 25 minutes, finite public metrics, range width = rounded high − rounded low, and agreement with `display.json` after documented public rounding. If cache timestamps differ between the two requests, the pair is retried before failing.
+
+**Alerting:** a failed run is the durable signal (GitHub Actions failure email/UI). This workflow does **not** send ntfy, SMS, or an external webhook. No production-monitor credentials exist in the workflow. A founder/platform choice is still required if phone/push alerting is wanted: either enable GitHub notification routing for this workflow, or add a repository secret for an existing ntfy topic and wire it here. Do not invent a new alert destination in code.
+
+Local/CI validation lives in `scripts/options_market_read_uptime.py` and `tests/test_options_market_read_uptime.py`. This is not a ChatGPT automation.
 
 ## Related
 
