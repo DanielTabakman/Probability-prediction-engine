@@ -83,6 +83,9 @@ This rebuilds **only** `msos_web_staging`, `ppe_display_api_staging`, and
 `ppe_display_cache_refresh_staging`. Production `msos_web` and
 `ppe_display_api` are not recreated. Cache warming is best-effort and capped at
 three minutes so a slow upstream cannot hold the shared deployment lock.
+The second checkout is a disposable deployment mirror: each deploy forces its
+tracked files to the selected ref while preserving ignored runtime files such
+as `.env`. Do not make development edits in `/opt/marketstructureos-staging`.
 
 ## Deploy production (unchanged)
 
