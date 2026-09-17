@@ -22,7 +22,8 @@
     "options_expression_fit_ranking_v1",
     "ppe_deribit_crypto_tier1_v1",
     "ppe_hyperliquid_perp_rail_v1",
-    "ppe_tradeable_universe_v1"
+    "ppe_tradeable_universe_v1",
+    "region_bet_risk_expression_bridge_v1"
   ],
   "docHints": {
     "nextBuildCandidate": {

@@ -58,7 +58,7 @@
       "layerPreset": "MSOS_UI",
       "buildBranch": "build/auto/RegionBet-RiskExpression-Product-Slice002",
       "declaredPlane": "PRODUCT-PLANE",
-      "implementationStatus": "PENDING",
+      "implementationStatus": "COMPLETE",
       "workerMode": "local-agent",
       "susMinutes": 90,
       "hardMinutes": 240,
