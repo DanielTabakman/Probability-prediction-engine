@@ -65,7 +65,13 @@ cp /opt/marketstructureos/.env .env     # optional — research CTA, etc.
 
 ## Deploy staging (operator)
 
-**GitHub Actions (recommended):** Actions → **Deploy VPS Staging** → Run workflow → optional `git_ref` (default `main`).
+**Automatic branch path (recommended):** push a branch whose name begins with
+`staging/`. The workflow deploys that exact branch to the isolated staging
+services. For example, `staging/options-market-read-next` deploys without a
+manual GitHub UI step.
+
+**Manual fallback:** Actions → **Deploy VPS Staging** → Run workflow →
+optional `git_ref` (default `main`).
 
 **SSH on VPS:**
 
@@ -93,8 +99,9 @@ Deploy and uptime workflows fail when the apex homepage serves Streamlit (`stApp
 
 ## Local workflow
 
-1. Branch off `main`, push changes.
-2. Run **Deploy VPS Staging** with your branch name.
+1. Branch off `main` using a `staging/` prefix and push changes.
+2. Wait for **Deploy VPS Staging** to pass for that branch. A manual dispatch
+   with another branch name remains available when needed.
 3. Test at `https://staging.marketstructureos.com`.
 4. Test `https://staging.marketstructureos.com/v1/options-market-read` and its
    staging display payload.
