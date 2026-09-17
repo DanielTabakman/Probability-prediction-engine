@@ -1,11 +1,11 @@
 openapi: 3.1.0
 info:
   title: Options Market Read
-  version: "1.2"
+  version: "1.3"
   description: >
-    GET /v1/options-market-read returns a deterministic plain-English read of
-    what the options market is pricing, including relative uncertainty versus
-    adjacent expiries, from a prepared PPE lognormal snapshot.
+    GET /v1/options-market-read returns a deterministic two-sentence read of
+    what the options market is pricing, with methodology and caveats in
+    disclosures, from a prepared PPE lognormal snapshot.
 servers:
   - url: https://marketstructureos.com
     description: Public preview
@@ -88,14 +88,15 @@ components:
         - data_status
         - metrics
         - interpretation
+        - disclosures
         - answer
       properties:
         schema_version:
           type: string
-          const: "1.2"
+          const: "1.3"
         ruleset_version:
           type: string
-          const: options-market-read.v1.2
+          const: options-market-read.v1.3
         asset:
           type: string
         quote_currency:
@@ -138,8 +139,13 @@ components:
           $ref: "#/components/schemas/MarketReadMetrics"
         interpretation:
           $ref: "#/components/schemas/MarketReadInterpretation"
+        disclosures:
+          $ref: "#/components/schemas/MarketReadDisclosures"
         answer:
           type: string
+          description: >
+            At most two sentences. Sentence 1 is the dated market snapshot.
+            Sentence 2 is relative priced uncertainty with ATM IV evidence.
     MarketReadMetrics:
       type: object
       additionalProperties: false
@@ -299,6 +305,27 @@ components:
         relation:
           type: string
           enum: [target_higher, target_lower, similar]
+    MarketReadDisclosures:
+      type: object
+      additionalProperties: false
+      required:
+        - informational_only
+        - middle_50_range
+        - atm_implied_volatility
+        - source_and_freshness
+      properties:
+        informational_only:
+          type: string
+          const: "This is risk-neutral options pricing, not a forecast or a trade recommendation."
+        middle_50_range:
+          type: string
+          const: "The middle 50% range is the interval from the 25th to the 75th percentile of the priced terminal distribution. Outcomes outside this range remain possible."
+        atm_implied_volatility:
+          type: string
+          const: "Annualized ATM implied volatility measures priced uncertainty. It is not direction and not a literal expected move."
+        source_and_freshness:
+          type: string
+          const: "Figures use the PPE lognormal reference methodology on the shared display payload. as_of is the snapshot build time; data_status cached means the in-process TTL cache was reused."
     ApiError:
       type: object
       additionalProperties: false

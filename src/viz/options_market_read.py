@@ -26,8 +26,8 @@ from src.viz.options_market_read_assets import (
 )
 
 OPTIONS_MARKET_READ_HTTP_PATH = "/v1/options-market-read"
-SCHEMA_VERSION = "1.2"
-RULESET_VERSION = "options-market-read.v1.2"
+SCHEMA_VERSION = "1.3"
+RULESET_VERSION = "options-market-read.v1.3"
 RESOLUTION_EXACT = "exact"
 RESOLUTION_NEAREST_BEFORE = "nearest_before"
 RESOLUTION_NEAREST_AFTER = "nearest_after"
@@ -58,33 +58,24 @@ UNCERTAINTY_UNAVAILABLE = "insufficient_context"
 
 _SNAPSHOT_ENV = "PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH"
 
-ANSWER_TEMPLATE = (
-    "As of {as_of_display}, {asset} spot is {quote_currency} {spot}. "
-    "For options expiring {resolved_expiry_display}, the middle 50% of priced "
-    "terminal outcomes runs from {low} to {high} ({low_percent}% to "
-    "{high_percent}% versus spot), with a median of {median}. ATM implied "
-    "volatility is {iv}% annualized; this measures priced uncertainty, not "
-    "direction. {uncertainty_description} This is "
-    "risk-neutral options pricing, not a forecast or trade recommendation."
-)
-EXPLICIT_BEFORE_PREFIX = (
-    "The requested target date, {effective_target_date_display}, is represented "
-    "by the nearest supported options expiry, {resolved_expiry_display}, "
-    "{absolute_offset} days before the target. "
-)
-EXPLICIT_AFTER_PREFIX = (
-    "The requested target date, {effective_target_date_display}, is represented "
-    "by the nearest supported options expiry, {resolved_expiry_display}, "
-    "{absolute_offset} days after the target. "
-)
-DEFAULT_BEFORE_PREFIX = (
-    "The default 30-day target is represented by the nearest supported options "
-    "expiry, {resolved_expiry_display}, {absolute_offset} days before the target. "
-)
-DEFAULT_AFTER_PREFIX = (
-    "The default 30-day target is represented by the nearest supported options "
-    "expiry, {resolved_expiry_display}, {absolute_offset} days after the target. "
-)
+DISCLOSURES = {
+    "informational_only": (
+        "This is risk-neutral options pricing, not a forecast or a trade recommendation."
+    ),
+    "middle_50_range": (
+        "The middle 50% range is the interval from the 25th to the 75th percentile "
+        "of the priced terminal distribution. Outcomes outside this range remain possible."
+    ),
+    "atm_implied_volatility": (
+        "Annualized ATM implied volatility measures priced uncertainty. It is not "
+        "direction and not a literal expected move."
+    ),
+    "source_and_freshness": (
+        "Figures use the PPE lognormal reference methodology on the shared display "
+        "payload. as_of is the snapshot build time; data_status cached means the "
+        "in-process TTL cache was reused."
+    ),
+}
 
 
 class OptionsMarketReadError(Exception):
@@ -771,12 +762,12 @@ def _uncertainty_rating(
         if pair == (RELATION_TARGET_HIGHER, RELATION_TARGET_LOWER):
             return (
                 UNCERTAINTY_RISING,
-                "Implied volatility rises across the previous, selected, and next expiries.",
+                "Priced uncertainty rises across the previous, selected, and next expiries.",
             )
         if pair == (RELATION_TARGET_LOWER, RELATION_TARGET_HIGHER):
             return (
                 UNCERTAINTY_FALLING,
-                "Implied volatility falls across the previous, selected, and next expiries.",
+                "Priced uncertainty falls across the previous, selected, and next expiries.",
             )
         if pair == (RELATION_SIMILAR, RELATION_SIMILAR):
             return (
@@ -876,6 +867,68 @@ def _price_with_currency(currency: str, value: float) -> str:
     return f"{currency} {_whole_units(value)}"
 
 
+def _one_decimal_percent(value: float) -> str:
+    return f"{float(value):.1f}"
+
+
+def day_gap_phrase(offset_days: int) -> str:
+    count = abs(int(offset_days))
+    unit = "day" if count == 1 else "days"
+    relation = "before" if offset_days < 0 else "after"
+    return f"{count} {unit} {relation} the target"
+
+
+def build_disclosures() -> dict[str, str]:
+    return dict(DISCLOSURES)
+
+
+def _range_clause(
+    *,
+    quote_currency: str,
+    metrics: dict[str, Any],
+    interpretation: dict[str, Any],
+) -> str:
+    mid = metrics["middle_50_range"]
+    range_percent = interpretation["range_vs_spot_percent"]
+    return (
+        f"a median of {_price_with_currency(quote_currency, float(metrics['median_terminal_price']))} "
+        f"with a middle 50% range of {_price_with_currency(quote_currency, float(mid['low_price']))} "
+        f"to {_price_with_currency(quote_currency, float(mid['high_price']))} "
+        f"({float(range_percent['low_percent']):+.1f}% to "
+        f"{float(range_percent['high_percent']):+.1f}% versus spot)"
+    )
+
+
+def _adjacent_iv_clause(uncertainty: dict[str, Any]) -> str:
+    target = uncertainty["target_expiry"]
+    selected = (
+        "selected-expiry ATM implied volatility at "
+        f"{_one_decimal_percent(target['atm_iv_percent'])}% annualized"
+    )
+    clauses: list[str] = []
+    for neighbor in (uncertainty.get("previous_expiry"), uncertainty.get("next_expiry")):
+        if neighbor is None:
+            continue
+        clauses.append(
+            f"{_one_decimal_percent(neighbor['atm_iv_percent'])}% on "
+            f"{_human_date(date.fromisoformat(str(neighbor['expiry'])))}"
+        )
+    if not clauses:
+        return selected.replace(" at ", " is ", 1)
+    if len(clauses) == 1:
+        return f"{selected} versus {clauses[0]}"
+    return f"{selected} versus {clauses[0]} and {clauses[1]}"
+
+
+def _uncertainty_answer_sentence(interpretation: dict[str, Any]) -> str:
+    uncertainty = interpretation["uncertainty_context"]
+    description = str(uncertainty["description"]).rstrip(".")
+    evidence = _adjacent_iv_clause(uncertainty)
+    if uncertainty["rating"] == UNCERTAINTY_UNAVAILABLE:
+        return f"{description}; {evidence}."
+    return f"{description}, with {evidence}."
+
+
 def render_answer(
     *,
     as_of: str,
@@ -889,44 +942,38 @@ def render_answer(
     effective_target_date: str | None = None,
     offset_days: int = 0,
 ) -> str:
-    mid = metrics["middle_50_range"]
-    range_percent = interpretation["range_vs_spot_percent"]
-    uncertainty = interpretation["uncertainty_context"]
     resolved_expiry_display = _human_date(date.fromisoformat(resolved_expiry))
-    body = ANSWER_TEMPLATE.format(
-        as_of_display=humanize_as_of(as_of),
-        asset=asset,
+    spot_clause = (
+        f"As of {humanize_as_of(as_of)}, {asset} spot is {quote_currency} "
+        f"{_whole_units(float(metrics['spot_price']))}"
+    )
+    range_clause = _range_clause(
         quote_currency=quote_currency,
-        spot=_whole_units(float(metrics["spot_price"])),
-        resolved_expiry_display=resolved_expiry_display,
-        median=_price_with_currency(quote_currency, float(metrics["median_terminal_price"])),
-        low=_price_with_currency(quote_currency, float(mid["low_price"])),
-        high=_price_with_currency(quote_currency, float(mid["high_price"])),
-        low_percent=f"{float(range_percent['low_percent']):+.1f}",
-        high_percent=f"{float(range_percent['high_percent']):+.1f}",
-        iv=f"{float(metrics['atm_iv_percent']):.1f}",
-        uncertainty_description=uncertainty["description"],
+        metrics=metrics,
+        interpretation=interpretation,
     )
     if resolution == RESOLUTION_EXACT:
-        return body
-    prefix_kwargs = {
-        "effective_target_date_display": (
+        first = (
+            f"{spot_clause}, and options expiring {resolved_expiry_display} "
+            f"price {range_clause}."
+        )
+    else:
+        target_display = (
             _human_date(date.fromisoformat(effective_target_date))
             if effective_target_date
             else ""
-        ),
-        "resolved_expiry_display": resolved_expiry_display,
-        "absolute_offset": abs(offset_days),
-    }
-    if requested_target_date is None:
-        prefix = (
-            DEFAULT_BEFORE_PREFIX if resolution == RESOLUTION_NEAREST_BEFORE else DEFAULT_AFTER_PREFIX
         )
-    else:
-        prefix = (
-            EXPLICIT_BEFORE_PREFIX if resolution == RESOLUTION_NEAREST_BEFORE else EXPLICIT_AFTER_PREFIX
+        gap = day_gap_phrase(offset_days)
+        if requested_target_date is None:
+            target_label = f"the default 30-day target, {target_display},"
+        else:
+            target_label = f"the requested target date, {target_display},"
+        first = (
+            f"{spot_clause}; {target_label} is represented by the nearest "
+            f"supported options expiry, {resolved_expiry_display}, {gap}, "
+            f"which prices {range_clause}."
         )
-    return prefix.format(**prefix_kwargs) + body
+    return f"{first} {_uncertainty_answer_sentence(interpretation)}"
 
 
 def build_market_read_response(
@@ -1002,6 +1049,7 @@ def build_market_read_response(
         "data_status": DATA_STATUS_CACHED,
         "metrics": public_metrics(metrics),
         "interpretation": interpretation,
+        "disclosures": build_disclosures(),
         "answer": answer,
     }
 

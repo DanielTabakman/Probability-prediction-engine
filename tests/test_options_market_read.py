@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 
@@ -20,9 +21,11 @@ from src.viz.embed_display_boundary import (
 )
 from src.viz.options_market_read import (
     OPTIONS_MARKET_READ_HTTP_PATH,
+    DISCLOSURES,
     OptionsMarketReadError,
     build_interpretation,
     build_market_read_response,
+    day_gap_phrase,
     derived_metrics,
     handle_options_market_read_request,
     humanize_as_of,
@@ -45,13 +48,49 @@ FIXTURE_PATH = (
 )
 
 DEFAULT_ANSWER = (
-    "As of June 6, 2026 at 12:00 PM UTC, BTC spot is USD 100,000. "
-    "For options expiring July 6, 2026, the middle 50% of priced terminal outcomes "
-    "runs from USD 90,000 to USD 120,000 (-10.0% to +20.0% versus spot), with a "
-    "median of USD 102,500. ATM implied volatility is 50.0% annualized; this "
-    "measures priced uncertainty, not direction. Implied volatility rises across "
-    "the previous, selected, and next expiries. This is "
-    "risk-neutral options pricing, not a forecast or trade recommendation."
+    "As of June 6, 2026 at 12:00 PM UTC, BTC spot is USD 100,000, and options "
+    "expiring July 6, 2026 price a median of USD 102,500 with a middle 50% range "
+    "of USD 90,000 to USD 120,000 (-10.0% to +20.0% versus spot). Priced "
+    "uncertainty rises across the previous, selected, and next expiries, with "
+    "selected-expiry ATM implied volatility at 50.0% annualized versus 48.0% on "
+    "June 27, 2026 and 52.0% on September 25, 2026."
+)
+EXACT_DECEMBER_ANSWER = (
+    "As of June 6, 2026 at 12:00 PM UTC, BTC spot is USD 100,000, and options "
+    "expiring December 25, 2026 price a median of USD 108,000 with a middle 50% "
+    "range of USD 80,000 to USD 140,000 (-20.0% to +40.0% versus spot). This "
+    "expiry prices noticeably more movement than the one available neighboring "
+    "expiry, with selected-expiry ATM implied volatility at 55.0% annualized "
+    "versus 52.0% on September 25, 2026."
+)
+REQUESTED_NEAREST_AFTER_ANSWER = (
+    "As of June 6, 2026 at 12:00 PM UTC, BTC spot is USD 100,000; the requested "
+    "target date, July 3, 2026, is represented by the nearest supported options "
+    "expiry, July 6, 2026, 3 days after the target, which prices a median of "
+    "USD 102,500 with a middle 50% range of USD 90,000 to USD 120,000 (-10.0% "
+    "to +20.0% versus spot). Priced uncertainty rises across the previous, "
+    "selected, and next expiries, with selected-expiry ATM implied volatility at "
+    "50.0% annualized versus 48.0% on June 27, 2026 and 52.0% on September 25, "
+    "2026."
+)
+REQUESTED_NEAREST_BEFORE_ANSWER = (
+    "As of June 6, 2026 at 12:00 PM UTC, BTC spot is USD 100,000; the requested "
+    "target date, October 1, 2026, is represented by the nearest supported "
+    "options expiry, September 25, 2026, 6 days before the target, which prices "
+    "a median of USD 104,000 with a middle 50% range of USD 85,000 to USD "
+    "128,000 (-15.0% to +28.0% versus spot). Priced uncertainty rises across "
+    "the previous, selected, and next expiries, with selected-expiry ATM "
+    "implied volatility at 52.0% annualized versus 50.0% on July 6, 2026 and "
+    "55.0% on December 25, 2026."
+)
+DEFAULT_NEAREST_BEFORE_ANSWER = (
+    "As of June 6, 2026 at 12:00 PM UTC, BTC spot is USD 100,000; the default "
+    "30-day target, July 6, 2026, is represented by the nearest supported "
+    "options expiry, July 1, 2026, 5 days before the target, which prices a "
+    "median of USD 102,500 with a middle 50% range of USD 90,000 to USD 120,000 "
+    "(-10.0% to +20.0% versus spot). There is not enough adjacent-expiry data to "
+    "compare this expiry with nearby dates; selected-expiry ATM implied "
+    "volatility is 50.0% annualized."
 )
 
 
@@ -86,8 +125,8 @@ def test_no_argument_defaults_to_btc_and_30_days() -> None:
     assert payload["requested_target_date"] is None
     assert payload["default_horizon_days"] == 30
     assert payload["resolved_expiry"] == "2026-07-06"
-    assert payload["schema_version"] == "1.2"
-    assert payload["ruleset_version"] == "options-market-read.v1.2"
+    assert payload["schema_version"] == "1.3"
+    assert payload["ruleset_version"] == "options-market-read.v1.3"
     assert payload["as_of"] == "2026-06-06T12:00:00Z"
     assert payload["as_of_display"] == "June 6, 2026 at 12:00 PM UTC"
     assert payload["effective_target_date"] == "2026-07-06"
@@ -97,6 +136,10 @@ def test_no_argument_defaults_to_btc_and_30_days() -> None:
     assert payload["distribution_method"] == "lognormal"
     assert payload["data_status"] == "cached"
     assert payload["snapshot_id"] == "omr-fixture-btc-2026-06-06"
+    assert payload["disclosures"] == DISCLOSURES
+    assert payload["answer"] == DEFAULT_ANSWER
+    assert "forecast" not in payload["answer"].lower()
+    assert "recommend" not in payload["answer"].lower()
 
     interpretation = payload["interpretation"]
     assert interpretation["days_to_expiry"] == 30
@@ -148,16 +191,7 @@ def test_exact_expiry_resolution() -> None:
     assert payload["effective_target_date"] == "2026-12-25"
     assert payload["expiry_offset_days"] == 0
     assert payload["expiry_resolution"] == "exact"
-    assert payload["answer"] == (
-        "As of June 6, 2026 at 12:00 PM UTC, BTC spot is USD 100,000. "
-        "For options expiring December 25, 2026, the middle 50% of priced terminal "
-        "outcomes runs from USD 80,000 to USD 140,000 (-20.0% to +40.0% versus "
-        "spot), with a median of USD 108,000. ATM implied volatility is 55.0% "
-        "annualized; this measures priced uncertainty, not direction. This expiry "
-        "prices noticeably more movement than the one available neighboring "
-        "expiry. This is risk-neutral options pricing, not a forecast or trade "
-        "recommendation."
-    )
+    assert payload["answer"] == EXACT_DECEMBER_ANSWER
 
 
 def test_nearest_later_expiry_has_positive_offset() -> None:
@@ -167,10 +201,7 @@ def test_nearest_later_expiry_has_positive_offset() -> None:
     assert payload["resolved_expiry"] == "2026-07-06"
     assert payload["expiry_offset_days"] == 3
     assert payload["expiry_resolution"] == "nearest_after"
-    assert payload["answer"].startswith(
-        "The requested target date, July 3, 2026, is represented by the nearest "
-        "supported options expiry, July 6, 2026, 3 days after the target. "
-    )
+    assert payload["answer"] == REQUESTED_NEAREST_AFTER_ANSWER
 
 
 def test_nearest_earlier_expiry_has_negative_offset() -> None:
@@ -181,10 +212,7 @@ def test_nearest_earlier_expiry_has_negative_offset() -> None:
     assert payload["resolved_expiry"] == "2026-09-25"
     assert payload["expiry_offset_days"] == -6
     assert payload["expiry_resolution"] == "nearest_before"
-    assert payload["answer"].startswith(
-        "The requested target date, October 1, 2026, is represented by the nearest "
-        "supported options expiry, September 25, 2026, 6 days before the target. "
-    )
+    assert payload["answer"] == REQUESTED_NEAREST_BEFORE_ANSWER
 
 
 def test_lowercase_asset_normalization() -> None:
@@ -651,14 +679,51 @@ def _term_structure_snapshot(
 
 
 @pytest.mark.parametrize(
-    ("previous_iv", "target_iv", "next_iv", "expected_rating"),
+    ("previous_iv", "target_iv", "next_iv", "expected_rating", "expected_description"),
     [
-        (28.0, 32.0, 29.0, "higher_than_neighbors"),
-        (35.0, 32.0, 37.0, "lower_than_neighbors"),
-        (30.0, 32.0, 34.0, "rising_across_expiries"),
-        (34.0, 32.0, 30.0, "falling_across_expiries"),
-        (31.5, 32.0, 32.5, "similar_to_neighbors"),
-        (31.5, 32.0, 34.0, "mixed_or_flat"),
+        (
+            28.0,
+            32.0,
+            29.0,
+            "higher_than_neighbors",
+            "This expiry prices noticeably more movement than both neighboring expiries.",
+        ),
+        (
+            35.0,
+            32.0,
+            37.0,
+            "lower_than_neighbors",
+            "This expiry prices noticeably less movement than both neighboring expiries.",
+        ),
+        (
+            30.0,
+            32.0,
+            34.0,
+            "rising_across_expiries",
+            "Priced uncertainty rises across the previous, selected, and next expiries.",
+        ),
+        (
+            34.0,
+            32.0,
+            30.0,
+            "falling_across_expiries",
+            "Priced uncertainty falls across the previous, selected, and next expiries.",
+        ),
+        (
+            31.5,
+            32.0,
+            32.5,
+            "similar_to_neighbors",
+            "This expiry prices about the same movement as both neighboring expiries.",
+        ),
+        (
+            31.5,
+            32.0,
+            34.0,
+            "mixed_or_flat",
+            "This expiry prices about the same movement as the previous expiry "
+            "and noticeably less than the next expiry.",
+        ),
     ],
 )
 def test_adjacent_expiry_uncertainty_ratings(
@@ -666,20 +731,23 @@ def test_adjacent_expiry_uncertainty_ratings(
     target_iv: float,
     next_iv: float,
     expected_rating: str,
+    expected_description: str,
 ) -> None:
     snapshot = _term_structure_snapshot(previous_iv, target_iv, next_iv)
     status, payload = _request("target_date=2026-07-01", snapshot=snapshot)
     assert status == "200 OK"
     uncertainty = payload["interpretation"]["uncertainty_context"]
     assert uncertainty["rating"] == expected_rating
+    assert uncertainty["description"] == expected_description
     assert uncertainty["target_expiry"]["atm_iv_percent"] == target_iv
     assert uncertainty["previous_expiry"]["atm_iv_percent"] == previous_iv
     assert uncertainty["next_expiry"]["atm_iv_percent"] == next_iv
-    if expected_rating == "mixed_or_flat":
-        assert uncertainty["description"] == (
-            "This expiry prices about the same movement as the previous expiry "
-            "and noticeably less than the next expiry."
-        )
+    assert expected_description.rstrip(".") in payload["answer"]
+    assert f"{target_iv:.1f}% annualized" in payload["answer"]
+    assert f"{previous_iv:.1f}% on June 20, 2026" in payload["answer"]
+    assert f"{next_iv:.1f}% on July 20, 2026" in payload["answer"]
+    assert payload["answer"].count(". ") == 1
+    assert payload["disclosures"] == DISCLOSURES
 
 
 def test_single_expiry_returns_honest_insufficient_context() -> None:
@@ -691,6 +759,7 @@ def test_single_expiry_returns_honest_insufficient_context() -> None:
     assert uncertainty["previous_expiry"] is None
     assert uncertainty["next_expiry"] is None
     assert "not enough adjacent-expiry data" in payload["answer"]
+    assert "selected-expiry ATM implied volatility is 50.0% annualized" in payload["answer"]
 
 
 def test_equal_distance_tie_selects_later_expiry() -> None:
@@ -750,7 +819,115 @@ def test_default_horizon_discloses_nearest_expiry() -> None:
     assert payload["resolved_expiry"] == "2026-07-01"
     assert payload["expiry_offset_days"] == -5
     assert payload["expiry_resolution"] == "nearest_before"
-    assert payload["answer"].startswith(
-        "The default 30-day target is represented by the nearest supported "
-        "options expiry, July 1, 2026, 5 days before the target. "
+    assert payload["answer"] == DEFAULT_NEAREST_BEFORE_ANSWER
+
+
+def test_singular_and_plural_day_gap_wording() -> None:
+    assert day_gap_phrase(1) == "1 day after the target"
+    assert day_gap_phrase(-1) == "1 day before the target"
+    assert day_gap_phrase(3) == "3 days after the target"
+    assert day_gap_phrase(-6) == "6 days before the target"
+    snapshot = _dated_snapshot(["2026-06-21"])
+    status, payload = _request("target_date=2026-06-20", snapshot=snapshot)
+    assert status == "200 OK"
+    assert payload["expiry_offset_days"] == 1
+    assert "1 day after the target" in payload["answer"]
+    assert "1 days after the target" not in payload["answer"]
+    earlier = _dated_snapshot(["2026-06-21"])
+    status, payload = _request("target_date=2026-06-22", snapshot=earlier)
+    assert status == "200 OK"
+    assert payload["expiry_offset_days"] == -1
+    assert "1 day before the target" in payload["answer"]
+
+
+def test_one_adjacent_expiry_is_named_in_answer() -> None:
+    snapshot = snapshot_from_payload(
+        {
+            "as_of": "2026-06-06T12:00:00Z",
+            "asset": "BTC",
+            "quote_currency": "USD",
+            "snapshot_id": "omr-one-neighbor",
+            "expiries": [
+                {
+                    "expiry_date": "2026-07-01",
+                    "spot_usd": 100000.0,
+                    "forward_usd": 101000.0,
+                    "atm_iv_annual": 0.32,
+                    "q25_usd": 90000.0,
+                    "q50_usd": 102500.0,
+                    "q75_usd": 120000.0,
+                },
+                {
+                    "expiry_date": "2026-07-20",
+                    "spot_usd": 100000.0,
+                    "forward_usd": 101000.0,
+                    "atm_iv_annual": 0.36,
+                    "q25_usd": 90000.0,
+                    "q50_usd": 102500.0,
+                    "q75_usd": 120000.0,
+                },
+            ],
+        }
     )
+    status, payload = _request("target_date=2026-07-01", snapshot=snapshot)
+    assert status == "200 OK"
+    uncertainty = payload["interpretation"]["uncertainty_context"]
+    assert uncertainty["previous_expiry"] is None
+    assert uncertainty["next_expiry"]["expiry"] == "2026-07-20"
+    assert uncertainty["rating"] == "lower_than_available_neighbor"
+    assert payload["answer"] == (
+        "As of June 6, 2026 at 12:00 PM UTC, BTC spot is USD 100,000, and options "
+        "expiring July 1, 2026 price a median of USD 102,500 with a middle 50% "
+        "range of USD 90,000 to USD 120,000 (-10.0% to +20.0% versus spot). This "
+        "expiry prices noticeably less movement than the one available neighboring "
+        "expiry, with selected-expiry ATM implied volatility at 32.0% annualized "
+        "versus 36.0% on July 20, 2026."
+    )
+
+
+def test_disclosures_stay_out_of_the_answer() -> None:
+    status, payload = _request("")
+    assert status == "200 OK"
+    assert payload["disclosures"] == DISCLOSURES
+    assert payload["disclosures"]["informational_only"].startswith("This is risk-neutral")
+    assert "outside this range remain possible" in payload["disclosures"]["middle_50_range"]
+    assert "literal expected move" in payload["disclosures"]["atm_implied_volatility"]
+    assert "lognormal reference" in payload["disclosures"]["source_and_freshness"]
+    assert "shared display payload" in payload["disclosures"]["source_and_freshness"]
+    assert "snapshot build time" in payload["disclosures"]["source_and_freshness"]
+    assert "TTL cache" in payload["disclosures"]["source_and_freshness"]
+    assert "risk-neutral options pricing" not in payload["answer"]
+    assert "literal expected move" not in payload["answer"]
+
+
+def test_snapshot_asset_mismatch_is_503() -> None:
+    spec = resolve_market_read_asset("BTC")
+    snapshot = snapshot_from_payload(
+        {
+            "as_of": "2026-06-06T12:00:00Z",
+            "asset": "BTC",
+            "quote_currency": "USD",
+            "snapshot_id": "omr-identity-mismatch",
+            "expiries": [
+                {
+                    "expiry_date": "2026-07-06",
+                    "spot_usd": 100000.0,
+                    "forward_usd": 101000.0,
+                    "atm_iv_annual": 0.5,
+                    "q25_usd": 90000.0,
+                    "q50_usd": 102500.0,
+                    "q75_usd": 120000.0,
+                }
+            ],
+        }
+    )
+    with pytest.raises(OptionsMarketReadError) as exc:
+        build_market_read_response(
+            spec=spec,
+            requested_target_date=None,
+            target_date=None,
+            snapshot=replace(snapshot, asset="SOL"),
+        )
+    assert exc.value.status == 503
+    assert exc.value.details["asset"] == "SOL"
+    assert exc.value.details["expected"] == "BTC"
