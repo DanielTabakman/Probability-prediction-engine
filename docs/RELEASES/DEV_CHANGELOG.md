@@ -4,12 +4,14 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `af5f4ffe` — Control-plane: dev changelog
 - `b3a72c74` — Control-plane: dev changelog
 - `120046d1` — Control-plane: dev changelog
 - `12778528` — Control-plane: dev changelog
 
 ## 2026-09-16
 
+- `2191a935` — Control-plane: queue Region Bet risk-to-expression bridge (#5462) (`docs/SOP/`)
 - `fdf7dc6d` — Merge pull request #5461 from DanielTabakman/docs/options-market-read-api-staging-plan
 - `5bfe40d3` — Merge pull request #5460 from DanielTabakman/feat/options-market-read-uptime-v1
 - `01d43ee1` — Docs: bounded plan for isolated Options Market Read API staging
