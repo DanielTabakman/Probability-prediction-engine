@@ -38,6 +38,7 @@ export type RegionBetContract = {
     max_loss_usd?: number;
     max_premium_usd?: number;
     position_size_usd?: number;
+    payoff_preference?: string;
     notes?: string;
   };
   selected_expression_ref: {
@@ -154,6 +155,7 @@ export function isRegionBetContract(value: unknown): value is RegionBetContract 
     isOptionalFiniteNumber(riskRow.max_loss_usd) &&
     isOptionalFiniteNumber(riskRow.max_premium_usd) &&
     isOptionalFiniteNumber(riskRow.position_size_usd) &&
+    isOptionalString(riskRow.payoff_preference) &&
     isOptionalString(riskRow.notes) &&
     expressionRefValid &&
     isRegionBetStatus(lifecycleRow.status) &&
