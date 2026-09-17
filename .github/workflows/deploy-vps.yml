@@ -16,13 +16,14 @@ on:
         required: false
         type: string
 
-concurrency:
-  group: deploy-vps
-  cancel-in-progress: true
-
 jobs:
   vps-deploy:
     name: VPS deploy
+    # Serialize only the production mutation/health gate. Optional witnesses run
+    # after the lock is released and cannot block an isolated staging deploy.
+    concurrency:
+      group: deploy-vps
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     env:
       PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}

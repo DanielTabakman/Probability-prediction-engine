@@ -86,6 +86,8 @@ three minutes so a slow upstream cannot hold the shared deployment lock.
 The second checkout is a disposable deployment mirror: each deploy forces its
 tracked files to the selected ref while preserving ignored runtime files such
 as `.env`. Do not make development edits in `/opt/marketstructureos-staging`.
+Only the production and staging mutation/health jobs share the lock; optional
+post-deploy production witnesses do not block staging.
 
 ## Deploy production (unchanged)
 
