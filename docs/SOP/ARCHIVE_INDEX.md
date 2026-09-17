@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-09-16T03:37:25Z · **Archived chapters:** 67
+**Generated:** 2026-09-17T03:47:50Z · **Archived chapters:** 68
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -57,6 +57,7 @@
 | `mvp1_snapshot_owner_v1` | `docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md` | `docs/SOP/MVP1_SNAPSHOT_OWNER_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json` |
 | `mvp1_sprint003_evidence_plane` | `docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json` |
 | `mvp1_steering_sync_evidence` | `docs/SOP/MVP1_FRONTIER.md` | `docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_steering_sync_evidence_relay.json` |
+| `options_expression_fit_ranking_v1` | `docs/SOP/POST_OPTIONS_EXPRESSION_FIT_RANKING_V1_SELECTION.md` | `docs/SOP/OPTIONS_EXPRESSION_FIT_RANKING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json` |
 | `options_horizon_comparison_v1` | `docs/SOP/POST_OPTIONS_HORIZON_COMPARISON_V1_SELECTION.md` | `docs/SOP/OPTIONS_HORIZON_COMPARISON_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json` |
 | `phase3_commercial_wrapper` | `docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md` | `docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/phase3_commercial_wrapper_relay.json` |
 | `ppe_asset_display_parity_v1` | `docs/SOP/POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md` | `docs/SOP/PPE_ASSET_DISPLAY_PARITY_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json` |
