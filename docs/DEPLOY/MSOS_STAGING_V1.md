@@ -57,7 +57,7 @@ sudo mkdir -p /opt/marketstructureos-staging
 sudo chown -R $USER:$USER /opt/marketstructureos-staging
 git clone https://github.com/<org>/Probability-prediction-engine.git /opt/marketstructureos-staging
 cd /opt/marketstructureos-staging
-git checkout -b staging origin/main   # or track your staging branch
+git checkout --detach origin/main       # deploy script selects an exact remote ref
 cp /opt/marketstructureos/.env .env     # optional — research CTA, etc.
 ```
 
