@@ -37,13 +37,13 @@ does not mean a synthetic or private market-data feed.
 
 ## Deployment and promotion
 
-1. Push a feature branch.
-2. Dispatch **Deploy VPS Staging** with `git_ref` set to that branch.
-3. The workflow deploys only the staging shell/API/cache-refresh services.
-4. It validates the staging shell and runs the full Options Market Read/display
+1. Push a feature branch under `staging/**` to deploy it automatically, or
+   manually dispatch **Deploy VPS Staging** with `git_ref` set to another branch.
+2. The workflow deploys only the staging shell/API/cache-refresh services.
+3. It validates the staging shell and runs the full Options Market Read/display
    agreement check against staging.
-5. It then verifies production is still healthy.
-6. Merge only after staging passes. The normal production workflow remains the
+4. It then verifies production is still healthy.
+5. Merge only after staging passes. The normal production workflow remains the
    production promotion path.
 
 The deployment workflow shares the existing `deploy-vps` concurrency group, so

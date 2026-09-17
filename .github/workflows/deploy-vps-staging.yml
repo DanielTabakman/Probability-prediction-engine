@@ -4,6 +4,9 @@
 name: Deploy VPS Staging
 
 on:
+  push:
+    branches:
+      - "staging/**"
   workflow_dispatch:
     inputs:
       git_ref:
@@ -21,13 +24,15 @@ on:
 
 concurrency:
   group: deploy-vps
-  cancel-in-progress: true
+  # A staging push must never cancel a production deploy already holding this lock.
+  # A newer production deploy may still pre-empt staging from deploy-vps.yml.
+  cancel-in-progress: false
 
 jobs:
   ensure-staging-dns:
     name: Staging DNS (optional)
     runs-on: ubuntu-latest
-    if: inputs.ensure_dns == 'true'
+    if: github.event_name == 'workflow_dispatch' && inputs.ensure_dns == 'true'
     continue-on-error: true
     steps:
       - name: Checkout
@@ -62,7 +67,7 @@ jobs:
           PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
           PPE_RESEARCH_OFFER_EMAIL: ${{ secrets.PPE_RESEARCH_OFFER_EMAIL }}
           PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
-          GIT_REF: ${{ inputs.git_ref }}
+          GIT_REF: ${{ github.event_name == 'push' && github.ref_name || inputs.git_ref }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}

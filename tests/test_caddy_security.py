@@ -120,3 +120,7 @@ def test_staging_workflow_checks_staging_and_production_contracts() -> None:
         in workflow
     )
     assert workflow.count("python scripts/options_market_read_uptime.py") == 2
+    assert 'branches:\n      - "staging/**"' in workflow
+    assert "github.event_name == 'push' && github.ref_name || inputs.git_ref" in workflow
+    assert "group: deploy-vps\n  # A staging push must never cancel a production deploy" in workflow
+    assert "cancel-in-progress: false" in workflow
