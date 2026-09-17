@@ -1,5 +1,5 @@
 {
-  "last_main_sha": "d08c2fca2f7b5822d40e9bb4fe6166c888aac214",
+  "last_main_sha": "72f784ff7e048876c901df73fef1f814279e6a1e",
   "recorded_events": [
     "chapter_closed:MVP1-DistStatsLeg-Closeout-Slice005",
     "chapter_closed:MSOS-DistDemo-Closeout-Slice005",
@@ -1651,6 +1651,9 @@
     "56ccef8efc04d71d7c2de495205beaeebb68b6c0",
     "bc946fa788a430231be04b90256a6477cc63b91f",
     "e18fd10147ac6797636eeae39bbf032e7bf38eaf",
-    "d08c2fca2f7b5822d40e9bb4fe6166c888aac214"
+    "d08c2fca2f7b5822d40e9bb4fe6166c888aac214",
+    "1277852895525fc5bf33b0545e1a4679098c1370",
+    "4e58ace657c32f1ea63af8e736a1e73e50771ff8",
+    "72f784ff7e048876c901df73fef1f814279e6a1e"
   ]
 }

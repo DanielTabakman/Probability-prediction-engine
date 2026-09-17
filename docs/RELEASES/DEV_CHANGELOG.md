@@ -2,8 +2,14 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-17
+
+- `12778528` — Control-plane: dev changelog
+
 ## 2026-09-16
 
+- `72f784ff` — Merge pull request #5458 from DanielTabakman/fix/expression-fit-charter-dispatchable
+- `4e58ace6` — Control-plane: align expression-fit charter test with native dispatchability
 - `d08c2fca` — Control-plane: mark Options Expression Fit product complete for closeout (#5457) (`docs/SOP/`)
 - `e18fd101` — Control-plane: dev changelog
 - `bc946fa7` — Control: charter Region Bet backlog continuation (#5456) (`docs/SOP/`)
