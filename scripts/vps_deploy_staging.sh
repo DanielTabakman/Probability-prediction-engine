@@ -74,10 +74,10 @@ docker compose --profile staging up -d --force-recreate \
   msos_web_staging
 
 echo "Warming isolated staging display cache…"
-docker compose --profile staging exec -T ppe_display_api_staging \
+timeout 180s docker compose --profile staging exec -T ppe_display_api_staging \
   python scripts/warm_display_payload_cache.py \
   --base-url http://127.0.0.1:8766 \
-  || echo "staging display cache warm failed (non-fatal; first request may be slow)"
+  || echo "staging display cache warm failed or timed out after 180s (non-fatal; first request may be slow)"
 
 # Reload shared Caddy routes (avoid --force-recreate — races production deploy on :80).
 if [[ -d "$PROD_ROOT" && "$PROD_ROOT" != "$STAGING_ROOT" ]]; then

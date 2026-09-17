@@ -61,10 +61,10 @@ jobs:
             docker compose up -d caddy
             bash scripts/vps_post_deploy_telemetry.sh || echo "vps_post_deploy_telemetry skipped (non-fatal)"
             echo "Warming display payload cache for enabled assets…"
-            docker compose exec -T ppe_display_api \
+            timeout 180s docker compose exec -T ppe_display_api \
               python scripts/warm_display_payload_cache.py \
               --base-url http://127.0.0.1:8765 \
-              || echo "display cache warm failed (non-fatal; first user hit may be slow)"
+              || echo "display cache warm failed or timed out after 180s (non-fatal; first user hit may be slow)"
 
       - name: Demo site health (no import traceback)
         run: |

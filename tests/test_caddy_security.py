@@ -107,9 +107,18 @@ def test_staging_deploy_recreates_only_staging_api_services() -> None:
     assert "ppe_display_cache_refresh_staging" in script
     assert 'git checkout --detach "$REF"' in script
     assert 'git checkout -B "$BRANCH" "$REF"' not in script
+    assert "timeout 180s docker compose --profile staging exec" in script
     assert "docker compose build app_demo" not in script
     assert "docker compose build app_full" not in script
     assert "--force-recreate msos_web app_demo app_full ppe_display_api" not in script
+
+
+def test_production_deploy_bounds_noncritical_cache_warm() -> None:
+    workflow = (REPO_ROOT / ".github" / "workflows" / "deploy-vps.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "timeout 180s docker compose exec -T ppe_display_api" in workflow
+    assert "timed out after 180s (non-fatal" in workflow
 
 
 def test_staging_bootstrap_uses_detached_checkout() -> None:
