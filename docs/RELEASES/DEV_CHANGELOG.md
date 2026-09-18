@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-18
 
+- `2ec2bbea` — Control-plane: dev changelog
 - `b7f0f9ed` — RegionBet-MonitorValue-Product-Slice002: show honest then/now underlying vs paper-expression on Monitor (PRODUCT-PLANE) (#5478) (`apps/msos-web/`)
 - `7179ea4e` — Control-plane: dev changelog
 - `60ec0b7e` — Control-plane: dev changelog
