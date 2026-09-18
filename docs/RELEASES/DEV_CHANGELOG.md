@@ -4,10 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-18
 
+- `1dbc71d7` — Control-plane: dev changelog
 - `745d8b87` — Control-plane: dev changelog
 
 ## 2026-09-17
 
+- `165dde1f` — Security: update MSOS Next.js dependency chain (#5476) (`apps/msos-web/`)
 - `cc93fd6b` — RegionBet-PayoffSave-Product-Slice002: confirm paper payoff and freeze entry snapshot (PRODUCT-PLANE) (#5475) (`apps/msos-web/`)
 - `f9d44bf0` — Control-plane: close out order 09 and queue payoff/save. (#5472) (`docs/SOP/`)
 - `07a17a8c` — Control-plane: dev changelog
