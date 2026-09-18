@@ -5,6 +5,7 @@ import { MonitorDeleteNotice } from "@/components/MonitorDeleteNotice";
 import { MonitorWatchList } from "@/components/MonitorWatchList";
 import { MonitorWelcomeCard } from "@/components/MonitorWelcomeCard";
 import { MonitorEmptyState } from "@/components/MonitorEmptyState";
+import { RegionBetMonitorCard } from "@/components/RegionBetMonitorCard";
 import { loadCommandCenterSummary } from "@/lib/commandCenterSummary";
 import type { MonitorFeed, MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
 import { resolveWorkflowOwnerId } from "@/lib/msosWorkflowOwner";
@@ -83,6 +84,8 @@ export async function MonitorContent({ feed }: Props) {
           </p>
         ) : null}
 
+        {feed.regionBetMonitor ? <RegionBetMonitorCard value={feed.regionBetMonitor} /> : null}
+
         <div className="monitor-summary" aria-label="Watch status">
           <span className="monitor-summary-label">{feed.healthLabel}</span>
           <div
@@ -129,7 +132,7 @@ export async function MonitorContent({ feed }: Props) {
           </div>
         ) : null}
 
-        {feed.paperTrades.length === 0 && feed.status !== "degraded" ? (
+        {feed.paperTrades.length === 0 && !feed.regionBetMonitor && feed.status !== "degraded" ? (
           <MonitorEmptyState assetTicker={feed.assetTicker} />
         ) : null}
 
