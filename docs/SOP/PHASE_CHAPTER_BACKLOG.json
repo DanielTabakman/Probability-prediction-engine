@@ -879,10 +879,10 @@
     },
     {
       "chapterId": "region_bet_payoff_save_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 10. Expression → payoff/scenarios → confirmation → persisted monitorable Region Bet with frozen entry snapshot. Paper-first; no live execution. Reuse the #5463 selected-expression draft; do not rebuild order 09.",
+      "reason": "[DONE] Catalog order 10 merged as PPE PR #5475 (cc93fd6b); payoff/save on main. Closeout recorded; do not rebuild. Stale Autobuilder draft #5473 is superseded. Next chapter 11 is READY for JIT catalog.",
       "autobuilderCatalogOrder": 10,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -899,17 +899,19 @@
     },
     {
       "chapterId": "region_bet_monitor_value_v1",
-      "status": "blocked",
+      "status": "ready",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH BLOCKED] Autobuilder intent order 11. Monitor teaches underlying-right vs expression-money with then/now metrics and plain-English drivers. Reuse Monitor/History. Dependency: region_bet_payoff_save_v1.",
+      "reason": "[HIGH READY] Autobuilder order 11. Monitor teaches underlying-right vs expression-money with then/now metrics and plain-English drivers. Reuse Monitor/History and the #5475 saved Region Bet; do not rebuild order 10.",
       "autobuilderCatalogOrder": 11,
-      "eligibility": "blocked_until_predecessor_terminal",
+      "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "region_bet_payoff_save_v1"
       ],
       "packetization": "just_in_time",
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_REGION_BET_MONITOR_VALUE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_REGION_BET_MONITOR_VALUE_V1.md",
       "autobuilderMergeAuthority": {
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-16T03:19:31+00:00"

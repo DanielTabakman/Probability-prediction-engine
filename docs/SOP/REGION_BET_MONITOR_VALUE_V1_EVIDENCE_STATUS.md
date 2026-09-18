@@ -1,0 +1,29 @@
+# Region Bet monitor value v1 — evidence status
+
+## Status
+
+CHARTERED. Ready for Autobuilder catalog order 11 after terminal order 10 (#5475).
+
+## COORDINATION STATUS
+
+| Slice | Status | Evidence |
+| --- | --- | --- |
+| `RegionBet-MonitorValue-Control-Slice001` | COMPLETE | Founder-approved charter, queue entry, phase plan, and selection record for Autobuilder catalog order 11. |
+| `RegionBet-MonitorValue-Product-Slice002` | PENDING | Then/now underlying vs paper-expression value on Monitor. |
+| `RegionBet-MonitorValue-Closeout-Slice003` | PENDING | Awaiting product merge. |
+
+## Owns
+
+Honest then-versus-now underlying and paper-expression value context on Monitor, using the existing feed and owner-scoped Region Bet record.
+
+## Does not own
+
+Payoff/save persistence (#5475), manage/adjust, learning closeout, live execution, or Autobuilder runtime authority.
+
+## Dependency
+
+Requires terminal `region_bet_payoff_save_v1` on product main (PR #5475). Satisfied.
+
+## Notes
+
+Product paths stay bounded to `docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json`.
