@@ -8,6 +8,10 @@ surfaces:
 - Probability Prediction Engine (PPE)
 - Market Structure OS (MSOS)
 
+Owned MSOS surfaces include the Options Market Read API and its human-facing
+console. The console is an adapter over PPE's documented JSON contract; it does
+not host or proxy Qatom or another consumer application.
+
 It is not a general-purpose host for Daniel's other products, prototypes, or
 collaborators' applications.
 

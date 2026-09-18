@@ -28,6 +28,14 @@ def test_unknown_top_level_route_is_rejected(tmp_path: Path) -> None:
     ]
 
 
+def test_options_market_read_is_an_owned_msos_route(tmp_path: Path) -> None:
+    repo = _minimal_repo(tmp_path)
+    route = repo / "apps/msos-web/src/app/options-market-read"
+    route.mkdir()
+
+    assert find_violations(repo) == []
+
+
 @pytest.mark.parametrize(
     ("relative_path", "content", "expected_fragment"),
     [

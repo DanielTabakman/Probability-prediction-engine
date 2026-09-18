@@ -11,6 +11,13 @@ checks pass for the deployed revision.
 | Production | `https://marketstructureos.com/v1/options-market-read` | `https://marketstructureos.com/ppe-display-api/display.json?asset=BTC&depth=full` |
 | Staging | `https://staging.marketstructureos.com/v1/options-market-read` | `https://staging.marketstructureos.com/ppe-display-api/display.json?asset=BTC&depth=full` |
 
+Staging also exposes a human testing console at
+`https://staging.marketstructureos.com/options-market-read`, user help at
+`/options-market-read/help`, and machine-readable integration help at
+`/options-market-read/api-help`. The console accepts a bounded set of ordinary
+date phrases and always shows the ISO target and resolved listed expiry. It is
+an adapter over the unchanged JSON API, not a second market-analysis pipeline.
+
 Qatom and other consumers use production. Staging is an unstable engineering
 surface and may run feature-branch code.
 
@@ -25,6 +32,8 @@ surface and may run feature-branch code.
 - `PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH` remains test-only and is not set in
   compose.
 - The staging Next.js shell reads from `ppe_display_api_staging`, not production.
+- The staging human console calls the same-origin staging API and never falls
+  back to the production endpoint.
 - Caddy routes only the two documented staging API path families to the staging
   process, before the staging-shell catch-all. Production routes remain pointed
   at `ppe_display_api`.

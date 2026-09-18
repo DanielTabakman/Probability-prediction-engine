@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test:options-market-read": "node --no-warnings --experimental-strip-types --test tests/optionsMarketReadQuery.test.mjs",
     "start": "next start",
     "lint": "next lint"
   },
