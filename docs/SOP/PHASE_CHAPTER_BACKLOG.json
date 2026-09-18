@@ -845,10 +845,10 @@
     },
     {
       "chapterId": "region_bet_risk_expression_bridge_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 09. Connect simple Region Bet risk constraints to understandable expression choices (safer or more likely, best fit, higher payout or convexity). Reuse the expression-fit primitives merged by #5454; do not rebuild stale draft #5428.",
+      "reason": "[DONE] Catalog order 09 merged as PPE PR #5463 (ca8a8285); risk-to-expression bridge on main. Closeout recorded; do not rebuild. Next chapter 10 is READY for JIT catalog.",
       "autobuilderCatalogOrder": 9,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -879,17 +879,19 @@
     },
     {
       "chapterId": "region_bet_payoff_save_v1",
-      "status": "blocked",
+      "status": "ready",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH BLOCKED] Autobuilder intent order 10. Expression → payoff/scenarios → confirmation → persisted monitorable Region Bet with frozen entry snapshot. Paper-first; no live execution. Dependency: region_bet_risk_expression_bridge_v1. JIT packetize after 09 terminal.",
+      "reason": "[HIGH READY] Autobuilder order 10. Expression → payoff/scenarios → confirmation → persisted monitorable Region Bet with frozen entry snapshot. Paper-first; no live execution. Reuse the #5463 selected-expression draft; do not rebuild order 09.",
       "autobuilderCatalogOrder": 10,
-      "eligibility": "blocked_until_predecessor_terminal",
+      "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "region_bet_risk_expression_bridge_v1"
       ],
       "packetization": "just_in_time",
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_REGION_BET_PAYOFF_SAVE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_REGION_BET_PAYOFF_SAVE_V1.md",
       "autobuilderMergeAuthority": {
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-16T03:19:31+00:00"

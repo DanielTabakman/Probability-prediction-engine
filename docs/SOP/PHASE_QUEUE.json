@@ -587,9 +587,19 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Autobuilder catalog order 09: Region Bet risk-to-expression bridge; reuse #5454 expression-fit primitives after terminal orders 06-08.",
       "selectionPrep": "docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md",
+      "founderPriority": "HIGH",
+      "workerMode": "local-agent",
+      "focusPlaybookTier": "P1",
+      "doneReason": "marked DONE after product merge #5463 (ca8a8285); closeout only, do not rebuild"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json",
+      "status": "READY",
+      "reason": "[HIGH] Autobuilder catalog order 10: Region Bet payoff/save after terminal 09 (#5463).",
+      "selectionPrep": "docs/SOP/POST_REGION_BET_PAYOFF_SAVE_V1_SELECTION.md",
       "founderPriority": "HIGH",
       "workerMode": "local-agent",
       "focusPlaybookTier": "P1"

@@ -2,7 +2,7 @@
 
 ## Status
 
-CHARTERED. Product is on `main` via PR #5463. Remaining work is closeout only â€” do not re-BUILD product.
+COMPLETE. Product is on `main` via PR #5463 (`ca8a8285`). Closeout recorded; do not re-BUILD product.
 
 ## COORDINATION STATUS
 
@@ -10,7 +10,7 @@ CHARTERED. Product is on `main` via PR #5463. Remaining work is closeout only â€
 | --- | --- | --- |
 | `RegionBet-RiskExpression-Control-Slice001` | COMPLETE | Founder-approved charter, queue entry, phase plan, and selection record for Autobuilder catalog order 09. |
 | `RegionBet-RiskExpression-Product-Slice002` | COMPLETE | Region Bet risk-to-expression bridge shipped in #5463 (`ca8a8285`). |
-| `RegionBet-RiskExpression-Closeout-Slice003` | PENDING | Awaiting closeout. |
+| `RegionBet-RiskExpression-Closeout-Slice003` | COMPLETE | Chapter closed after #5463 / #5464; next Autobuilder catalog order is 10. |
 
 ## Owns
 
@@ -26,4 +26,4 @@ Requires terminal `region_bet_market_compare_bridge_v1` on product main (PR #544
 
 ## Notes
 
-Product paths stay bounded to `docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json`. This update only records that Slice002 is already on `main`.
+Product paths stay bounded to `docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json`. Do not catalog or rebuild this chapter.

@@ -16,4 +16,4 @@ This selection authorizes only the risk-to-expression bridge listed in `docs/SOP
 
 ## Order
 
-Catalog order 9 follows order 8. Items 10–17 stay intent-only until JIT packetization against then-current `main` after this chapter is terminal.
+Catalog order 9 follows order 8 and is now terminal on `main` (PR #5463). Item 10 is the next JIT packet. Items 11–17 stay intent-only until 10 is terminal.
