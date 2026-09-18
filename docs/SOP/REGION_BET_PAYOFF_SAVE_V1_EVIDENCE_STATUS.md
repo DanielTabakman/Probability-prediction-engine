@@ -2,15 +2,15 @@
 
 ## Status
 
-CHARTERED. Ready for Autobuilder catalog order 10 after terminal order 09 (#5463).
+COMPLETE. Product is on `main` via PR #5475 (`cc93fd6b`). Closeout recorded; do not re-BUILD product. Stale Autobuilder draft #5473 is closed as superseded.
 
 ## COORDINATION STATUS
 
 | Slice | Status | Evidence |
 | --- | --- | --- |
 | `RegionBet-PayoffSave-Control-Slice001` | COMPLETE | Founder-approved charter, queue entry, phase plan, and selection record for Autobuilder catalog order 10. |
-| `RegionBet-PayoffSave-Product-Slice002` | PENDING | Payoff/scenario explanation, confirmation, and frozen-entry persistence. |
-| `RegionBet-PayoffSave-Closeout-Slice003` | PENDING | Awaiting product merge. |
+| `RegionBet-PayoffSave-Product-Slice002` | COMPLETE | Region Bet payoff/save shipped in #5475 (`cc93fd6b`). |
+| `RegionBet-PayoffSave-Closeout-Slice003` | COMPLETE | Chapter closed after #5475; next Autobuilder catalog order is 11. |
 
 ## Owns
 
@@ -26,4 +26,4 @@ Requires terminal `region_bet_risk_expression_bridge_v1` on product main (PR #54
 
 ## Notes
 
-Product paths stay bounded to `docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json`.
+Product paths stay bounded to `docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json`. Do not catalog or rebuild this chapter.

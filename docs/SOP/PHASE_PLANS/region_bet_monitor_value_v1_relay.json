@@ -2,6 +2,9 @@
   "name": "region_bet_monitor_value_v1",
   "title": "Region Bet monitor value v1",
   "baselineBranch": "main",
+  "selectionRecord": "docs/SOP/POST_REGION_BET_MONITOR_VALUE_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/REGION_BET_MONITOR_VALUE_V1_EVIDENCE_STATUS.md",
+  "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MONITOR_VALUE_V1.md",
   "founderPriorityOverride": {
     "status": "accepted",
     "source": "Autobuilder backlog order 11 after region_bet_payoff_save_v1.",
@@ -53,6 +56,7 @@
     {
       "sliceId": "RegionBet-MonitorValue-Product-Slice002",
       "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MONITOR_VALUE_V1.md",
       "buildBranch": "build/auto/RegionBet-MonitorValue-Product-Slice002",
       "declaredPlane": "PRODUCT-PLANE",
       "implementationStatus": "PENDING",
