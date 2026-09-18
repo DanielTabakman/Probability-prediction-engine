@@ -1,0 +1,12 @@
+---
+description: Proactive agent notes — grounded only; no invented operator context.
+alwaysApply: true
+---
+
+# Agent grounding (operator preference)
+
+**Proactive is good; don't personalize without a source.**
+
+- Unprompted observations are welcome when they help (blockers, contradictions, scope drift, safety).
+- Ground them in **this repo** — file path, command output, doc, or label as **hypothesis**.
+- Do **not** state the operator's other products, UIs, or results as fact unless verified in-thread or from repo artifacts.
