@@ -144,6 +144,7 @@ export function createRegionBetGuidedDraft(
       notes: seed?.risk_constraints?.notes,
     },
     selected_expression_ref: seed?.selected_expression_ref ?? null,
+    frozen_entry_snapshot: seed?.frozen_entry_snapshot,
     lifecycle: {
       status: seed?.lifecycle?.status ?? "draft",
       created_at_utc: createdAt,
@@ -168,11 +169,21 @@ export function buildRegionBetGuidedShellSnapshot(
   };
 }
 
+export function isRegionBetGuidedShellFrozen(regionBet: RegionBetContract): boolean {
+  return (
+    Boolean(regionBet.frozen_entry_snapshot) &&
+    (regionBet.lifecycle.status === "active" || regionBet.lifecycle.status === "monitoring")
+  );
+}
+
 export function applyRegionBetGuidedShellPatch(
   regionBet: RegionBetContract,
   patch: RegionBetGuidedShellPatch,
   now: Date = new Date(),
 ): RegionBetContract {
+  if (isRegionBetGuidedShellFrozen(regionBet)) {
+    return regionBet;
+  }
   const next: RegionBetContract = {
     ...regionBet,
     asset: { ...regionBet.asset, ...patch.asset },

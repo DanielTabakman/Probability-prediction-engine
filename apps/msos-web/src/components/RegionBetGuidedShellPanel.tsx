@@ -6,6 +6,10 @@ import type {
   RegionBetGuidedShellPatch,
 } from "@/lib/regionBetGuidedShell";
 import { RegionBetMarketComparePanel } from "@/components/RegionBetMarketComparePanel";
+import {
+  RegionBetPayoffSavePanel,
+  type RegionBetPayoffSaveStatus,
+} from "@/components/RegionBetPayoffSavePanel";
 import { RegionBetRiskExpressionPanel } from "@/components/RegionBetRiskExpressionPanel";
 import type { RegionBetContract } from "@/lib/regionBet";
 
@@ -22,6 +26,8 @@ type RegionBetGuidedShellPanelProps = {
   snapshot: RegionBetGuidedShellSnapshot;
   assetOptions: RegionBetGuidedAssetOption[];
   onDraftChange: (patch: RegionBetGuidedShellPatch) => void;
+  onConfirmPayoff: () => void;
+  payoffSaveStatus: RegionBetPayoffSaveStatus;
 };
 
 function datetimeValue(value: string | undefined): string {
@@ -48,6 +54,8 @@ export function RegionBetGuidedShellPanel({
   snapshot,
   assetOptions,
   onDraftChange,
+  onConfirmPayoff,
+  payoffSaveStatus,
 }: RegionBetGuidedShellPanelProps) {
   if (step === "asset") {
     return (
@@ -259,6 +267,11 @@ export function RegionBetGuidedShellPanel({
         </label>
       </div>
       <RegionBetRiskExpressionPanel draft={draft} onDraftChange={onDraftChange} />
+      <RegionBetPayoffSavePanel
+        draft={draft}
+        status={payoffSaveStatus}
+        onConfirmPayoff={onConfirmPayoff}
+      />
     </>
   );
 }
