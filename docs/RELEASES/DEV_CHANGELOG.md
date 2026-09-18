@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-17
 
+- `f9d44bf0` — Control-plane: close out order 09 and queue payoff/save. (#5472) (`docs/SOP/`)
+- `07a17a8c` — Control-plane: dev changelog
 - `8a3876b3` — Control-plane: dev changelog
 - `02737e99` — Platform: scope deploy lock to mutation jobs (#5470)
 - `88817ab1` — Control-plane: dev changelog
