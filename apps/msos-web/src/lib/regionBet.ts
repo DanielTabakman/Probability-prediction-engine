@@ -93,6 +93,33 @@ export type RegionBetFrozenEntrySnapshot = NonNullable<
   RegionBetContract["frozen_entry_snapshot"]
 >;
 
+export const REGION_BET_OBSERVATION_QUALITIES = [
+  "observed",
+  "estimated",
+  "stale",
+  "unavailable",
+] as const;
+
+export type RegionBetObservationQuality =
+  (typeof REGION_BET_OBSERVATION_QUALITIES)[number];
+
+export function isRegionBetObservationQuality(
+  value: unknown,
+): value is RegionBetObservationQuality {
+  return (
+    value === "observed" ||
+    value === "estimated" ||
+    value === "stale" ||
+    value === "unavailable"
+  );
+}
+
+export function regionBetHasFrozenEntrySnapshot(
+  regionBet: Pick<RegionBetContract, "frozen_entry_snapshot">,
+): boolean {
+  return regionBet.frozen_entry_snapshot !== undefined;
+}
+
 export const REGION_BET_STORAGE_KEY = "msos.region.bet.v1";
 
 export const REGION_BET_PERSISTENCE_LABEL =

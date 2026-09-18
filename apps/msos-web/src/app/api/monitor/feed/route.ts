@@ -17,7 +17,10 @@ export async function GET(request: Request) {
     const match = cookieHeader.match(new RegExp(`${DISPLAY_CURRENCY_COOKIE}=([^;]+)`));
     const displayCurrency = parseDisplayCurrencyFromCookie(match?.[1]);
     const feed = await loadMonitorFeed(identity.email, displayCurrency);
-    return NextResponse.json(feed);
+    return NextResponse.json({
+      ...feed,
+      regionBetMonitor: feed.regionBetMonitor ?? null,
+    });
   } catch (err) {
     console.error("monitor feed GET failed", err);
     return NextResponse.json({ error: "failed to load monitor feed" }, { status: 500 });

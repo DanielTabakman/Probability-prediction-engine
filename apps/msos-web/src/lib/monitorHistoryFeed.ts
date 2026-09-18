@@ -3,21 +3,27 @@ import {
   type CommandCenterSummary,
   type CommandCenterSnapshotRow,
 } from "@/lib/commandCenterSummary";
-import type { StoredExpression } from "@/lib/msosWorkflowStore";
 import type { PaperTradeStatus } from "@/lib/expressionPersistence";
+import { formatMoney, type DisplayCurrency } from "@/lib/displayCurrency";
+import type { MonitorMarkParts } from "@/lib/monitorMarkLine";
+import { formatMarkLine } from "@/lib/monitorMarkLine";
 import {
   effectivePaperTradeStatus,
+  getCurrentRegionBet,
   getCurrentThesis,
   listPaperTrades,
+  type StoredExpression,
 } from "@/lib/msosWorkflowStore";
-import { formatMoney, type DisplayCurrency } from "@/lib/displayCurrency";
 import {
   fetchDisplayPayload,
   resolveDisplayAssetMeta,
 } from "@/lib/ppeDisplayPayload";
+import {
+  buildRegionBetMonitorValue,
+  type RegionBetMonitorValue,
+} from "@/lib/regionBetMonitor";
+import { isRegionBetMonitorable } from "@/lib/regionBetPayoff";
 import { resolveLabAssetId } from "@/lib/strategyLabAsset";
-import type { MonitorMarkParts } from "@/lib/monitorMarkLine";
-import { formatMarkLine } from "@/lib/monitorMarkLine";
 
 export type MonitorWatchPanel = {
   id: string;
@@ -56,6 +62,7 @@ export type MonitorFeed = {
   alerts: MonitorAlert[];
   paperTrades: PaperTradeSummary[];
   manageEnabled: boolean;
+  regionBetMonitor?: RegionBetMonitorValue | null;
   degradedReason?: string;
 };
 
@@ -198,6 +205,19 @@ function markLineForTrade(
   return parts ? formatMarkLine(parts, formatUsdAmount) : undefined;
 }
 
+function regionBetWatchPanel(value: RegionBetMonitorValue): MonitorWatchPanel {
+  return {
+    id: `region-bet-${value.region_bet_id}`,
+    title: `Region Bet · ${value.symbol}`,
+    body: [
+      `Underlying ${value.underlying.entry.display} → ${value.underlying.current.display}`,
+      `Expression ${value.expression.entry.display} → ${value.expression.current.display}`,
+    ].join(" · "),
+    tone: "teal",
+    badge: "Paper",
+  };
+}
+
 function buildWatchPanels(
   thesis: Awaited<ReturnType<typeof getCurrentThesis>>,
   paperTrades: StoredExpression[],
@@ -205,8 +225,12 @@ function buildWatchPanels(
   currentSpotUsd: number | null,
   marketAsOfUtc?: string,
   formatUsdAmount: (usd: number) => string = (usd) => formatMoney(usd, "USD"),
+  regionBetMonitor?: RegionBetMonitorValue | null,
 ): MonitorWatchPanel[] {
   const panels: MonitorWatchPanel[] = [];
+  if (regionBetMonitor) {
+    panels.push(regionBetWatchPanel(regionBetMonitor));
+  }
   if (thesis) {
     panels.push({
       id: "thesis",
@@ -338,9 +362,10 @@ export async function loadMonitorFeed(
   const fmt = (usd: number) => formatMoney(usd, displayCurrency);
   const summary = loadCommandCenterSummary(ownerEmail);
   const email = ownerEmail ?? "";
-  const [thesis, paperTrades] = await Promise.all([
+  const [thesis, paperTrades, regionBet] = await Promise.all([
     getCurrentThesis(email),
     listPaperTrades(email),
+    getCurrentRegionBet(email),
   ]);
   const displayAssetId = resolveLabAssetId({
     thesisAssetId: thesis?.assetId,
@@ -352,7 +377,48 @@ export async function loadMonitorFeed(
   const marketAsOfUtc = display?.as_of_utc;
 
   const hasPaperTrades = paperTrades.length > 0;
-  const hasWorkflow = Boolean(thesis || hasPaperTrades);
+  const regionBetAssetId = regionBet?.asset.asset_id?.trim();
+  let regionSpotUsd = currentSpotUsd;
+  let regionAsOfUtc = marketAsOfUtc;
+  let regionTrustState = display?.trust_state;
+  if (
+    regionBet &&
+    isRegionBetMonitorable(regionBet) &&
+    regionBetAssetId &&
+    regionBetAssetId !== displayAssetId
+  ) {
+    const regionDisplay = await fetchDisplayPayload(
+      resolveLabAssetId({ thesisAssetId: regionBetAssetId, useStored: false }),
+    );
+    regionSpotUsd = regionDisplay?.spot_usd ?? null;
+    regionAsOfUtc = regionDisplay?.as_of_utc;
+    regionTrustState = regionDisplay?.trust_state;
+  }
+  const matchingExpression = paperTrades.find(
+    (trade) => trade.id === regionBet?.selected_expression_ref?.expression_id,
+  );
+  const savedExpressionMark = matchingExpression?.markAtSave;
+  const entryExpressionValue =
+    typeof savedExpressionMark?.netCostUsd === "number" &&
+    Number.isFinite(savedExpressionMark.netCostUsd)
+      ? savedExpressionMark.netCostUsd
+      : null;
+  const regionBetMonitor =
+    regionBet && isRegionBetMonitorable(regionBet)
+      ? buildRegionBetMonitorValue(regionBet, {
+          spot_usd: regionSpotUsd,
+          observed_at_utc: regionAsOfUtc,
+          compared_at_utc: regionAsOfUtc,
+          trust_state: regionTrustState,
+          entry_expression_value_usd: entryExpressionValue,
+          entry_expression_observed_at_utc:
+            entryExpressionValue != null ? savedExpressionMark?.markedAt : null,
+          expression_value_usd: null,
+          expression_observed_at_utc: null,
+        })
+      : null;
+  const hasRegionBet = Boolean(regionBetMonitor);
+  const hasWorkflow = Boolean(thesis || hasPaperTrades || hasRegionBet);
 
   if (summary.status === "degraded" && !hasWorkflow) {
     return {
@@ -382,6 +448,7 @@ export async function loadMonitorFeed(
       degradedReason: summary.degradedReason,
       paperTrades: [],
       manageEnabled: false,
+      regionBetMonitor: null,
     };
   }
 
@@ -397,22 +464,33 @@ export async function loadMonitorFeed(
     currentSpotUsd,
     marketAsOfUtc,
     fmt,
+    regionBetMonitor,
   );
   const alerts = buildAlerts(summary);
   const health = hasPaperTrades
     ? healthFromPaperTrades(paperTrades)
-    : healthFromSummary(summary, hasPaperTrades);
+    : hasRegionBet
+      ? { pct: 60, label: "Region Bet on watch — paper observation only" }
+      : healthFromSummary(summary, hasPaperTrades);
   const hasSnapshots = summary.status === "live" && summary.recentSnapshots.length > 0;
 
   return {
     status: hasWorkflow || hasSnapshots ? "live" : "empty",
     sourceLabel: WORKFLOW_SOURCE,
-    heroTitle: hasPaperTrades ? "Paper trade watch" : hasWorkflow ? "Thesis watch" : "Monitoring workspace",
-    heroSubtitle: hasPaperTrades
-      ? `${paperTrades.length} saved paper trade${paperTrades.length === 1 ? "" : "s"} on ${assetTicker} — marks refresh when market data is online.`
-      : hasSnapshots
-        ? "Watching your saved views."
-        : "Save a paper trade in Strategy Lab to start building history.",
+    heroTitle: hasRegionBet
+      ? "Region Bet watch"
+      : hasPaperTrades
+        ? "Paper trade watch"
+        : hasWorkflow
+          ? "Thesis watch"
+          : "Monitoring workspace",
+    heroSubtitle: hasRegionBet
+      ? "Underlying then/now is shown separately from paper-expression then/now. Missing marks stay unlabeled as unavailable."
+      : hasPaperTrades
+        ? `${paperTrades.length} saved paper trade${paperTrades.length === 1 ? "" : "s"} on ${assetTicker} — marks refresh when market data is online.`
+        : hasSnapshots
+          ? "Watching your saved views."
+          : "Save a paper trade in Strategy Lab to start building history.",
     assetTicker,
     healthPct: health.pct,
     healthLabel: health.label,
@@ -420,6 +498,7 @@ export async function loadMonitorFeed(
     alerts,
     paperTrades: paperTradeSummaries,
     manageEnabled: hasPaperTrades,
+    regionBetMonitor,
   };
 }
 
