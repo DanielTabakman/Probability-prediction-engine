@@ -45,6 +45,37 @@ export type RegionBetContract = {
     expression_id: string;
     source?: string;
   } | null;
+  frozen_entry_snapshot?: {
+    confirmed_at_utc: string;
+    entry: {
+      spot_usd: number;
+      timestamp_utc: string;
+    };
+    market_snapshot: {
+      as_of_utc: string;
+      source?: string;
+      method?: string;
+      implied_probability_pct?: number;
+      implied_move_pct?: number;
+    };
+    risk_constraints: {
+      max_loss_usd?: number;
+      max_premium_usd?: number;
+      position_size_usd?: number;
+      payoff_preference?: string;
+      notes?: string;
+    };
+    selected_region: {
+      time_start_utc: string;
+      time_end_utc: string;
+      price_min_usd: number;
+      price_max_usd: number;
+    };
+    selected_expression_ref: {
+      expression_id: string;
+      source?: string;
+    };
+  };
   lifecycle: {
     status: RegionBetStatus;
     created_at_utc: string;
@@ -53,6 +84,14 @@ export type RegionBetContract = {
   };
   user_note?: string;
 };
+
+export type PersistRegionBetOptions = {
+  confirmPayoff?: boolean;
+};
+
+export type RegionBetFrozenEntrySnapshot = NonNullable<
+  RegionBetContract["frozen_entry_snapshot"]
+>;
 
 export const REGION_BET_STORAGE_KEY = "msos.region.bet.v1";
 
@@ -85,6 +124,58 @@ function isRegionBetStatus(value: unknown): value is RegionBetStatus {
     value === "monitoring" ||
     value === "closed" ||
     value === "archived"
+  );
+}
+
+function isRegionBetFrozenEntrySnapshot(
+  value: unknown,
+): value is RegionBetFrozenEntrySnapshot {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Record<string, unknown>;
+  const entry = row.entry;
+  const marketSnapshot = row.market_snapshot;
+  const riskConstraints = row.risk_constraints;
+  const selectedRegion = row.selected_region;
+  const expressionRef = row.selected_expression_ref;
+  if (
+    !entry ||
+    typeof entry !== "object" ||
+    !marketSnapshot ||
+    typeof marketSnapshot !== "object" ||
+    !riskConstraints ||
+    typeof riskConstraints !== "object" ||
+    !selectedRegion ||
+    typeof selectedRegion !== "object" ||
+    !expressionRef ||
+    typeof expressionRef !== "object"
+  ) {
+    return false;
+  }
+  const entryRow = entry as Record<string, unknown>;
+  const marketSnapshotRow = marketSnapshot as Record<string, unknown>;
+  const riskRow = riskConstraints as Record<string, unknown>;
+  const selectedRegionRow = selectedRegion as Record<string, unknown>;
+  const expressionRow = expressionRef as Record<string, unknown>;
+  return (
+    typeof row.confirmed_at_utc === "string" &&
+    isFiniteNumber(entryRow.spot_usd) &&
+    typeof entryRow.timestamp_utc === "string" &&
+    typeof marketSnapshotRow.as_of_utc === "string" &&
+    isOptionalString(marketSnapshotRow.source) &&
+    isOptionalString(marketSnapshotRow.method) &&
+    isOptionalFiniteNumber(marketSnapshotRow.implied_probability_pct) &&
+    isOptionalFiniteNumber(marketSnapshotRow.implied_move_pct) &&
+    isOptionalFiniteNumber(riskRow.max_loss_usd) &&
+    isOptionalFiniteNumber(riskRow.max_premium_usd) &&
+    isOptionalFiniteNumber(riskRow.position_size_usd) &&
+    isOptionalString(riskRow.payoff_preference) &&
+    isOptionalString(riskRow.notes) &&
+    typeof selectedRegionRow.time_start_utc === "string" &&
+    typeof selectedRegionRow.time_end_utc === "string" &&
+    isFiniteNumber(selectedRegionRow.price_min_usd) &&
+    isFiniteNumber(selectedRegionRow.price_max_usd) &&
+    typeof expressionRow.expression_id === "string" &&
+    isOptionalString(expressionRow.source)
   );
 }
 
@@ -158,6 +249,8 @@ export function isRegionBetContract(value: unknown): value is RegionBetContract 
     isOptionalString(riskRow.payoff_preference) &&
     isOptionalString(riskRow.notes) &&
     expressionRefValid &&
+    (row.frozen_entry_snapshot === undefined ||
+      isRegionBetFrozenEntrySnapshot(row.frozen_entry_snapshot)) &&
     isRegionBetStatus(lifecycleRow.status) &&
     typeof lifecycleRow.created_at_utc === "string" &&
     typeof lifecycleRow.updated_at_utc === "string" &&
@@ -209,7 +302,10 @@ export async function fetchRegionBet(): Promise<RegionBetContract | null> {
   }
 }
 
-export async function persistRegionBet(regionBet: RegionBetContract): Promise<boolean> {
+export async function persistRegionBet(
+  regionBet: RegionBetContract,
+  options: PersistRegionBetOptions = {},
+): Promise<boolean> {
   saveRegionBet(regionBet);
   if (typeof window === "undefined") return true;
   try {
@@ -217,7 +313,7 @@ export async function persistRegionBet(regionBet: RegionBetContract): Promise<bo
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ regionBet }),
+      body: JSON.stringify({ regionBet, confirmPayoff: options.confirmPayoff === true }),
     });
     return response.ok;
   } catch {

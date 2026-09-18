@@ -24,6 +24,7 @@ import {
   persistRegionBet,
   type RegionBetContract,
 } from "@/lib/regionBet";
+import { confirmRegionBetPayoff } from "@/lib/regionBetPayoff";
 
 const DEFAULT_ASSET_OPTIONS: RegionBetGuidedAssetOption[] = [
   { asset_id: "ETH", symbol: "ETH", venue: "Deribit", spot_usd: 3000 },
@@ -31,7 +32,7 @@ const DEFAULT_ASSET_OPTIONS: RegionBetGuidedAssetOption[] = [
   { asset_id: "NVDA", symbol: "NVDA", venue: "equity options chain", spot_usd: 120 },
 ];
 
-type SaveState = "idle" | "saving" | "saved" | "invalid" | "offline";
+type SaveState = "idle" | "saving" | "saved" | "confirmed" | "invalid" | "offline";
 
 type RegionBetGuidedShellProps = {
   initialRegionBet?: RegionBetContract | null;
@@ -84,6 +85,18 @@ export function RegionBetGuidedShell({
     return true;
   }, [draft]);
 
+  const confirmPayoff = useCallback(async () => {
+    const confirmed = confirmRegionBetPayoff(draft, { confirmed: true });
+    if (!confirmed) {
+      setSaveState("invalid");
+      return;
+    }
+    setSaveState("saving");
+    const saved = await persistRegionBet(confirmed, { confirmPayoff: true });
+    setDraft(confirmed);
+    setSaveState(saved ? "confirmed" : "offline");
+  }, [draft]);
+
   const goPrevious = useCallback(() => {
     setStep((current) => previousRegionBetGuidedShellStep(current));
   }, []);
@@ -102,8 +115,10 @@ export function RegionBetGuidedShell({
       ? "Saving draft..."
       : saveState === "saved"
         ? REGION_BET_PERSISTENCE_LABEL
+        : saveState === "confirmed"
+          ? "Active paper Region Bet saved with a frozen entry snapshot."
         : saveState === "invalid"
-          ? "Draft needs a valid asset, window, and price region before saving."
+          ? "Draft needs a valid region, selected paper expression, and explicit confirmation."
           : saveState === "offline"
             ? "Saved locally; server sync will retry from the Region Bet contract."
             : hydrated
@@ -155,6 +170,8 @@ export function RegionBetGuidedShell({
         snapshot={snapshot}
         assetOptions={assetOptions}
         onDraftChange={updateDraft}
+        onConfirmPayoff={confirmPayoff}
+        payoffSaveStatus={saveState === "confirmed" ? "saved" : saveState}
       />
 
       <div className="panel outcome">
