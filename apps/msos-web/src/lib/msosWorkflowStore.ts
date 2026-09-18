@@ -4,7 +4,12 @@ import { randomUUID } from "crypto";
 
 import type { ExpressionRecord, PaperTradeStatus } from "@/lib/expressionPersistence";
 import type { HorizonRegionIntent } from "@/lib/horizonRegion";
-import { isRegionBetContract, type RegionBetContract } from "@/lib/regionBet";
+import {
+  isRegionBetContract,
+  type PersistRegionBetOptions,
+  type RegionBetContract,
+} from "@/lib/regionBet";
+import { canConfirmRegionBetPayoff, regionBetFrozenSnapshotKey } from "@/lib/regionBetPayoff";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
 import { normalizeOwnerEmail } from "@/lib/msosIdentityCore";
 import { scopeOwnerId } from "@/lib/msosSession";
@@ -665,6 +670,7 @@ export async function getCurrentRegionBet(ownerEmail: string): Promise<StoredReg
 export async function upsertRegionBet(
   regionBet: RegionBetContract,
   ownerEmail: string,
+  options: PersistRegionBetOptions = {},
 ): Promise<StoredRegionBet> {
   if (!isRegionBetContract(regionBet)) {
     throw new Error("invalid region bet");
@@ -680,6 +686,26 @@ export async function upsertRegionBet(
           (row) => row.id === pointers.regionBetId && regionBetOwnerMatches(row, ownerEmail),
         )
       : undefined);
+  const incomingMonitorable =
+    regionBet.lifecycle.status === "active" || regionBet.lifecycle.status === "monitoring";
+  const existingMonitorable =
+    existing?.lifecycle.status === "active" || existing?.lifecycle.status === "monitoring";
+  if (incomingMonitorable && !regionBet.frozen_entry_snapshot) {
+    throw new Error("active region bet requires a frozen entry snapshot");
+  }
+  if (incomingMonitorable && !canConfirmRegionBetPayoff(regionBet)) {
+    throw new Error("active region bet has malformed payoff confirmation input");
+  }
+  if (incomingMonitorable && !existingMonitorable && options.confirmPayoff !== true) {
+    throw new Error("explicit payoff confirmation required");
+  }
+  if (
+    existing?.frozen_entry_snapshot &&
+    regionBetFrozenSnapshotKey(existing.frozen_entry_snapshot) !==
+      regionBetFrozenSnapshotKey(regionBet.frozen_entry_snapshot)
+  ) {
+    throw new Error("frozen entry snapshot is immutable");
+  }
   const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
   const next: StoredRegionBet = {
     ...regionBet,

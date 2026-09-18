@@ -35,11 +35,20 @@ export async function PUT(request: Request) {
     if (!regionBet) {
       return NextResponse.json({ error: "missing region bet" }, { status: 400 });
     }
-    const saved = await upsertRegionBet(regionBet, identity.email);
+    const saved = await upsertRegionBet(regionBet, identity.email, {
+      confirmPayoff: body?.confirmPayoff === true,
+    });
     return NextResponse.json({ regionBet: saved });
   } catch (err) {
     const message = err instanceof Error ? err.message : "failed to save region bet";
-    const status = message.includes("invalid region bet") ? 400 : 500;
+    const status =
+      message.includes("invalid region bet") ||
+      message.includes("explicit payoff confirmation required") ||
+      message.includes("active region bet requires") ||
+      message.includes("active region bet has malformed") ||
+      message.includes("frozen entry snapshot is immutable")
+        ? 400
+        : 500;
     console.error("region-bet PUT failed", err);
     return NextResponse.json({ error: message }, { status });
   }
