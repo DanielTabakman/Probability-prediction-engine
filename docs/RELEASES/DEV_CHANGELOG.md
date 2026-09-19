@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-19
 
-_No merges to `main`._
+- `413fc776` — Control-plane: close out order 11 and queue session resume. (#5479) (`docs/SOP/`)
+- `9e3ec685` — Control-plane: dev changelog
 
 ## 2026-09-18
 
