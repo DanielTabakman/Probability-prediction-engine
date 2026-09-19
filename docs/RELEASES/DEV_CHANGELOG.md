@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-19
 
+- Merge pull request #5480 from DanielTabakman/build/auto/MSOS-SessionResume-Product-Slice002
+- MSOS-SessionResume-Product-Slice002 PRODUCT-PLANE: resume owner-scoped Region Bet without leaking state (`apps/msos-web/`)
+- `2cf87fd4` — Control-plane: dev changelog
 - `413fc776` — Control-plane: close out order 11 and queue session resume. (#5479) (`docs/SOP/`)
 - `9e3ec685` — Control-plane: dev changelog
 
