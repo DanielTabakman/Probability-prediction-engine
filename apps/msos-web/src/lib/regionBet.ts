@@ -83,6 +83,7 @@ export type RegionBetContract = {
     closed_at_utc?: string;
   };
   user_note?: string;
+  guided_step?: "asset" | "window" | "region" | "compare" | "review";
 };
 
 export type PersistRegionBetOptions = {

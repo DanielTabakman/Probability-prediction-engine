@@ -319,6 +319,7 @@
         "tests/test_msos_web_product_usage.py",
         "tests/test_msos_web_feedback.py",
         "tests/test_msos_web_region_bet_",
+        "tests/test_msos_web_session_resume.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",
         "docs/SOP/SPRINT_MSOS_",
