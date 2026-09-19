@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { MarketMovedSinceCard } from "@/components/MarketMovedSinceCard";
 import { PaperTradeManageActions } from "@/components/PaperTradeManageActions";
 import type { HistoryFeed, HistoryState } from "@/lib/monitorHistoryFeed";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
@@ -55,6 +56,8 @@ export function HistoryContent({ feed }: Props) {
             {friendlySnapshotFeedMessage(feed.degradedReason)}
           </p>
         ) : null}
+
+        {feed.marketMovedSince ? <MarketMovedSinceCard value={feed.marketMovedSince} /> : null}
 
         {feed.status === "empty" ? (
           <p className="panel-sub">Save a view in Strategy Lab to start building history.</p>

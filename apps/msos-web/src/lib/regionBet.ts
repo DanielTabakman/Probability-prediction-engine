@@ -76,6 +76,15 @@ export type RegionBetContract = {
       source?: string;
     };
   };
+  last_seen_snapshot?: {
+    viewed_at_utc: string;
+    spot_usd?: number;
+    observed_at_utc?: string;
+    quality?: RegionBetObservationQuality;
+    source?: string;
+    implied_probability_pct?: number;
+    implied_move_pct?: number;
+  };
   lifecycle: {
     status: RegionBetStatus;
     created_at_utc: string;
@@ -92,6 +101,10 @@ export type PersistRegionBetOptions = {
 
 export type RegionBetFrozenEntrySnapshot = NonNullable<
   RegionBetContract["frozen_entry_snapshot"]
+>;
+
+export type RegionBetLastSeenSnapshot = NonNullable<
+  RegionBetContract["last_seen_snapshot"]
 >;
 
 export const REGION_BET_OBSERVATION_QUALITIES = [
@@ -119,6 +132,41 @@ export function regionBetHasFrozenEntrySnapshot(
   regionBet: Pick<RegionBetContract, "frozen_entry_snapshot">,
 ): boolean {
   return regionBet.frozen_entry_snapshot !== undefined;
+}
+
+export function regionBetHasLastSeenSnapshot(
+  regionBet: Pick<RegionBetContract, "last_seen_snapshot">,
+): boolean {
+  return regionBet.last_seen_snapshot !== undefined;
+}
+
+export function buildRegionBetLastSeenSnapshot(input: {
+  viewed_at_utc: string;
+  spot_usd?: number | null;
+  observed_at_utc?: string | null;
+  quality?: RegionBetObservationQuality | null;
+  source?: string | null;
+  implied_probability_pct?: number | null;
+  implied_move_pct?: number | null;
+}): RegionBetLastSeenSnapshot | null {
+  const viewedAt = input.viewed_at_utc.trim();
+  if (!viewedAt) return null;
+  const snapshot: RegionBetLastSeenSnapshot = { viewed_at_utc: viewedAt };
+  if (isFiniteNumber(input.spot_usd)) snapshot.spot_usd = input.spot_usd;
+  if (typeof input.observed_at_utc === "string" && input.observed_at_utc.trim()) {
+    snapshot.observed_at_utc = input.observed_at_utc.trim();
+  }
+  if (isRegionBetObservationQuality(input.quality)) snapshot.quality = input.quality;
+  if (typeof input.source === "string" && input.source.trim()) {
+    snapshot.source = input.source.trim();
+  }
+  if (isFiniteNumber(input.implied_probability_pct)) {
+    snapshot.implied_probability_pct = input.implied_probability_pct;
+  }
+  if (isFiniteNumber(input.implied_move_pct)) {
+    snapshot.implied_move_pct = input.implied_move_pct;
+  }
+  return snapshot;
 }
 
 export const REGION_BET_STORAGE_KEY = "msos.region.bet.v1";
@@ -152,6 +200,22 @@ function isRegionBetStatus(value: unknown): value is RegionBetStatus {
     value === "monitoring" ||
     value === "closed" ||
     value === "archived"
+  );
+}
+
+function isRegionBetLastSeenSnapshot(
+  value: unknown,
+): value is RegionBetLastSeenSnapshot {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Record<string, unknown>;
+  return (
+    typeof row.viewed_at_utc === "string" &&
+    isOptionalFiniteNumber(row.spot_usd) &&
+    isOptionalString(row.observed_at_utc) &&
+    (row.quality === undefined || isRegionBetObservationQuality(row.quality)) &&
+    isOptionalString(row.source) &&
+    isOptionalFiniteNumber(row.implied_probability_pct) &&
+    isOptionalFiniteNumber(row.implied_move_pct)
   );
 }
 
@@ -279,6 +343,8 @@ export function isRegionBetContract(value: unknown): value is RegionBetContract 
     expressionRefValid &&
     (row.frozen_entry_snapshot === undefined ||
       isRegionBetFrozenEntrySnapshot(row.frozen_entry_snapshot)) &&
+    (row.last_seen_snapshot === undefined ||
+      isRegionBetLastSeenSnapshot(row.last_seen_snapshot)) &&
     isRegionBetStatus(lifecycleRow.status) &&
     typeof lifecycleRow.created_at_utc === "string" &&
     typeof lifecycleRow.updated_at_utc === "string" &&
