@@ -40,7 +40,10 @@ def test_completed_region_bet_frontier_is_recorded() -> None:
     assert rows[10]["status"] == "done"
     assert "#5475" in str(rows[10]["reason"])
     assert rows[11]["chapterId"] == "region_bet_monitor_value_v1"
-    assert rows[11]["status"] == "ready"
+    assert rows[11]["status"] == "done"
+    assert "#5478" in str(rows[11]["reason"])
+    assert rows[12]["chapterId"] == "msos_session_resume_v1"
+    assert rows[12]["status"] == "ready"
 
 
 def test_order_09_resolves_stale_draft_to_merged_replacement() -> None:

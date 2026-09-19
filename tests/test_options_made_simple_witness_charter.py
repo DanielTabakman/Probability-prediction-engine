@@ -9,12 +9,13 @@ from scripts.founder_portfolio import collect_portfolio
 
 REPO = Path(__file__).resolve().parents[1]
 A_ID = "options_horizon_comparison_v1"
-RB_ID = "region_bet_monitor_value_v1"
+RB_ID = "msos_session_resume_v1"
 A_PLAN = "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json"
 B_PLAN = "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json"
-RB_PLAN = "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json"
+RB_PLAN = "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json"
 RB09_PLAN = "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json"
 RB10_PLAN = "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json"
+RB11_PLAN = "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json"
 
 
 def _json(rel: str) -> dict:
@@ -63,7 +64,14 @@ def test_order_10_queue_row_is_done_after_closeout() -> None:
     assert "#5475" in closed["doneReason"]
 
 
-def test_ready_frontier_is_region_bet_monitor_value(monkeypatch) -> None:
+def test_order_11_queue_row_is_done_after_closeout() -> None:
+    queue = _json("docs/SOP/PHASE_QUEUE.json")
+    closed = next(item for item in queue["items"] if item.get("planPath") == RB11_PLAN)
+    assert closed["status"] == "DONE"
+    assert "#5478" in closed["doneReason"]
+
+
+def test_ready_frontier_is_msos_session_resume(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     ready = _ready_queue_items()
@@ -74,7 +82,7 @@ def test_ready_frontier_is_region_bet_monitor_value(monkeypatch) -> None:
         assert stale not in joined
 
 
-def test_founder_portfolio_recommends_region_bet_monitor_value(monkeypatch) -> None:
+def test_founder_portfolio_recommends_msos_session_resume(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     snapshot = collect_portfolio(REPO)
@@ -85,15 +93,16 @@ def test_founder_portfolio_recommends_region_bet_monitor_value(monkeypatch) -> N
     assert snapshot["recommended_next_action"]["work_item_id"] == RB_ID
     work = next(item for item in ppe["ready_work"] if item["work_item_id"] == RB_ID)
     assert work["source_plan"] == RB_PLAN
-    assert work["selected_native_slice"] == "RegionBet-MonitorValue-Product-Slice002"
+    assert work["selected_native_slice"] == "MSOS-SessionResume-Product-Slice002"
     assert work["allowed_product_paths"] == [
         "apps/msos-web/src/lib/regionBet.ts",
-        "apps/msos-web/src/lib/regionBetMonitor.ts",
-        "apps/msos-web/src/lib/monitorHistoryFeed.ts",
-        "apps/msos-web/src/components/RegionBetMonitorCard.tsx",
-        "apps/msos-web/src/components/MonitorContent.tsx",
-        "apps/msos-web/src/app/api/monitor/feed/route.ts",
-        "tests/test_msos_web_region_bet_monitor_value.py",
+        "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+        "apps/msos-web/src/lib/regionBetResume.ts",
+        "apps/msos-web/src/lib/msosWorkflowStore.ts",
+        "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+        "apps/msos-web/src/components/RegionBetResumeCard.tsx",
+        "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+        "tests/test_msos_web_session_resume.py",
     ]
 
 

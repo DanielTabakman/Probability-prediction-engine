@@ -899,10 +899,10 @@
     },
     {
       "chapterId": "region_bet_monitor_value_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 11. Monitor teaches underlying-right vs expression-money with then/now metrics and plain-English drivers. Reuse Monitor/History and the #5475 saved Region Bet; do not rebuild order 10.",
+      "reason": "[DONE] Catalog order 11 merged as PPE PR #5478 (b7f0f9ed); then/now Monitor on main. Closeout recorded; do not rebuild. Next chapter 12 is READY for JIT catalog.",
       "autobuilderCatalogOrder": 11,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -919,17 +919,19 @@
     },
     {
       "chapterId": "msos_session_resume_v1",
-      "status": "blocked",
-      "priority": "medium",
+      "status": "ready",
+      "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[MEDIUM BLOCKED] Autobuilder intent order 12. Resume most recent saved Region Bet / workflow context. Use existing workflow persistence. Dependency: region_bet_payoff_save_v1.",
+      "reason": "[HIGH READY] Autobuilder order 12. Resume most recent valid owner-scoped Region Bet and last safe guided-flow step. Reuse the #5475 persistence contract; do not rebuild orders 10–11.",
       "autobuilderCatalogOrder": 12,
-      "eligibility": "blocked_until_predecessor_terminal",
+      "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "region_bet_payoff_save_v1"
       ],
       "packetization": "just_in_time",
       "planPath": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_SESSION_RESUME_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_MSOS_SESSION_RESUME_V1.md",
       "autobuilderMergeAuthority": {
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-16T03:19:31+00:00"
