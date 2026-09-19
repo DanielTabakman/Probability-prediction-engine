@@ -2,6 +2,9 @@
   "name": "msos_market_moved_since_v1",
   "title": "MSOS market moved since v1",
   "baselineBranch": "main",
+  "selectionRecord": "docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/MSOS_MARKET_MOVED_SINCE_V1_EVIDENCE_STATUS.md",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MARKET_MOVED_SINCE_V1.md",
   "founderPriorityOverride": {
     "status": "accepted",
     "source": "Autobuilder backlog order 13 after msos_session_resume_v1.",
@@ -53,6 +56,7 @@
     {
       "sliceId": "MSOS-MarketMovedSince-Product-Slice002",
       "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MARKET_MOVED_SINCE_V1.md",
       "buildBranch": "build/auto/MSOS-MarketMovedSince-Product-Slice002",
       "declaredPlane": "PRODUCT-PLANE",
       "implementationStatus": "PENDING",

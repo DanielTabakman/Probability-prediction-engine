@@ -919,10 +919,10 @@
     },
     {
       "chapterId": "msos_session_resume_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 12. Resume most recent valid owner-scoped Region Bet and last safe guided-flow step. Reuse the #5475 persistence contract; do not rebuild orders 10–11.",
+      "reason": "[HIGH DONE] Autobuilder order 12 merged as PPE PR #5480 (3d779c56). Resume most recent valid owner-scoped Region Bet and last safe guided-flow step. Do not rebuild.",
       "autobuilderCatalogOrder": 12,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -939,17 +939,19 @@
     },
     {
       "chapterId": "msos_market_moved_since_v1",
-      "status": "blocked",
-      "priority": "medium",
+      "status": "ready",
+      "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[MEDIUM BLOCKED] Autobuilder intent order 13. Deterministic 'Since you last looked…' summary vs saved workflow/last-seen snapshot. No prediction or trade recommendation. Dependency: msos_session_resume_v1.",
+      "reason": "[HIGH READY] Autobuilder order 13. Deterministic last-seen versus now summary vs saved workflow/last-seen snapshot. No prediction or trade recommendation. Do not rebuild order 12 (#5480).",
       "autobuilderCatalogOrder": 13,
-      "eligibility": "blocked_until_predecessor_terminal",
+      "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "msos_session_resume_v1"
       ],
       "packetization": "just_in_time",
       "planPath": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_MSOS_MARKET_MOVED_SINCE_V1.md",
       "autobuilderMergeAuthority": {
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-16T03:19:31+00:00"

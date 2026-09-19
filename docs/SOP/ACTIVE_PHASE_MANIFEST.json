@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SESSION_RESUME_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_SESSION_RESUME_V1_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MARKET_MOVED_SINCE_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Autobuilder catalog order 12: MSOS session resume after terminal 11 (#5478).",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Autobuilder catalog order 13: MSOS market-moved-since after terminal 12 (#5480).",
   "workerMode": "local-agent"
 }

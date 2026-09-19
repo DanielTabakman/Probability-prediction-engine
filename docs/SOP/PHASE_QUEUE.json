@@ -617,9 +617,19 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Autobuilder catalog order 12: MSOS session resume after terminal 11 (#5478).",
       "selectionPrep": "docs/SOP/POST_MSOS_SESSION_RESUME_V1_SELECTION.md",
+      "founderPriority": "HIGH",
+      "workerMode": "local-agent",
+      "focusPlaybookTier": "P1",
+      "doneReason": "marked DONE after product merge #5480 (3d779c56); closeout only, do not rebuild"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
+      "status": "READY",
+      "reason": "[HIGH] Autobuilder catalog order 13: MSOS market-moved-since after terminal 12 (#5480).",
+      "selectionPrep": "docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md",
       "founderPriority": "HIGH",
       "workerMode": "local-agent",
       "focusPlaybookTier": "P1"
