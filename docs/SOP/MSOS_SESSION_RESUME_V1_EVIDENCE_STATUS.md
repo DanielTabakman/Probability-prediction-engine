@@ -1,16 +1,16 @@
 # MSOS session resume v1 — evidence status
 
-## Status
+**Status:** **COMPLETE**
 
-CHARTERED. Ready for Autobuilder catalog order 12 after terminal order 11 (#5478).
+Product is on `main` via PR #5480 (`3d779c56`). Closeout recorded; do not re-BUILD product.
 
 ## COORDINATION STATUS
 
 | Slice | Status | Evidence |
 | --- | --- | --- |
 | `MSOS-SessionResume-Control-Slice001` | COMPLETE | Founder-approved charter, queue entry, phase plan, and selection record for Autobuilder catalog order 12. |
-| `MSOS-SessionResume-Product-Slice002` | PENDING | Resume most recent valid owner-scoped Region Bet and last safe guided-flow step. |
-| `MSOS-SessionResume-Closeout-Slice003` | PENDING | Awaiting product merge. |
+| `MSOS-SessionResume-Product-Slice002` | COMPLETE | Owner-scoped Region Bet resume and last safe guided-flow step shipped in #5480 (`3d779c56`). |
+| `MSOS-SessionResume-Closeout-Slice003` | COMPLETE | Chapter closed after #5480; next Autobuilder catalog order is 13. |
 
 ## Owns
 
@@ -26,4 +26,4 @@ Requires terminal `region_bet_payoff_save_v1` on product main (PR #5475). Satisf
 
 ## Notes
 
-Product paths stay bounded to `docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json`.
+Product paths stay bounded to `docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json`. Do not catalog or rebuild this chapter.
