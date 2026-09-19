@@ -5,6 +5,7 @@ import { MonitorDeleteNotice } from "@/components/MonitorDeleteNotice";
 import { MonitorWatchList } from "@/components/MonitorWatchList";
 import { MonitorWelcomeCard } from "@/components/MonitorWelcomeCard";
 import { MonitorEmptyState } from "@/components/MonitorEmptyState";
+import { MarketMovedSinceCard } from "@/components/MarketMovedSinceCard";
 import { RegionBetMonitorCard } from "@/components/RegionBetMonitorCard";
 import { loadCommandCenterSummary } from "@/lib/commandCenterSummary";
 import type { MonitorFeed, MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
@@ -84,6 +85,8 @@ export async function MonitorContent({ feed }: Props) {
           </p>
         ) : null}
 
+        {feed.marketMovedSince ? <MarketMovedSinceCard value={feed.marketMovedSince} /> : null}
+
         {feed.regionBetMonitor ? <RegionBetMonitorCard value={feed.regionBetMonitor} /> : null}
 
         <div className="monitor-summary" aria-label="Watch status">
@@ -132,7 +135,10 @@ export async function MonitorContent({ feed }: Props) {
           </div>
         ) : null}
 
-        {feed.paperTrades.length === 0 && !feed.regionBetMonitor && feed.status !== "degraded" ? (
+        {feed.paperTrades.length === 0 &&
+        !feed.regionBetMonitor &&
+        !feed.marketMovedSince &&
+        feed.status !== "degraded" ? (
           <MonitorEmptyState assetTicker={feed.assetTicker} />
         ) : null}
 

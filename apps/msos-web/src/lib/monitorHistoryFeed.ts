@@ -19,6 +19,11 @@ import {
   resolveDisplayAssetMeta,
 } from "@/lib/ppeDisplayPayload";
 import {
+  buildMarketMovedSinceSummary,
+  type MarketMovedSinceSummary,
+} from "@/lib/marketMovedSince";
+import type { RegionBetContract } from "@/lib/regionBet";
+import {
   buildRegionBetMonitorValue,
   type RegionBetMonitorValue,
 } from "@/lib/regionBetMonitor";
@@ -63,6 +68,7 @@ export type MonitorFeed = {
   paperTrades: PaperTradeSummary[];
   manageEnabled: boolean;
   regionBetMonitor?: RegionBetMonitorValue | null;
+  marketMovedSince?: MarketMovedSinceSummary | null;
   degradedReason?: string;
 };
 
@@ -85,6 +91,7 @@ export type HistoryFeed = {
   sourceLabel: string;
   intro: string;
   entries: HistoryEntry[];
+  marketMovedSince?: MarketMovedSinceSummary | null;
   degradedReason?: string;
 };
 
@@ -203,6 +210,21 @@ function markLineForTrade(
 ): string | undefined {
   const parts = markPartsForTrade(trade, currentSpotUsd, asOfUtc);
   return parts ? formatMarkLine(parts, formatUsdAmount) : undefined;
+}
+
+function buildSharedMarketMovedSince(
+  regionBet: RegionBetContract | null,
+  nowSpotUsd: number | null,
+  nowAsOfUtc?: string,
+  nowTrustState?: string,
+): MarketMovedSinceSummary | null {
+  if (!regionBet) return null;
+  return buildMarketMovedSinceSummary(regionBet, {
+    spot_usd: nowSpotUsd,
+    observed_at_utc: nowAsOfUtc,
+    compared_at_utc: nowAsOfUtc,
+    trust_state: nowTrustState,
+  });
 }
 
 function regionBetWatchPanel(value: RegionBetMonitorValue): MonitorWatchPanel {
@@ -381,12 +403,7 @@ export async function loadMonitorFeed(
   let regionSpotUsd = currentSpotUsd;
   let regionAsOfUtc = marketAsOfUtc;
   let regionTrustState = display?.trust_state;
-  if (
-    regionBet &&
-    isRegionBetMonitorable(regionBet) &&
-    regionBetAssetId &&
-    regionBetAssetId !== displayAssetId
-  ) {
+  if (regionBet && regionBetAssetId && regionBetAssetId !== displayAssetId) {
     const regionDisplay = await fetchDisplayPayload(
       resolveLabAssetId({ thesisAssetId: regionBetAssetId, useStored: false }),
     );
@@ -417,7 +434,13 @@ export async function loadMonitorFeed(
           expression_observed_at_utc: null,
         })
       : null;
-  const hasRegionBet = Boolean(regionBetMonitor);
+  const marketMovedSince = buildSharedMarketMovedSince(
+    regionBet,
+    regionSpotUsd,
+    regionAsOfUtc,
+    regionTrustState,
+  );
+  const hasRegionBet = Boolean(regionBetMonitor || marketMovedSince);
   const hasWorkflow = Boolean(thesis || hasPaperTrades || hasRegionBet);
 
   if (summary.status === "degraded" && !hasWorkflow) {
@@ -449,6 +472,7 @@ export async function loadMonitorFeed(
       paperTrades: [],
       manageEnabled: false,
       regionBetMonitor: null,
+      marketMovedSince: null,
     };
   }
 
@@ -499,21 +523,41 @@ export async function loadMonitorFeed(
     paperTrades: paperTradeSummaries,
     manageEnabled: hasPaperTrades,
     regionBetMonitor,
+    marketMovedSince,
   };
 }
 
 export async function loadHistoryFeed(ownerEmail: string | null): Promise<HistoryFeed> {
   const summary = loadCommandCenterSummary(ownerEmail);
   const email = ownerEmail ?? "";
-  const [thesis, paperTrades] = await Promise.all([getCurrentThesis(email), listPaperTrades(email)]);
+  const [thesis, paperTrades, regionBet] = await Promise.all([
+    getCurrentThesis(email),
+    listPaperTrades(email),
+    getCurrentRegionBet(email),
+  ]);
 
   const hasPaperTrades = paperTrades.length > 0;
-  if (summary.status === "degraded" && !hasPaperTrades && !thesis) {
+  const regionBetAssetId = regionBet?.asset.asset_id?.trim();
+  const historyDisplayAssetId = resolveLabAssetId({
+    thesisAssetId: regionBetAssetId ?? thesis?.assetId,
+    useStored: false,
+  });
+  const historyDisplay = regionBet
+    ? await fetchDisplayPayload(historyDisplayAssetId)
+    : null;
+  const marketMovedSince = buildSharedMarketMovedSince(
+    regionBet,
+    historyDisplay?.spot_usd ?? null,
+    historyDisplay?.as_of_utc,
+    historyDisplay?.trust_state,
+  );
+  if (summary.status === "degraded" && !hasPaperTrades && !thesis && !marketMovedSince) {
     return {
       status: "degraded",
       sourceLabel: WORKFLOW_SOURCE,
       intro: "Saved history isn't available right now.",
       entries: [],
+      marketMovedSince: null,
       degradedReason: summary.degradedReason,
     };
   }
@@ -524,12 +568,13 @@ export async function loadHistoryFeed(ownerEmail: string | null): Promise<Histor
   ].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 
   return {
-    status: entries.length > 0 ? "live" : "empty",
+    status: entries.length > 0 || marketMovedSince ? "live" : "empty",
     sourceLabel: WORKFLOW_SOURCE,
     intro: hasPaperTrades
       ? "Paper trades and saved views in your workspace — newest first."
       : "From first look → saved view → paper trade → review. Live fills appear when connected.",
     entries,
+    marketMovedSince,
     degradedReason: summary.status === "degraded" ? summary.degradedReason : undefined,
   };
 }

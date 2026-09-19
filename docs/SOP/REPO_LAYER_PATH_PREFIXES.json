@@ -320,6 +320,7 @@
         "tests/test_msos_web_feedback.py",
         "tests/test_msos_web_region_bet_",
         "tests/test_msos_web_session_resume.py",
+        "tests/test_msos_web_market_moved_since.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",
         "docs/SOP/SPRINT_MSOS_",
