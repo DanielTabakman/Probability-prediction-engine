@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-19
+
+_No merges to `main`._
+
 ## 2026-09-18
 
+- `d3e628b4` — Control-plane: dev changelog
 - `2ec2bbea` — Control-plane: dev changelog
 - `b7f0f9ed` — RegionBet-MonitorValue-Product-Slice002: show honest then/now underlying vs paper-expression on Monitor (PRODUCT-PLANE) (#5478) (`apps/msos-web/`)
 - `7179ea4e` — Control-plane: dev changelog
