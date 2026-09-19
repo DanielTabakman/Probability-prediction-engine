@@ -10,4 +10,10 @@ cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
 python "%CD%\scripts\ppe_token_audit.py" --repo-root "%CD%" %*
-exit /b %ERRORLEVEL%
+set "CURSOR_AUDIT_EXIT=%ERRORLEVEL%"
+
+python "%CD%\scripts\ppe_context_surface_audit.py" --repo-root "%CD%" %*
+set "CONTEXT_AUDIT_EXIT=%ERRORLEVEL%"
+
+if not "%CURSOR_AUDIT_EXIT%"=="0" exit /b %CURSOR_AUDIT_EXIT%
+exit /b %CONTEXT_AUDIT_EXIT%
