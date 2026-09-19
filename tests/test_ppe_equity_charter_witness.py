@@ -79,6 +79,7 @@ def test_equity_chapter_closed_queue_and_manifest() -> None:
         "docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json",
         "docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json",
         "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
     )
     assert status in ("READY", "RUNNING", "COMPLETE", "BLOCKED")
     if status == "COMPLETE":

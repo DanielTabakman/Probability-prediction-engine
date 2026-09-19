@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MONITOR_VALUE_V1.md",
-  "selectionRecord": "docs/SOP/POST_REGION_BET_MONITOR_VALUE_V1_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SESSION_RESUME_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_SESSION_RESUME_V1_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Autobuilder catalog order 11: Region Bet monitor value after terminal 10 (#5475).",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Autobuilder catalog order 12: MSOS session resume after terminal 11 (#5478).",
   "workerMode": "local-agent"
 }

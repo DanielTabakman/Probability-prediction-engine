@@ -2,6 +2,9 @@
   "name": "msos_session_resume_v1",
   "title": "MSOS session resume v1",
   "baselineBranch": "main",
+  "selectionRecord": "docs/SOP/POST_MSOS_SESSION_RESUME_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/MSOS_SESSION_RESUME_V1_EVIDENCE_STATUS.md",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SESSION_RESUME_V1.md",
   "founderPriorityOverride": {
     "status": "accepted",
     "source": "Autobuilder backlog order 12 after region_bet_payoff_save_v1.",
@@ -54,6 +57,7 @@
     {
       "sliceId": "MSOS-SessionResume-Product-Slice002",
       "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SESSION_RESUME_V1.md",
       "buildBranch": "build/auto/MSOS-SessionResume-Product-Slice002",
       "declaredPlane": "PRODUCT-PLANE",
       "implementationStatus": "PENDING",

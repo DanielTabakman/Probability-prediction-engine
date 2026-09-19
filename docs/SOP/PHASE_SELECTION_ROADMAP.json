@@ -354,9 +354,15 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
-      "status": "ready",
-      "reason": "[HIGH] Autobuilder catalog order 11: Region Bet monitor value after terminal 10 and merged #5475.",
+      "status": "done",
+      "reason": "[DONE] Autobuilder catalog order 11 merged as PPE PR #5478; do not rebuild.",
       "selectionPrep": "docs/SOP/POST_REGION_BET_MONITOR_VALUE_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_session_resume_v1_relay.json",
+      "status": "ready",
+      "reason": "[HIGH] Autobuilder catalog order 12: MSOS session resume after terminal 11 and merged #5478.",
+      "selectionPrep": "docs/SOP/POST_MSOS_SESSION_RESUME_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
