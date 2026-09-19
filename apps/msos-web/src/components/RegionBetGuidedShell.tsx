@@ -6,6 +6,7 @@ import {
   RegionBetGuidedShellPanel,
   type RegionBetGuidedAssetOption,
 } from "@/components/RegionBetGuidedShellPanel";
+import { RegionBetResumeCard } from "@/components/RegionBetResumeCard";
 import {
   REGION_BET_GUIDED_SHELL_STEPS,
   applyRegionBetGuidedShellPatch,
@@ -15,16 +16,21 @@ import {
   nextRegionBetGuidedShellStep,
   previousRegionBetGuidedShellStep,
   regionBetGuidedShellStepIndex,
+  withRegionBetGuidedShellStep,
   type RegionBetGuidedShellPatch,
   type RegionBetGuidedShellStep,
 } from "@/lib/regionBetGuidedShell";
 import {
   REGION_BET_PERSISTENCE_LABEL,
-  fetchRegionBet,
   persistRegionBet,
   type RegionBetContract,
 } from "@/lib/regionBet";
 import { confirmRegionBetPayoff } from "@/lib/regionBetPayoff";
+import {
+  createCleanStartRegionBetResume,
+  fetchRegionBetResume,
+  type RegionBetResumeState,
+} from "@/lib/regionBetResume";
 
 const DEFAULT_ASSET_OPTIONS: RegionBetGuidedAssetOption[] = [
   { asset_id: "ETH", symbol: "ETH", venue: "Deribit", spot_usd: 3000 },
@@ -51,20 +57,45 @@ export function RegionBetGuidedShell({
   );
   const [hydrated, setHydrated] = useState(Boolean(initialRegionBet));
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [resume, setResume] = useState<RegionBetResumeState>(() =>
+    initialRegionBet
+      ? {
+          schema_version: 1,
+          kind: "region_bet_session_resume",
+          mode: "resume",
+          reason: "valid",
+          regionBet: createRegionBetGuidedDraft(initialRegionBet),
+          step: initialStep,
+          clean_start_available: true,
+          paper_only: true,
+          limitation:
+            "Paper workflow only. Resume restores your saved Region Bet. Not financial advice, not a recommendation, and not order execution.",
+        }
+      : createCleanStartRegionBetResume("missing"),
+  );
+
+  const applyResumeState = useCallback((state: RegionBetResumeState) => {
+    setResume(state);
+    if (state.mode === "resume" && state.regionBet) {
+      setDraft(createRegionBetGuidedDraft(state.regionBet));
+      setStep(state.step);
+      return;
+    }
+    setDraft(createRegionBetGuidedDraft());
+    setStep("asset");
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
-    void fetchRegionBet().then((stored) => {
+    void fetchRegionBetResume().then((state) => {
       if (cancelled) return;
-      if (stored) {
-        setDraft(createRegionBetGuidedDraft(stored));
-      }
+      applyResumeState(state);
       setHydrated(true);
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [applyResumeState]);
 
   const currentIndex = regionBetGuidedShellStepIndex(step);
   const snapshot = useMemo(() => buildRegionBetGuidedShellSnapshot(draft), [draft]);
@@ -108,6 +139,24 @@ export function RegionBetGuidedShell({
     }
   }, [persistDraft]);
 
+  useEffect(() => {
+    setDraft((current) =>
+      current.guided_step === step ? current : withRegionBetGuidedShellStep(current, step),
+    );
+  }, [step]);
+
+  const resumeSavedDraft = useCallback(() => {
+    if (resume.mode === "resume" && resume.regionBet) {
+      applyResumeState(resume);
+    }
+  }, [applyResumeState, resume]);
+
+  const startCleanDraft = useCallback(() => {
+    setDraft(createRegionBetGuidedDraft());
+    setStep("asset");
+    setSaveState("idle");
+  }, []);
+
   const atFirstStep = currentIndex === 0;
   const atLastStep = currentIndex === REGION_BET_GUIDED_SHELL_STEPS.length - 1;
   const statusLabel =
@@ -127,6 +176,13 @@ export function RegionBetGuidedShell({
 
   return (
     <section className="work strategy-lab-work" aria-label="Region Bet guided shell">
+      {hydrated ? (
+        <RegionBetResumeCard
+          resume={resume}
+          onResume={resumeSavedDraft}
+          onCleanStart={startCleanDraft}
+        />
+      ) : null}
       <div className="panel chart">
         <div className="panel-head">
           <div>

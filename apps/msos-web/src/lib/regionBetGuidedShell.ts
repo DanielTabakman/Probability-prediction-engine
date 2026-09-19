@@ -30,6 +30,7 @@ export type RegionBetGuidedShellPatch = {
   risk_constraints?: Partial<RegionBetContract["risk_constraints"]>;
   selected_expression_ref?: RegionBetContract["selected_expression_ref"];
   user_note?: string;
+  guided_step?: RegionBetGuidedShellStep;
 };
 
 export const REGION_BET_GUIDED_SHELL_STEPS: RegionBetGuidedShellStepDef[] = [
@@ -68,6 +69,55 @@ function normalizeStepIndex(step: RegionBetGuidedShellStep): number {
 
 export function regionBetGuidedShellStepIndex(step: RegionBetGuidedShellStep): number {
   return normalizeStepIndex(step);
+}
+
+export function isRegionBetGuidedShellStep(
+  value: unknown,
+): value is RegionBetGuidedShellStep {
+  return REGION_BET_GUIDED_SHELL_STEPS.some((item) => item.id === value);
+}
+
+export function regionBetGuidedShellHasAsset(regionBet: RegionBetContract): boolean {
+  return regionBet.asset.asset_id.trim().length > 0;
+}
+
+export function regionBetGuidedShellHasWindow(regionBet: RegionBetContract): boolean {
+  return !Number.isNaN(Date.parse(regionBet.target.expiry_utc));
+}
+
+export function regionBetGuidedShellHasRegion(regionBet: RegionBetContract): boolean {
+  const region = regionBet.selected_region;
+  return (
+    region.price_min_usd < region.price_max_usd &&
+    !Number.isNaN(Date.parse(region.time_start_utc)) &&
+    !Number.isNaN(Date.parse(region.time_end_utc)) &&
+    Date.parse(region.time_start_utc) <= Date.parse(region.time_end_utc)
+  );
+}
+
+export function earliestSafeIncompleteRegionBetStep(
+  regionBet: RegionBetContract,
+): RegionBetGuidedShellStep {
+  if (!regionBetGuidedShellHasAsset(regionBet)) return "asset";
+  if (!regionBetGuidedShellHasWindow(regionBet)) return "window";
+  if (!regionBetGuidedShellHasRegion(regionBet)) return "region";
+  if (!regionBet.selected_expression_ref?.expression_id.trim()) return "compare";
+  return "review";
+}
+
+export function resolveRegionBetGuidedShellResumeStep(
+  stored: unknown,
+  regionBet: RegionBetContract,
+): RegionBetGuidedShellStep {
+  if (isRegionBetGuidedShellStep(stored)) return stored;
+  return earliestSafeIncompleteRegionBetStep(regionBet);
+}
+
+export function withRegionBetGuidedShellStep(
+  regionBet: RegionBetContract,
+  step: RegionBetGuidedShellStep,
+): RegionBetContract {
+  return { ...regionBet, guided_step: step };
 }
 
 export function nextRegionBetGuidedShellStep(
@@ -145,6 +195,7 @@ export function createRegionBetGuidedDraft(
     },
     selected_expression_ref: seed?.selected_expression_ref ?? null,
     frozen_entry_snapshot: seed?.frozen_entry_snapshot,
+    guided_step: isRegionBetGuidedShellStep(seed?.guided_step) ? seed.guided_step : undefined,
     lifecycle: {
       status: seed?.lifecycle?.status ?? "draft",
       created_at_utc: createdAt,
@@ -182,6 +233,9 @@ export function applyRegionBetGuidedShellPatch(
   now: Date = new Date(),
 ): RegionBetContract {
   if (isRegionBetGuidedShellFrozen(regionBet)) {
+    if (patch.guided_step !== undefined && isRegionBetGuidedShellStep(patch.guided_step)) {
+      return withRegionBetGuidedShellStep(regionBet, patch.guided_step);
+    }
     return regionBet;
   }
   const next: RegionBetContract = {
@@ -202,6 +256,10 @@ export function applyRegionBetGuidedShellPatch(
       updated_at_utc: now.toISOString(),
     },
     user_note: patch.user_note ?? regionBet.user_note,
+    guided_step:
+      patch.guided_step !== undefined && isRegionBetGuidedShellStep(patch.guided_step)
+        ? patch.guided_step
+        : regionBet.guided_step,
   };
   return next;
 }

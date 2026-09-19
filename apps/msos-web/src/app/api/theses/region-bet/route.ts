@@ -5,6 +5,7 @@ import { requireProtectedIdentity } from "@/lib/msosIdentity";
 import {
   getCurrentRegionBet,
   getRegionBetById,
+  resolveStoredRegionBetResume,
   upsertRegionBet,
 } from "@/lib/msosWorkflowStore";
 
@@ -15,6 +16,11 @@ export async function GET(request: Request) {
   if (!identity.ok) return identity.response;
   try {
     const url = new URL(request.url);
+    const resumeRequested = url.searchParams.get("resume") === "1";
+    if (resumeRequested) {
+      const resume = await resolveStoredRegionBetResume(identity.email);
+      return NextResponse.json({ regionBet: resume.regionBet, resume });
+    }
     const regionBetId = url.searchParams.get("id")?.trim();
     const regionBet = regionBetId
       ? await getRegionBetById(identity.email, regionBetId)

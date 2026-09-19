@@ -10,6 +10,12 @@ import {
   type RegionBetContract,
 } from "@/lib/regionBet";
 import {
+  createCleanStartRegionBetResume,
+  isRegionBetResumeStale,
+  resolveRegionBetResume,
+  type RegionBetResumeState,
+} from "@/lib/regionBetResume";
+import {
   canConfirmRegionBetPayoff,
   isRegionBetMonitorable,
   regionBetFrozenSnapshotKey,
@@ -669,6 +675,62 @@ export async function getCurrentRegionBet(ownerEmail: string): Promise<StoredReg
       (row) => row.id === pointers.regionBetId && regionBetOwnerMatches(row, ownerEmail),
     ) ?? null
   );
+}
+
+function compareRegionBetRecency(a: StoredRegionBet, b: StoredRegionBet): number {
+  const aTs = Date.parse(a.lifecycle.updated_at_utc);
+  const bTs = Date.parse(b.lifecycle.updated_at_utc);
+  return (Number.isNaN(bTs) ? 0 : bTs) - (Number.isNaN(aTs) ? 0 : aTs);
+}
+
+export async function getMostRecentValidRegionBet(
+  ownerEmail: string,
+): Promise<StoredRegionBet | null> {
+  const store = await readStore();
+  const owned = (store.regionBets ?? []).filter(
+    (row) =>
+      regionBetOwnerMatches(row, ownerEmail) &&
+      isRegionBetContract(row) &&
+      !isRegionBetResumeStale(row),
+  );
+  if (owned.length === 0) return null;
+  return [...owned].sort(compareRegionBetRecency)[0] ?? null;
+}
+
+export async function resolveStoredRegionBetResume(
+  ownerEmail: string,
+): Promise<RegionBetResumeState> {
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  if (pointers.regionBetId) {
+    const pointed = store.regionBets?.find((row) => row.id === pointers.regionBetId);
+    if (pointed && !regionBetOwnerMatches(pointed, ownerEmail)) {
+      return createCleanStartRegionBetResume("cross_owner");
+    }
+    if (pointed && regionBetOwnerMatches(pointed, ownerEmail)) {
+      const pointedResume = resolveRegionBetResume({
+        requestOwner: ownerEmail,
+        storedOwner: pointed.ownerEmail,
+        stored: pointed,
+        storedStep: pointed.guided_step,
+      });
+      if (pointedResume.mode === "resume") {
+        return pointedResume;
+      }
+    }
+  }
+  const recent = await getMostRecentValidRegionBet(ownerEmail);
+  if (!recent) {
+    return createCleanStartRegionBetResume(
+      pointers.regionBetId ? "stale" : "missing",
+    );
+  }
+  return resolveRegionBetResume({
+    requestOwner: ownerEmail,
+    storedOwner: recent.ownerEmail,
+    stored: recent,
+    storedStep: recent.guided_step,
+  });
 }
 
 export async function upsertRegionBet(
