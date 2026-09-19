@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-19
 
+- `ac8608fa` — Merge pull request #5482 from DanielTabakman/ops/closeout-12-queue-13
+- `9f5c4264` — Control-plane: close out order 12 and queue market-moved-since. (`docs/SOP/`)
+- `bb5aa21e` — Control-plane: dev changelog
 - Merge pull request #5480 from DanielTabakman/build/auto/MSOS-SessionResume-Product-Slice002
 - MSOS-SessionResume-Product-Slice002 PRODUCT-PLANE: resume owner-scoped Region Bet without leaking state (`apps/msos-web/`)
 - `2cf87fd4` — Control-plane: dev changelog
