@@ -10,7 +10,7 @@ COMPLETE. Product is on `main` via PR #5475 (`cc93fd6b`). Closeout recorded; do 
 | --- | --- | --- |
 | `RegionBet-PayoffSave-Control-Slice001` | COMPLETE | Founder-approved charter, queue entry, phase plan, and selection record for Autobuilder catalog order 10. |
 | `RegionBet-PayoffSave-Product-Slice002` | COMPLETE | Region Bet payoff/save shipped in #5475 (`cc93fd6b`). |
-| `RegionBet-PayoffSave-Closeout-Slice003` | COMPLETE | Chapter closed after #5475; next Autobuilder catalog order is 11. |
+| `RegionBet-PayoffSave-Closeout-Slice003` | COMPLETE | Chapter closed after #5475; order 11 is also terminal (#5478). |
 
 ## Owns
 

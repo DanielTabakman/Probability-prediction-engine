@@ -2,15 +2,15 @@
 
 ## Status
 
-CHARTERED. Ready for Autobuilder catalog order 11 after terminal order 10 (#5475).
+COMPLETE. Product is on `main` via PR #5478 (`b7f0f9ed`). Closeout recorded; do not re-BUILD product. Autobuilder Codex retries failed on usage limit and must not rebuild this chapter.
 
 ## COORDINATION STATUS
 
 | Slice | Status | Evidence |
 | --- | --- | --- |
 | `RegionBet-MonitorValue-Control-Slice001` | COMPLETE | Founder-approved charter, queue entry, phase plan, and selection record for Autobuilder catalog order 11. |
-| `RegionBet-MonitorValue-Product-Slice002` | PENDING | Then/now underlying vs paper-expression value on Monitor. |
-| `RegionBet-MonitorValue-Closeout-Slice003` | PENDING | Awaiting product merge. |
+| `RegionBet-MonitorValue-Product-Slice002` | COMPLETE | Honest then/now Monitor value shipped in #5478 (`b7f0f9ed`). |
+| `RegionBet-MonitorValue-Closeout-Slice003` | COMPLETE | Chapter closed after #5478; Autobuilder orders 12–17 stay uncataloged. |
 
 ## Owns
 
@@ -26,4 +26,4 @@ Requires terminal `region_bet_payoff_save_v1` on product main (PR #5475). Satisf
 
 ## Notes
 
-Product paths stay bounded to `docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json`.
+Product paths stay bounded to `docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json`. Do not catalog or rebuild this chapter. Do not catalog orders 12–17 from this closeout.

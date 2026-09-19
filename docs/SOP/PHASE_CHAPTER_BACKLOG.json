@@ -882,7 +882,7 @@
       "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[DONE] Catalog order 10 merged as PPE PR #5475 (cc93fd6b); payoff/save on main. Closeout recorded; do not rebuild. Stale Autobuilder draft #5473 is superseded. Next chapter 11 is READY for JIT catalog.",
+      "reason": "[DONE] Catalog order 10 merged as PPE PR #5475 (cc93fd6b); payoff/save on main. Closeout recorded; do not rebuild. Stale Autobuilder draft #5473 is superseded. Chapter 11 is also terminal (#5478).",
       "autobuilderCatalogOrder": 10,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -899,10 +899,10 @@
     },
     {
       "chapterId": "region_bet_monitor_value_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 11. Monitor teaches underlying-right vs expression-money with then/now metrics and plain-English drivers. Reuse Monitor/History and the #5475 saved Region Bet; do not rebuild order 10.",
+      "reason": "[DONE] Catalog order 11 merged as PPE PR #5478 (b7f0f9ed); monitor value on main. Closeout recorded; do not rebuild. Autobuilder Codex usage-limit failures are not a rebuild signal. Orders 12-17 stay uncataloged.",
       "autobuilderCatalogOrder": 11,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [

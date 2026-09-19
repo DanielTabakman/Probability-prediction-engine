@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-09-18T01:26:59Z · **Archived chapters:** 70
+**Generated:** 2026-09-19T21:44:43Z · **Archived chapters:** 71
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -73,6 +73,7 @@
 | `ppe_sol_bybit_ship_v1` | `docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json` |
 | `ppe_tradeable_universe_v1` | `docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md` | `docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json` |
 | `ppe_trust_surface_v1` | `docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md` | `docs/SOP/PPE_TRUST_SURFACE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json` |
+| `region_bet_monitor_value_v1` | `docs/SOP/POST_REGION_BET_MONITOR_VALUE_V1_SELECTION.md` | `docs/SOP/REGION_BET_MONITOR_VALUE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json` |
 | `region_bet_payoff_save_v1` | `docs/SOP/POST_REGION_BET_PAYOFF_SAVE_V1_SELECTION.md` | `docs/SOP/REGION_BET_PAYOFF_SAVE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/region_bet_payoff_save_v1_relay.json` |
 | `region_bet_risk_expression_bridge_v1` | `docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md` | `docs/SOP/REGION_BET_RISK_EXPRESSION_BRIDGE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json` |
 | `repo_housekeeping_v1` | `docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md` | `docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json` |

@@ -16,4 +16,4 @@ This selection authorizes only the payoff/save chapter listed in `docs/SOP/PHASE
 
 ## Order
 
-Catalog order 10 follows order 9 and is now terminal on `main` (PR #5475). Item 11 is the next JIT packet. Items 12–17 stay intent-only until 11 is terminal. Stale Autobuilder draft #5473 is superseded and must not be merged.
+Catalog order 10 follows order 9 and is now terminal on `main` (PR #5475). Item 11 is also terminal on `main` (PR #5478). Items 12–17 stay intent-only and uncataloged. Stale Autobuilder draft #5473 is superseded and must not be merged.

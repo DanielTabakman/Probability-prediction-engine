@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MONITOR_VALUE_V1.md",
-  "selectionRecord": "docs/SOP/POST_REGION_BET_MONITOR_VALUE_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Autobuilder catalog order 11: Region Bet monitor value after terminal 10 (#5475).",
+  "phasePlanPath": "",
+  "sprintSpecPath": "",
+  "selectionRecord": "",
+  "status": "COMPLETE",
+  "notes": "Catalog order 11 closed after product merge #5478 (b7f0f9ed). Do not rebuild. Autobuilder orders 12-17 stay uncataloged.",
   "workerMode": "local-agent"
 }

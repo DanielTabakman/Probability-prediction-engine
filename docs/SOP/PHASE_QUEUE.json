@@ -607,12 +607,13 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_monitor_value_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Autobuilder catalog order 11: Region Bet monitor value after terminal 10 (#5475).",
       "selectionPrep": "docs/SOP/POST_REGION_BET_MONITOR_VALUE_V1_SELECTION.md",
       "founderPriority": "HIGH",
       "workerMode": "local-agent",
-      "focusPlaybookTier": "P1"
+      "focusPlaybookTier": "P1",
+      "doneReason": "marked DONE after product merge #5478 (b7f0f9ed); closeout only, do not rebuild. Orders 12-17 stay uncataloged"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",

@@ -63,38 +63,31 @@ def test_order_10_queue_row_is_done_after_closeout() -> None:
     assert "#5475" in closed["doneReason"]
 
 
-def test_ready_frontier_is_region_bet_monitor_value(monkeypatch) -> None:
+def test_order_11_queue_row_is_done_after_closeout() -> None:
+    queue = _json("docs/SOP/PHASE_QUEUE.json")
+    closed = next(item for item in queue["items"] if item.get("planPath") == RB_PLAN)
+    assert closed["status"] == "DONE"
+    assert "#5478" in closed["doneReason"]
+
+
+def test_ready_frontier_is_empty_after_order_11_closeout(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     ready = _ready_queue_items()
-    assert [item["planPath"] for item in ready] == [RB_PLAN]
-    assert [item["founderPriority"] for item in ready] == ["HIGH"]
-    joined = "\n".join(item["planPath"] + " " + item["reason"] for item in ready).lower()
-    for stale in ("commodity_proxy", "uso", "hyperliquid", "replay_scrubber", "tier1b", "tier1c"):
-        assert stale not in joined
+    assert ready == []
 
 
-def test_founder_portfolio_recommends_region_bet_monitor_value(monkeypatch) -> None:
+def test_founder_portfolio_does_not_rebuild_region_bet_monitor_value(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     snapshot = collect_portfolio(REPO)
     ppe = _pipeline(snapshot)
     ready_ids = [item["work_item_id"] for item in ppe["ready_work"]]
 
-    assert ready_ids == [RB_ID]
-    assert snapshot["recommended_next_action"]["work_item_id"] == RB_ID
-    work = next(item for item in ppe["ready_work"] if item["work_item_id"] == RB_ID)
-    assert work["source_plan"] == RB_PLAN
-    assert work["selected_native_slice"] == "RegionBet-MonitorValue-Product-Slice002"
-    assert work["allowed_product_paths"] == [
-        "apps/msos-web/src/lib/regionBet.ts",
-        "apps/msos-web/src/lib/regionBetMonitor.ts",
-        "apps/msos-web/src/lib/monitorHistoryFeed.ts",
-        "apps/msos-web/src/components/RegionBetMonitorCard.tsx",
-        "apps/msos-web/src/components/MonitorContent.tsx",
-        "apps/msos-web/src/app/api/monitor/feed/route.ts",
-        "tests/test_msos_web_region_bet_monitor_value.py",
-    ]
+    assert RB_ID not in ready_ids
+    rec = snapshot["recommended_next_action"] or {}
+    assert rec.get("work_item_id") != RB_ID
+    assert rec.get("work_item_id") != "ppe_commodity_proxy_tier1_v1"
 
 
 def test_a_and_b_touch_sets_are_disjoint_and_b_forbids_a_paths() -> None:
