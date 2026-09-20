@@ -137,6 +137,8 @@ export function OptionsMarketReadConsole() {
     setLoading(true);
     setRequestError(null);
     setInputError(null);
+    if (note) setQueryNote(note);
+    setPickedDate(targetDate ?? "");
     try {
       const response = await fetch(rawApiHref(targetDate), {
         cache: "no-store",
@@ -149,8 +151,6 @@ export function OptionsMarketReadConsole() {
       }
       setPayload(body);
       setActiveTargetDate(targetDate);
-      if (note) setQueryNote(note);
-      if (targetDate) setPickedDate(targetDate);
     } catch {
       setRequestError("The testing API could not be reached. Please try again shortly.");
     } finally {
