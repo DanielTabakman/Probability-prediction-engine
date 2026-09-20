@@ -15,6 +15,12 @@ Does **not** change `/ppe-display-api/*`. Replaces the earlier `/v1/implied-rang
 | Production | `https://marketstructureos.com/v1/options-market-read` | Stable consumer integration, including Qatom |
 | Isolated staging | `https://staging.marketstructureos.com/v1/options-market-read` | Feature-branch validation before production promotion |
 
+The staging environment provides a human testing console at
+`https://staging.marketstructureos.com/options-market-read`. That page parses a
+documented, bounded set of date phrases into `target_date`, displays the exact
+date and resolved expiry, and renders `answer` before metrics and disclosures.
+It does not change this API contract or use an LLM for interpretation.
+
 Staging has a separate checkout, API process, refresh process, and in-memory
 cache. It is not a consumer endpoint and may change during development. See
 [`OPTIONS_MARKET_READ_STAGING_PLAN_V1.md`](OPTIONS_MARKET_READ_STAGING_PLAN_V1.md).
@@ -139,6 +145,9 @@ Tests may set `PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH` to a fixture. Production C
 Production synthetic monitoring rides the existing uptime workflow; see [`OPTIONS_MARKET_READ_UPTIME_V1.md`](OPTIONS_MARKET_READ_UPTIME_V1.md).
 
 ## Qatom consumer handoff
+
+The concise partner handoff, integration checklist, and copy-paste examples are
+in [`QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md`](QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md).
 
 This is documentation only. Do not publish to, message, or configure Qatom from this repository without separate authorization.
 

@@ -58,6 +58,7 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 - [`IMPLIED_LAB_SMOKE.md`](IMPLIED_LAB_SMOKE.md) — Playwright UI smoke procedures
 - [`API/OPTIONS_MARKET_READ_V1.md`](API/OPTIONS_MARKET_READ_V1.md) — `GET /v1/options-market-read`
 - [`API/OPTIONS_MARKET_READ_STAGING_PLAN_V1.md`](API/OPTIONS_MARKET_READ_STAGING_PLAN_V1.md) — isolated staging topology and promotion gate
+- [`API/QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md`](API/QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md) — one-page partner integration handoff
 
 ## Bounded MSOS initiatives
 
