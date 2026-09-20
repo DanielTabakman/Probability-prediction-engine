@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-19
 
+- `80bfe711` — Product: Options Market Read human console (#5474) (`apps/msos-web/`)
+- `821512ac` — Control-plane: dev changelog
 - Merge pull request #5483 from DanielTabakman/build/auto/MSOS-MarketMovedSince-Product-Slice002
 - MSOS-MarketMovedSince-Product-Slice002 PRODUCT-PLANE: show deterministic last-seen versus now on Monitor and History (`apps/msos-web/`)
 - `72ea1245` — Control-plane: dev changelog
