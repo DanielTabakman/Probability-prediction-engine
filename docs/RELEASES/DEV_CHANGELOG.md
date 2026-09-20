@@ -2,6 +2,10 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-20
+
+- `009b019f` — Control-plane: dev changelog
+
 ## 2026-09-19
 
 - `80bfe711` — Product: Options Market Read human console (#5474) (`apps/msos-web/`)
