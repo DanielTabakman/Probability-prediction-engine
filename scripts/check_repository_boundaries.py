@@ -19,6 +19,7 @@ ALLOWED_TOP_LEVEL_ROUTES = frozenset(
         "monitor",
         "operator",
         "options-horizon",
+        "options-market-read",
         "strategy-lab",
     }
 )
