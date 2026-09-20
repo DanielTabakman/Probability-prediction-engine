@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { optionsMarketReadEnvironment } from "@/lib/optionsMarketReadEnvironment";
+
 export function GET(request: NextRequest) {
-  const environment = request.nextUrl.hostname.startsWith("staging.")
-    ? "staging"
-    : "production";
+  const environment = optionsMarketReadEnvironment(
+    request.headers.get("x-forwarded-host"),
+    request.headers.get("host"),
+    request.nextUrl.hostname,
+  );
   const help = {
     name: "Options Market Read",
     environment,

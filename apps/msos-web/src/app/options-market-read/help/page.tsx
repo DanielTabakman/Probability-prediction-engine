@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 
 import { MsosLogo } from "@/components/MsosLogo";
+import { optionsMarketReadEnvironment } from "@/lib/optionsMarketReadEnvironment";
 import styles from "../options-market-read.module.css";
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ const examples = [
 
 export default async function OptionsMarketReadHelpPage() {
   const host = (await headers()).get("host")?.toLowerCase() ?? "";
-  const isStaging = host.startsWith("staging.");
+  const isStaging = optionsMarketReadEnvironment(null, host) === "staging";
 
   return (
     <div className={styles.page}>

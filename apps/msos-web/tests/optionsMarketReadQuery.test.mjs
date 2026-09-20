@@ -5,6 +5,7 @@ import {
   parseOptionsMarketQuestion,
   targetDateFromPreset,
 } from "../src/lib/optionsMarketReadQuery.ts";
+import { optionsMarketReadEnvironment } from "../src/lib/optionsMarketReadEnvironment.ts";
 
 const AS_OF = "2026-09-17T18:49:12Z";
 
@@ -54,4 +55,21 @@ test("preset targets are deterministic", () => {
   assert.equal(targetDateFromPreset("7d", AS_OF).targetDate, "2026-09-24");
   assert.equal(targetDateFromPreset("90d", AS_OF).targetDate, "2026-12-16");
   assert.equal(targetDateFromPreset("year-end", AS_OF).targetDate, "2026-12-31");
+});
+
+test("environment labels respect the public host forwarded by Caddy", () => {
+  assert.equal(
+    optionsMarketReadEnvironment("staging.marketstructureos.com", "msos_web_staging:3000"),
+    "staging",
+  );
+  assert.equal(
+    optionsMarketReadEnvironment(
+      "staging.marketstructureos.com, proxy.internal",
+      "msos_web_staging:3000",
+    ),
+    "staging",
+  );
+  assert.equal(optionsMarketReadEnvironment(null, "staging.marketstructureos.com"), "staging");
+  assert.equal(optionsMarketReadEnvironment(null, "marketstructureos.com"), "production");
+  assert.equal(optionsMarketReadEnvironment(null, "msos_web:3000", "marketstructureos.com"), "production");
 });
