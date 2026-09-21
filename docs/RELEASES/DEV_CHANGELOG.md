@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-20
 
+- `b04b9200` — Control-plane: charter Options Market Read partner acceptance (#5484) (`docs/SOP/`)
+- `77c31f02` — Control-plane: dev changelog
 - `009b019f` — Control-plane: dev changelog
 
 ## 2026-09-19
