@@ -79,38 +79,32 @@ def test_order_12_queue_row_is_done_after_closeout() -> None:
     assert "#5480" in closed["doneReason"]
 
 
-def test_ready_frontier_is_msos_market_moved_since(monkeypatch) -> None:
+def test_order_13_queue_row_is_done_after_closeout() -> None:
+    queue = _json("docs/SOP/PHASE_QUEUE.json")
+    closed = next(item for item in queue["items"] if item.get("planPath") == RB_PLAN)
+    assert closed["status"] == "DONE"
+    assert "#5483" in closed["doneReason"]
+
+
+def test_ready_frontier_is_empty_after_order_13_closeout(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     ready = _ready_queue_items()
-    assert [item["planPath"] for item in ready] == [RB_PLAN]
-    assert [item["founderPriority"] for item in ready] == ["HIGH"]
-    joined = "\n".join(item["planPath"] + " " + item["reason"] for item in ready).lower()
+    assert ready == []
+    joined = "\n".join(item["planPath"] + " " + item.get("reason", "") for item in ready).lower()
     for stale in ("commodity_proxy", "uso", "hyperliquid", "replay_scrubber", "tier1b", "tier1c"):
         assert stale not in joined
 
 
-def test_founder_portfolio_recommends_msos_market_moved_since(monkeypatch) -> None:
+def test_founder_portfolio_does_not_rebuild_msos_market_moved_since(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     snapshot = collect_portfolio(REPO)
     ppe = _pipeline(snapshot)
     ready_ids = [item["work_item_id"] for item in ppe["ready_work"]]
 
-    assert ready_ids == [RB_ID]
-    assert snapshot["recommended_next_action"]["work_item_id"] == RB_ID
-    work = next(item for item in ppe["ready_work"] if item["work_item_id"] == RB_ID)
-    assert work["source_plan"] == RB_PLAN
-    assert work["selected_native_slice"] == "MSOS-MarketMovedSince-Product-Slice002"
-    assert work["allowed_product_paths"] == [
-        "apps/msos-web/src/lib/regionBet.ts",
-        "apps/msos-web/src/lib/marketMovedSince.ts",
-        "apps/msos-web/src/lib/monitorHistoryFeed.ts",
-        "apps/msos-web/src/components/MarketMovedSinceCard.tsx",
-        "apps/msos-web/src/components/MonitorContent.tsx",
-        "apps/msos-web/src/components/HistoryContent.tsx",
-        "tests/test_msos_web_market_moved_since.py",
-    ]
+    assert ready_ids == []
+    assert snapshot["recommended_next_action"].get("work_item_id") != RB_ID
 
 
 def test_a_and_b_touch_sets_are_disjoint_and_b_forbids_a_paths() -> None:

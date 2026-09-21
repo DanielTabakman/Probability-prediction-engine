@@ -939,10 +939,10 @@
     },
     {
       "chapterId": "msos_market_moved_since_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 13. Deterministic last-seen versus now summary vs saved workflow/last-seen snapshot. No prediction or trade recommendation. Do not rebuild order 12 (#5480).",
+      "reason": "[DONE] Catalog order 13 merged as PPE PR #5483 (7389d01); last-seen versus now on Monitor and History. Closeout recorded; do not rebuild. Orders 14-17 stay uncataloged.",
       "autobuilderCatalogOrder": 13,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [

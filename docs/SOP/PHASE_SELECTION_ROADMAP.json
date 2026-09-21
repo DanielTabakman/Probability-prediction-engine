@@ -366,8 +366,8 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
-      "status": "ready",
-      "reason": "[HIGH] Autobuilder catalog order 13: MSOS market-moved-since after terminal 12 and merged #5480.",
+      "status": "done",
+      "reason": "[DONE] Autobuilder catalog order 13 merged as PPE PR #5483; do not rebuild.",
       "selectionPrep": "docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md"
     },
     {
