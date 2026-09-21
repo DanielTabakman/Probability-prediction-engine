@@ -1,0 +1,97 @@
+{
+  "name": "options_market_read_partner_acceptance_v1",
+  "title": "Options Market Read partner acceptance v1",
+  "baselineBranch": "main",
+  "selectionRecord": "docs/SOP/POST_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_EVIDENCE_STATUS.md",
+  "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Founder direction before the Tuesday Qatom integration meeting.",
+    "purpose": "Turn the working BTC Options Market Read v1.3 primitive into an integration-ready partner contract without broadening into advice or execution."
+  },
+  "productScope": {
+    "direction": "Options Market Read partner integration",
+    "job": "partner_acceptance",
+    "stableId": "options_market_read_partner_acceptance_v1",
+    "summary": "Freeze, prove, document, and observe the v1.3 partner contract across isolated staging and production.",
+    "informationalOnly": true
+  },
+  "acceptanceCriteria": [
+    "Keep the existing GET /v1/options-market-read v1.3 fields backward compatible; any additive change is documented and covered by contract tests.",
+    "Provide a repeatable conformance witness for default, exact-expiry, nearest-expiry, stale-data, unsupported-asset, past-date, and no-close-expiry behavior on staging and production.",
+    "Keep the partner handoff, OpenAPI document, machine help, and copy-paste examples consistent with the deployed contract and rendering hierarchy.",
+    "Record explicit founder and partner decisions for authentication, rate limits, CORS, alert destination, and non-PII usage telemetry; do not invent defaults for undecided controls.",
+    "Prove production promotion and rollback while preserving the isolated staging process/cache and the existing Options Market Read uptime agreement check.",
+    "Keep exposure selection, opportunity ranking, trade recommendations, execution, payment handling, historical volatility labels, and new assets out of this chapter."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "docs/API/OPTIONS_MARKET_READ_V1.md",
+      "docs/API/QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md",
+      "docs/API/options-market-read.openapi.yaml",
+      "apps/msos-web/src/app/options-market-read/api-help/route.ts",
+      "scripts/options_market_read_partner_acceptance.py",
+      "scripts/options_market_read_uptime.py",
+      "tests/test_options_market_read_partner_acceptance.py",
+      "tests/test_options_market_read_uptime.py"
+    ],
+    "forbiddenPaths": [
+      "Qatom application source or configuration",
+      "wildcard /v1/* routing",
+      "new asset enablement",
+      "historical uncertainty ratings",
+      "exposure, strategy, recommendation, execution, or payment APIs",
+      "changes that silently break schema_version 1.3 or ruleset_version options-market-read.v1.3"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "OptionsMarketRead-PartnerAcceptance-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/OptionsMarketRead-PartnerAcceptance-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "OptionsMarketRead-PartnerAcceptance-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md",
+      "buildBranch": "build/auto/OptionsMarketRead-PartnerAcceptance-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/API/OPTIONS_MARKET_READ_V1.md",
+        "docs/API/QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md",
+        "docs/API/options-market-read.openapi.yaml",
+        "apps/msos-web/src/app/options-market-read/api-help/route.ts",
+        "scripts/options_market_read_partner_acceptance.py",
+        "tests/test_options_market_read_partner_acceptance.py"
+      ]
+    },
+    {
+      "sliceId": "OptionsMarketRead-PartnerAcceptance-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/OptionsMarketRead-PartnerAcceptance-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "options_market_read_partner_acceptance_v1",
+        "chapterTitle": "Options Market Read partner acceptance v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_EVIDENCE_STATUS.md",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}
