@@ -2,6 +2,10 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-21
+
+- `208ead8f` — Control-plane: dev changelog
+
 ## 2026-09-20
 
 - `b04b9200` — Control-plane: charter Options Market Read partner acceptance (#5484) (`docs/SOP/`)
