@@ -635,6 +635,16 @@
       "focusPlaybookTier": "P1"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[HIGH NEXT] Options Market Read v1.3 partner acceptance after the current READY chapter; freeze compatibility, prove staged/production conformance, and record Qatom integration controls without inventing them.",
+      "selectionPrep": "docs/SOP/POST_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_SELECTION.md",
+      "founderPriority": "HIGH",
+      "workerMode": "local-agent",
+      "focusPlaybookTier": "P1",
+      "holdReason": "Keep PLANNED until msos_market_moved_since_v1 is terminal and the Tuesday Qatom meeting records call shape, auth, rate-limit, CORS, alerting, and telemetry decisions."
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
       "status": "PLANNED",
       "reason": "Recurring between-chapter hygiene skipped for this selection; steward selected Trader Learning Spine ops chapter.",

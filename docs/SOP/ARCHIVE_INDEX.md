@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-09-19T21:49:50Z · **Archived chapters:** 72
+**Generated:** 2026-09-21T02:56:29Z · **Archived chapters:** 72
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
