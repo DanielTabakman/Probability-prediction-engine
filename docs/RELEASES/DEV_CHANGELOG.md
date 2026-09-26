@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-26
 
-_No merges to `main`._
+- `1cba4088` — Canonize Engineering Operating System v1 (`docs/SOP/`)
+- `3f0bc70a` — Control-plane: dev changelog
 
 ## 2026-09-25
 
