@@ -16,6 +16,7 @@ CANON = [
     "docs/SOP/FOUNDER_PIPELINE_COMMANDS_V1.md",
     "docs/SOP/PIPELINE_CREATION_SOP_V1.md",
     "docs/SOP/SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md",
+    "docs/SOP/ENGINEERING_OPERATING_SYSTEM_V1.md",
 ]
 OPTIONS_A_ID = "options_horizon_comparison_v1"
 OPTIONS_B_ID = "options_expression_fit_ranking_v1"
