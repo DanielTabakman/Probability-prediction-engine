@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-26
 
+- `8d426795` — docs: add Engineering OS phase 0 inventory (#5495) (`docs/SOP/`)
+- `3bc9f1d8` — Control-plane: dev changelog
 - `4e1fc521` — Control-plane: clarify API, MSOS and Autobuilder lane ownership (`docs/SOP/`)
 - `91290db8` — Control-plane: dev changelog
 - `1cba4088` — Canonize Engineering Operating System v1 (`docs/SOP/`)
