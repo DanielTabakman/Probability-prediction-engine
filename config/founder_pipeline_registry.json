@@ -4,7 +4,8 @@
     "docs/SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md",
     "docs/SOP/FOUNDER_PIPELINE_COMMANDS_V1.md",
     "docs/SOP/PIPELINE_CREATION_SOP_V1.md",
-    "docs/SOP/SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md"
+    "docs/SOP/SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md",
+    "docs/SOP/ENGINEERING_OPERATING_SYSTEM_V1.md"
   ],
   "validated_dependencies": {
     "msos_autobuilder_build_next_dispatcher": {
@@ -121,5 +122,84 @@
         "reason": "Registered for read-only visibility; runtime refill controller and staged witnesses are pending."
       }
     }
-  ]
+  ],
+  "engineering_os": {
+    "version": 1,
+    "canon": "docs/SOP/ENGINEERING_OPERATING_SYSTEM_V1.md",
+    "backlog_classes": [
+      "RESEARCH",
+      "CANDIDATE",
+      "COMMITTED"
+    ],
+    "lifecycle_states": [
+      "BACKLOG",
+      "TRIAGE",
+      "CHARTERED",
+      "ACCEPTANCE_DEFINED",
+      "READY_TO_BUILD",
+      "RUNNING",
+      "TESTING",
+      "REVIEW",
+      "STAGING",
+      "RELEASED",
+      "MONITORING",
+      "COMPLETE",
+      "AWAITING_FOUNDER",
+      "BLOCKED",
+      "REJECTED",
+      "SUPERSEDED"
+    ],
+    "dispatch_rule": {
+      "requires_backlog_class": "COMMITTED",
+      "requires_native_state": "READY_TO_BUILD",
+      "note": "Engineering OS metadata never makes work dispatchable by itself; pipeline-native evidence remains authoritative."
+    },
+    "lanes": [
+      {
+        "lane_id": "factory",
+        "display_name": "Factory / Autobuilder",
+        "pipeline_ids": [
+          "autobuilder"
+        ],
+        "mode": "PRODUCTION",
+        "implementation_wip_limit": 1
+      },
+      {
+        "lane_id": "msos",
+        "display_name": "MSOS",
+        "pipeline_ids": [
+          "ppe"
+        ],
+        "mode": "PRODUCTION",
+        "implementation_wip_limit": 1
+      },
+      {
+        "lane_id": "api_distribution",
+        "display_name": "API / Distribution",
+        "pipeline_ids": [
+          "ppe"
+        ],
+        "mode": "PRODUCTION",
+        "implementation_wip_limit": 1
+      },
+      {
+        "lane_id": "structured_launchpad",
+        "display_name": "Structured Launchpad",
+        "pipeline_ids": [
+          "ppe"
+        ],
+        "mode": "INCUBATION",
+        "implementation_wip_limit": 0
+      },
+      {
+        "lane_id": "labs",
+        "display_name": "Labs",
+        "pipeline_ids": [
+          "ppe"
+        ],
+        "mode": "RESEARCH",
+        "implementation_wip_limit": 0
+      }
+    ]
+  }
 }
