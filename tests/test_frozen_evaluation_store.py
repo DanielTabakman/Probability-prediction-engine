@@ -10,6 +10,7 @@ from pathlib import Path
 
 from src.viz.frozen_evaluation_record import build_frozen_evaluation_record
 from src.viz.frozen_evaluation_store import (
+    get_snapshot_review_payload,
     get_by_id,
     insert_record,
     list_recent,
@@ -52,9 +53,88 @@ class TestFrozenEvaluationStore(unittest.TestCase):
                 assert got is not None
                 self.assertEqual(got["snapshot_id"], rid)
                 self.assertEqual(got["payload_schema_version"], rec["payload_schema_version"])
+                self.assertEqual(got["record_header"]["snapshot_id"], rid)
+                self.assertEqual(got["record_header"]["payload_schema_version"], "ppe_frozen_eval_v1")
                 self.assertEqual(got["classifier_version"], "bd-test-1")
                 self.assertEqual(got["benchmark_witness"]["forward_usd"], 100_000.0)
                 json.dumps(got)  # serializable
+
+                raw = conn.execute(
+                    "SELECT record_json FROM frozen_evaluations WHERE id = ?",
+                    (rid,),
+                ).fetchone()["record_json"]
+                self.assertEqual(raw, json.dumps(got, separators=(",", ":"), sort_keys=True, ensure_ascii=False))
+
+                review_payload = get_snapshot_review_payload(conn, rid)
+                assert review_payload is not None
+                self.assertEqual(review_payload["schema_version"], "snapshot_review_v1")
+                self.assertEqual(review_payload["snapshot_id"], rid)
+                self.assertEqual(review_payload["record_header"]["snapshot_id"], rid)
+                self.assertNotIn("owner_email", review_payload)
+                self.assertNotIn("owner_email", review_payload["record_header"])
+            finally:
+                conn.close()
+
+    def test_current_version_record_without_header_is_read_compatible(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "legacy-current.sqlite"
+            conn = open_store(p)
+            try:
+                rec = build_frozen_evaluation_record(verification={}, expiry_str="5MAY26")
+                rec.pop("record_header")
+                raw = json.dumps(rec, separators=(",", ":"), sort_keys=True, ensure_ascii=False)
+                conn.execute(
+                    """
+                    INSERT INTO frozen_evaluations
+                    (id, created_at, expiry, summary_line, record_json, owner_email)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (rec["snapshot_id"], rec["created_at_utc"], rec["expiry"], "legacy-current", raw, None),
+                )
+                conn.commit()
+
+                got = get_by_id(conn, rec["snapshot_id"])
+                assert got is not None
+                self.assertEqual(got["payload_schema_version"], "ppe_frozen_eval_v1")
+                self.assertEqual(got["record_header"]["snapshot_id"], rec["snapshot_id"])
+            finally:
+                conn.close()
+
+    def test_unsupported_frozen_record_versions_fail_at_store_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "unsupported.sqlite"
+            conn = open_store(p)
+            try:
+                rec = build_frozen_evaluation_record(verification={}, expiry_str="5MAY26")
+                rec["payload_schema_version"] = "frozen_evaluation_v1"
+                rec["record_header"]["payload_schema_version"] = "frozen_evaluation_v1"
+                with self.assertRaisesRegex(ValueError, "unsupported frozen evaluation payload_schema_version"):
+                    insert_record(conn, rec)
+
+                valid = build_frozen_evaluation_record(verification={}, expiry_str="5MAY26")
+                bad = dict(valid)
+                bad["payload_schema_version"] = "frozen_evaluation_v1"
+                bad["record_header"] = dict(valid["record_header"])
+                bad["record_header"]["payload_schema_version"] = "frozen_evaluation_v1"
+                conn.execute(
+                    """
+                    INSERT INTO frozen_evaluations
+                    (id, created_at, expiry, summary_line, record_json, owner_email)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        bad["snapshot_id"],
+                        bad["created_at_utc"],
+                        bad["expiry"],
+                        "bad-version",
+                        json.dumps(bad, separators=(",", ":"), sort_keys=True, ensure_ascii=False),
+                        None,
+                    ),
+                )
+                conn.commit()
+
+                with self.assertRaisesRegex(ValueError, "unsupported frozen evaluation payload_schema_version"):
+                    get_by_id(conn, bad["snapshot_id"])
             finally:
                 conn.close()
 
