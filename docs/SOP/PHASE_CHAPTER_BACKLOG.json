@@ -939,10 +939,10 @@
     },
     {
       "chapterId": "msos_market_moved_since_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 13. Deterministic last-seen versus now summary vs saved workflow/last-seen snapshot. No prediction or trade recommendation. Do not rebuild order 12 (#5480).",
+      "reason": "[DONE] Autobuilder order 13 shipped as PPE PR #5483 (7389d01b); deterministic last-seen versus now summary is on main. Refill terminal-excluded the stale queued copy; do not rebuild.",
       "autobuilderCatalogOrder": 13,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -955,7 +955,10 @@
       "autobuilderMergeAuthority": {
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-16T03:19:31+00:00"
-      }
+      },
+      "relatedPullRequests": [
+        "DanielTabakman/Probability-prediction-engine#5483"
+      ]
     },
     {
       "chapterId": "options_market_read_partner_acceptance_v1",
