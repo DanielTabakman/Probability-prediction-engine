@@ -20,7 +20,7 @@ CANON = [
 ]
 OPTIONS_A_ID = "options_horizon_comparison_v1"
 OPTIONS_B_ID = "options_expression_fit_ranking_v1"
-REGION_BET_13_ID = "msos_market_moved_since_v1"
+API_18_ID = "msos_implied_range_api_v1"
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -587,7 +587,7 @@ def test_issue_5374_reconciled_items_do_not_reappear_after_options_made_simple_s
     }
     ready_ids = {item["work_item_id"] for item in ppe["ready_work"]}
 
-    assert ready_ids == {REGION_BET_13_ID}
+    assert ready_ids == {API_18_ID}
     assert ready_ids.isdisjoint(reconciled_ids)
     assert snapshot["recommended_next_action"]["work_item_id"] not in reconciled_ids
 
@@ -1048,8 +1048,8 @@ def test_selection_context_without_exclusions_preserves_region_bet_recommendatio
         "scope": "request",
         "effect": "exclusions remove matching READY candidates from recommendation eligibility only; ready_work is unchanged",
     }
-    assert [item["work_item_id"] for item in ppe["ready_work"]] == [REGION_BET_13_ID]
-    assert snapshot["recommended_next_action"]["work_item_id"] == REGION_BET_13_ID
+    assert [item["work_item_id"] for item in ppe["ready_work"]] == [API_18_ID]
+    assert snapshot["recommended_next_action"]["work_item_id"] == API_18_ID
 
 
 def test_selection_context_excluding_merged_options_a_is_unmatched_and_recommends_region_bet(monkeypatch) -> None:
@@ -1062,8 +1062,8 @@ def test_selection_context_excluding_merged_options_a_is_unmatched_and_recommend
     ready_ids = [item["work_item_id"] for item in ppe["ready_work"]]
     rec = snapshot["recommended_next_action"]
 
-    assert ready_ids == [REGION_BET_13_ID]
-    assert rec["work_item_id"] == REGION_BET_13_ID
+    assert ready_ids == [API_18_ID]
+    assert rec["work_item_id"] == API_18_ID
     assert rec["selection_context"] == snapshot["selection_context"]
     assert rec["selection_explanation"]["selection_context"] == snapshot["selection_context"]
     assert snapshot["selection_context"]["matched_exclusions"] == []
@@ -1078,7 +1078,7 @@ def test_selection_context_excluding_options_pair_still_recommends_region_bet(mo
     snapshot = collect_portfolio(REPO, excluded_work_item_ids=[OPTIONS_A_ID, OPTIONS_B_ID])
     rec = snapshot["recommended_next_action"]
 
-    assert rec["work_item_id"] == REGION_BET_13_ID
+    assert rec["work_item_id"] == API_18_ID
     assert rec["state"] == "READY_TO_BUILD"
     assert snapshot["selection_context"]["matched_exclusions"] == []
     assert snapshot["selection_context"]["unmatched_exclusions"] == [OPTIONS_B_ID, OPTIONS_A_ID]
@@ -1091,7 +1091,7 @@ def test_selection_context_unknown_exclusion_reports_unmatched_without_blocking(
 
     snapshot = collect_portfolio(REPO, excluded_work_item_ids=["missing_work_item"])
 
-    assert snapshot["recommended_next_action"]["work_item_id"] == REGION_BET_13_ID
+    assert snapshot["recommended_next_action"]["work_item_id"] == API_18_ID
     assert snapshot["selection_context"]["matched_exclusions"] == []
     assert snapshot["selection_context"]["unmatched_exclusions"] == ["missing_work_item"]
 
@@ -1106,7 +1106,7 @@ def test_selection_context_deduplicates_and_sorts_exclusions(monkeypatch) -> Non
 
     assert first["selection_context"] == second["selection_context"]
     assert first["selection_context"]["excluded_work_item_ids"] == [OPTIONS_B_ID, OPTIONS_A_ID]
-    assert first["recommended_next_action"]["work_item_id"] == REGION_BET_13_ID
+    assert first["recommended_next_action"]["work_item_id"] == API_18_ID
 
 
 def test_cli_exclusion_contract_is_json_and_read_only(monkeypatch) -> None:
@@ -1148,7 +1148,7 @@ def test_cli_exclusion_contract_is_json_and_read_only(monkeypatch) -> None:
 
     assert proc.returncode == 0
     assert before == after
-    assert payload["recommended_next_action"]["work_item_id"] == REGION_BET_13_ID
+    assert payload["recommended_next_action"]["work_item_id"] == API_18_ID
     assert payload["selection_context"]["excluded_work_item_ids"] == [OPTIONS_A_ID]
 
 
