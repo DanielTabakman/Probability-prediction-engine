@@ -59,7 +59,7 @@
       "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MARKET_MOVED_SINCE_V1.md",
       "buildBranch": "build/auto/MSOS-MarketMovedSince-Product-Slice002",
       "declaredPlane": "PRODUCT-PLANE",
-      "implementationStatus": "PENDING",
+      "implementationStatus": "COMPLETE",
       "workerMode": "local-agent",
       "susMinutes": 90,
       "hardMinutes": 240,
@@ -87,7 +87,8 @@
         "chapterTitle": "MSOS market moved since v1",
         "chapterStatus": "COMPLETE",
         "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
-      }
+      },
+      "implementationStatus": "COMPLETE"
     }
   ]
 }
