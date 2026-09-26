@@ -16,4 +16,4 @@ This selection authorizes only the session-resume chapter listed in `docs/SOP/PH
 
 ## Order
 
-Catalog order 12 follows order 11 and is now terminal on `main` (PR #5480). Item 13 is the next JIT packet. Items 14–17 stay intent-only until 13 is terminal.
+Catalog order 12 follows order 11 and is now terminal on `main` (PR #5480). Item 13 is also terminal on `main` (PR #5483). Items 14–17 stay intent-only.

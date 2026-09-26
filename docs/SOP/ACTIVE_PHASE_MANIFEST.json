@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MARKET_MOVED_SINCE_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Autobuilder catalog order 13: MSOS market-moved-since after terminal 12 (#5480).",
+  "phasePlanPath": "",
+  "sprintSpecPath": "",
+  "selectionRecord": "",
+  "status": "COMPLETE",
+  "notes": "Catalog order 13 closed after product merge #5483 (7389d01). Do not rebuild market-moved-since. Autobuilder orders 14-17 stay uncataloged.",
   "workerMode": "local-agent"
 }

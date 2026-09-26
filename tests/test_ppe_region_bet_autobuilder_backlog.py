@@ -46,7 +46,8 @@ def test_completed_region_bet_frontier_is_recorded() -> None:
     assert rows[12]["status"] == "done"
     assert "#5480" in str(rows[12]["reason"])
     assert rows[13]["chapterId"] == "msos_market_moved_since_v1"
-    assert rows[13]["status"] == "ready"
+    assert rows[13]["status"] == "done"
+    assert "#5483" in str(rows[13]["reason"])
 
 
 def test_order_09_resolves_stale_draft_to_merged_replacement() -> None:
