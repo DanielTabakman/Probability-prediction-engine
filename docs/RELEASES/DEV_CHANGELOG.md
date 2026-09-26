@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-26
 
+- `76485e48` — Engineering OS: canonical lane/backlog/lifecycle metadata v1 (#5498) (`scripts/`)
+- `d991ee8b` — Control-plane: dev changelog
 - `8d426795` — docs: add Engineering OS phase 0 inventory (#5495) (`docs/SOP/`)
 - `3bc9f1d8` — Control-plane: dev changelog
 - `4e1fc521` — Control-plane: clarify API, MSOS and Autobuilder lane ownership (`docs/SOP/`)
