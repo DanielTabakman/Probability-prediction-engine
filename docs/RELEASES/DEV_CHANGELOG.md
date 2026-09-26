@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-26
 
+- `1a45708e` — Engineering OS: queue Implied Range API v1 for Autobuilder (#5502) (`docs/SOP/`)
+- `9d0207e6` — Control-plane: dev changelog
 - `76485e48` — Engineering OS: canonical lane/backlog/lifecycle metadata v1 (#5498) (`scripts/`)
 - `d991ee8b` — Control-plane: dev changelog
 - `8d426795` — docs: add Engineering OS phase 0 inventory (#5495) (`docs/SOP/`)
