@@ -246,16 +246,19 @@ def _external_source_root(pipe: dict[str, Any]) -> tuple[Path | None, dict[str, 
 
 
 def _ready_queue_items(repo: Path) -> list[dict[str, Any]]:
-    data, _ = _load_json(repo / "docs/SOP/PHASE_QUEUE.json")
+    queue_data, _ = _load_json(repo / "docs/SOP/PHASE_QUEUE.json")
     out: list[dict[str, Any]] = []
-    for index, item in enumerate((data or {}).get("items") or []):
+    seen: set[str] = set()
+    queue_items = (queue_data or {}).get("items") or []
+    for index, item in enumerate(queue_items):
         if not isinstance(item, dict):
             continue
         status = str(item.get("status") or "").strip().upper()
         if status != "READY":
             continue
+        work_item_id = Path(str(item.get("planPath") or "")).stem.replace("_relay", "")
         work = {
-            "work_item_id": Path(str(item.get("planPath") or "")).stem.replace("_relay", ""),
+            "work_item_id": work_item_id,
             "title": str(item.get("reason") or item.get("planPath") or "").strip(),
             "native_state": status,
             "state": "READY_TO_BUILD",
@@ -271,6 +274,78 @@ def _ready_queue_items(repo: Path) -> list[dict[str, Any]]:
             work["selected_native_dispatchable"] = packet.get("dispatchable")
             work["allowed_product_paths"] = packet.get("allowed_product_paths")
         out.append(work)
+        if work_item_id:
+            seen.add(work_item_id)
+
+    backlog_data, _ = _load_json(repo / "docs/SOP/PHASE_CHAPTER_BACKLOG.json")
+    for backlog_index, item in enumerate((backlog_data or {}).get("items") or []):
+        if not isinstance(item, dict):
+            continue
+        work_item_id = str(item.get("chapterId") or "").strip()
+        status = str(item.get("status") or "").strip().upper()
+        packet = item.get("autobuilderPacket")
+        if (
+            status != "READY"
+            or not work_item_id
+            or work_item_id in seen
+            or not isinstance(packet, dict)
+        ):
+            continue
+        slice_id = str(packet.get("sliceId") or "").strip()
+        allowed_paths = [
+            str(path)
+            for path in packet.get("allowedPaths") or []
+            if isinstance(path, str) and path.strip()
+        ]
+        acceptance = [
+            str(value)
+            for value in packet.get("acceptanceCriteria") or []
+            if isinstance(value, str) and value.strip()
+        ]
+        dispatch_blockers: list[str] = []
+        if not slice_id:
+            dispatch_blockers.append("autobuilderPacket.sliceId is missing")
+        if not allowed_paths:
+            dispatch_blockers.append("autobuilderPacket.allowedPaths is empty")
+        if not acceptance:
+            dispatch_blockers.append("autobuilderPacket.acceptanceCriteria is empty")
+        work = {
+            "work_item_id": work_item_id,
+            "title": str(item.get("reason") or work_item_id).strip(),
+            "native_state": status,
+            "state": "READY_TO_BUILD",
+            "trace": f"docs/SOP/PHASE_CHAPTER_BACKLOG.json#{work_item_id}",
+            "evidence": "manual",
+            "selection": _selection_metadata(
+                item,
+                age_index=len(queue_items) + backlog_index,
+            ),
+            "native_prerequisites": {
+                "read_only": True,
+                "source": "ppe_backlog_autobuilder_packet",
+                "generated_at": _utc_now(),
+                "source_plan": None,
+                "selected_native_slice": slice_id or None,
+                "allowed_product_paths": allowed_paths,
+                "dispatchable": not dispatch_blockers,
+                "dispatch_blockers": dispatch_blockers,
+                "evidence": {
+                    "source_files": [
+                        _evidence_source_file(
+                            repo,
+                            "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                        )
+                    ],
+                },
+                "statuses": {},
+            },
+            "source_plan": None,
+            "selected_native_slice": slice_id or None,
+            "selected_native_dispatchable": not dispatch_blockers,
+            "allowed_product_paths": allowed_paths,
+        }
+        out.append(work)
+        seen.add(work_item_id)
     return out
 
 
@@ -971,7 +1046,7 @@ def _ppe_next_action(
     return {
         "state": "UNFILLED",
         "action_type": "evidence check",
-        "summary": "No READY PPE queue item found in PHASE_QUEUE.json.",
+        "summary": "No READY PPE queue or bounded backlog packet found.",
         "evidence": "manual",
     }
 
@@ -1398,285 +1473,3 @@ def _recommend_next(
             "selection_rank": list(rank),
             "selection_context": selection_context,
             "selection_explanation": _selection_explanation(pipe, work, rank, selection_context),
-        }
-
-    all_ready_candidates_excluded = bool(ready_candidate_count and excluded_ready_count == ready_candidate_count)
-
-    review_candidates = [
-        (str(pipe.get("pipeline_id") or ""), pipe, item)
-        for pipe in pipelines_snapshot
-        for item in (pipe.get("awaiting_review_work") or [])
-        if isinstance(item, dict)
-    ]
-    if review_candidates:
-        _, pipe, item = sorted(review_candidates, key=lambda row: (row[0], str(row[2].get("work_item_id") or "")))[0]
-        return {
-            "pipeline_id": pipe.get("pipeline_id"),
-            "state": "AWAITING_REVIEW",
-            "action_type": "review",
-            "summary": f"Review {item.get('work_item_id') or 'candidate'}",
-            "work_item_id": item.get("work_item_id"),
-            "evidence": item.get("evidence"),
-            "selection_context": selection_context,
-        }
-
-    pipeline_actions = []
-    action_priority = {"RUNNING": 0, "AWAITING_FOUNDER": 1, "BLOCKED": 2, "BACKPRESSURE": 3, "UNFILLED": 4, "COMPLETE": 5}
-    for pipe in pipelines_snapshot:
-        action = pipe.get("next_action") if isinstance(pipe.get("next_action"), dict) else {}
-        state = str(action.get("state") or pipe.get("state") or "BLOCKED")
-        if state == "READY_TO_BUILD" and str(action.get("work_item_id") or "") in excluded_work_item_ids:
-            continue
-        pipeline_actions.append((action_priority.get(state, 99), str(pipe.get("pipeline_id") or ""), pipe, action))
-
-    sorted_pipeline_actions = sorted(pipeline_actions, key=lambda item: (item[0], item[1]))
-    if sorted_pipeline_actions and sorted_pipeline_actions[0][0] < action_priority["UNFILLED"]:
-        _, _, pipe, action = sorted_pipeline_actions[0]
-        return {
-            "pipeline_id": pipe.get("pipeline_id"),
-            "state": action.get("state") or pipe.get("state"),
-            "action_type": action.get("action_type"),
-            "summary": action.get("summary"),
-            "work_item_id": action.get("work_item_id"),
-            "evidence": action.get("evidence"),
-            "selection_context": selection_context,
-        }
-
-    if all_ready_candidates_excluded:
-        return {
-            "pipeline_id": None,
-            "state": "UNFILLED",
-            "action_type": "build",
-            "summary": "READY_TO_BUILD items exist, but all eligible build candidates were excluded by request context.",
-            "work_item_id": None,
-            "evidence": "request_scoped_selection_context",
-            "selection_context": selection_context,
-        }
-
-    if not pipeline_actions:
-        return {
-            "pipeline_id": None,
-            "state": "UNFILLED",
-            "action_type": "evidence check",
-            "summary": "No registered pipelines.",
-            "evidence": "missing",
-            "selection_context": selection_context,
-        }
-    _, _, pipe, action = sorted_pipeline_actions[0]
-    return {
-        "pipeline_id": pipe.get("pipeline_id"),
-        "state": action.get("state") or pipe.get("state"),
-        "action_type": action.get("action_type"),
-        "summary": action.get("summary"),
-        "work_item_id": action.get("work_item_id"),
-        "evidence": action.get("evidence"),
-        "selection_context": selection_context,
-    }
-
-
-def _pipeline_evidence_rank(pipe: dict[str, Any]) -> int:
-    evidence = pipe.get("evidence") if isinstance(pipe.get("evidence"), list) else []
-    kinds = {str(item.get("kind") or "") for item in evidence if isinstance(item, dict)}
-    if "native_runtime" in kinds:
-        return 0
-    if "manual" in kinds or "canonical" in kinds:
-        return 1
-    if "inferred" in kinds:
-        return 2
-    return 3
-
-
-def _selection_explanation(
-    pipe: dict[str, Any],
-    work: dict[str, Any],
-    rank: tuple[Any, ...],
-    selection_context: dict[str, Any],
-) -> dict[str, Any]:
-    selection = work.get("selection") if isinstance(work.get("selection"), dict) else {}
-    return {
-        "policy": [
-            "explicit accepted founder priority",
-            "accepted external deadline",
-            "dependency-unblock value",
-            "readiness and evidence freshness",
-            "portfolio fairness",
-            "age within priority class",
-            "deterministic tie-breaker",
-        ],
-        "winner": {
-            "pipeline_id": pipe.get("pipeline_id"),
-            "work_item_id": work.get("work_item_id"),
-            "founder_priority": selection.get("founder_priority"),
-            "deadline": selection.get("deadline"),
-            "dependency_unblock_value": selection.get("dependency_unblock_value"),
-            "age_index": selection.get("age_index"),
-        },
-        "rank_tuple": list(rank),
-        "selection_context": selection_context,
-        "why": "Selected the lowest deterministic rank among safe READY_TO_BUILD items; blocked/stale pipelines are excluded.",
-    }
-
-
-def format_commands() -> str:
-    lines = ["Founder commands (read-only implementation status)", ""]
-    for name, meaning, example in COMMANDS:
-        if name in {"what's next", "what's running", "commands"}:
-            marker = "implemented read-only"
-        elif name == "build next":
-            marker = "installed/enabled one-shot dispatch via Autobuilder; this help entrypoint remains read-only"
-        else:
-            marker = "disabled/unimplemented"
-        lines.append(f"- {name}: {meaning} Example: `{example}` ({marker})")
-    lines.append("")
-    lines.append("Read-only v1 confirmation: this entrypoint never dispatches, enqueues, approves, repairs, or writes.")
-    return "\n".join(lines) + "\n"
-
-
-def format_whats_next(snapshot: dict[str, Any]) -> str:
-    lines = [
-        "Founder portfolio: what's next",
-        "",
-        "Read-only: yes. No work was dispatched, queued, approved, repaired, or written.",
-        f"As of: {snapshot.get('as_of')}",
-        "",
-    ]
-    rec = snapshot.get("recommended_next_action") or {}
-    lines.append(
-        "Recommended next action: "
-        f"{rec.get('pipeline_id') or 'none'} / {rec.get('state')} / {rec.get('action_type')} - {rec.get('summary')}"
-    )
-    if rec.get("selection_explanation"):
-        lines.append(f"Selection: {rec['selection_explanation'].get('why')}")
-    lines.append("")
-    lines.append("Engineering OS lanes:")
-    for lane in (snapshot.get("engineering_os") or {}).get("lanes") or []:
-        states = ", ".join(
-            f"{item.get('pipeline_id')}={item.get('state')}"
-            for item in lane.get("pipeline_states") or []
-        ) or "no pipeline evidence"
-        lines.append(
-            f"- {lane.get('lane_id')}: mode={lane.get('mode')} "
-            f"wip={lane.get('implementation_wip_limit')} ({states})"
-        )
-    lines.append("")
-    lines.append("Pipelines:")
-    for pipe in snapshot.get("pipelines") or []:
-        action = pipe.get("next_action") or {}
-        evidence = action.get("evidence") or "missing"
-        lines.append(
-            f"- {pipe.get('pipeline_id')}: {pipe.get('state')} "
-            f"(native={pipe.get('native_state')}, evidence={evidence}) - {action.get('summary')}"
-        )
-    errors = snapshot.get("registry_errors") or []
-    if errors:
-        lines.extend(["", "Registry validation errors:"])
-        lines.extend(f"- {err}" for err in errors)
-    return "\n".join(lines) + "\n"
-
-
-def format_whats_running(snapshot: dict[str, Any]) -> str:
-    cap = snapshot.get("capacity") or {}
-    lines = [
-        "Founder portfolio: what's running",
-        "",
-        "Read-only: yes. No work was dispatched, queued, approved, repaired, or written.",
-        f"As of: {snapshot.get('as_of')}",
-        f"AUTOMATIC BUILD MODE: {cap.get('automatic_mode')}",
-        f"DESIRED CAPACITY: {cap.get('desired')}",
-        f"CONFIGURED MAX: {cap.get('configured_max')}",
-        f"RUNNING: {cap.get('running')}",
-        f"READY TO BUILD: {cap.get('ready')}",
-        f"QUEUED: {cap.get('queued')}",
-        f"AWAITING REVIEW: {cap.get('awaiting_review')}",
-        f"AVAILABLE CAPACITY: {cap.get('available')}",
-        "",
-    ]
-    for pipe in snapshot.get("pipelines") or []:
-        pcap = pipe.get("capacity") or {}
-        lines.append(f"{pipe.get('pipeline_id')} ({pipe.get('registration_stage')}):")
-        lines.append(
-            f"  mode={pcap.get('automatic_mode')} desired={pcap.get('desired')} "
-            f"configured={pcap.get('configured_max')} available={pcap.get('available')}"
-        )
-        for label, key in (
-            ("running", "running_work"),
-            ("ready to build", "ready_work"),
-            ("queued", "queued_work"),
-            ("awaiting review", "awaiting_review_work"),
-            ("backpressure", "backpressure"),
-            ("stale evidence", "stale_evidence"),
-        ):
-            items = pipe.get(key) or []
-            if not items:
-                lines.append(f"  {label}: none")
-            else:
-                lines.append(f"  {label}:")
-                for item in items[:6]:
-                    if isinstance(item, dict):
-                        name = item.get("work_item_id") or item.get("reason") or item.get("source") or item.get("message")
-                        ev = item.get("evidence") or item.get("kind") or "unknown"
-                        lines.append(f"    - {name} (state={item.get('state')}, evidence={ev})")
-        lines.append("")
-    return "\n".join(lines).rstrip() + "\n"
-
-
-def _normalize_command(words: list[str]) -> str:
-    text = " ".join(words).strip().lower()
-    text = text.replace("’", "'")
-    aliases = {
-        "whats-next": "what's next",
-        "whats next": "what's next",
-        "what next": "what's next",
-        "next": "what's next",
-        "whats-running": "what's running",
-        "whats running": "what's running",
-        "running": "what's running",
-        "help": "commands",
-    }
-    return aliases.get(text, text)
-
-
-def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Read-only founder portfolio commands")
-    ap.add_argument("command", nargs="*", help="commands | what's next | what's running")
-    ap.add_argument("--repo-root", type=Path, default=ROOT)
-    ap.add_argument("--json", action="store_true")
-    ap.add_argument(
-        "--exclude-work-item-id",
-        action="append",
-        default=[],
-        help="Request-scoped READY work item ID to exclude from recommended_next_action eligibility.",
-    )
-    args = ap.parse_args(argv)
-
-    command = _normalize_command(args.command or ["commands"])
-    repo = args.repo_root.resolve()
-
-    if command == "commands":
-        payload = {"read_only": True, "commands": COMMANDS}
-        if args.json:
-            print(json.dumps(payload, indent=2))
-        else:
-            print(format_commands(), end="")
-        return 0
-
-    if command not in {"what's next", "what's running"}:
-        print(
-            f"founder_portfolio: unsupported or non-read-only command `{command}`. "
-            "Implemented read-only commands: what's next, what's running, commands.",
-            file=sys.stderr,
-        )
-        return 2
-
-    snapshot = collect_portfolio(repo, excluded_work_item_ids=args.exclude_work_item_id)
-    if args.json:
-        print(json.dumps(snapshot, indent=2))
-    elif command == "what's next":
-        print(format_whats_next(snapshot), end="")
-    else:
-        print(format_whats_running(snapshot), end="")
-    return 1 if snapshot.get("registry_errors") else 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
