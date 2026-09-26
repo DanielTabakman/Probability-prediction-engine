@@ -1015,8 +1015,6 @@
       "status": "ready",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "planPath": "docs/SOP/PHASE_PLANS/msos_implied_range_api_v1_relay.json",
-      "selectionRecord": "docs/SOP/POST_MSOS_IMPLIED_RANGE_API_V1_SELECTION.md",
       "canonRef": "DanielTabakman/Probability-prediction-engine#5501",
       "reason": "[HIGH READY] Engineering OS API / Distribution priority. Add GET /v1/implied-range as an additive BTC/ETH machine primitive by reusing existing Options Horizon / Options Market Read infrastructure; no second options engine or cache.",
       "autobuilderCatalogOrder": 18,
@@ -1028,6 +1026,40 @@
       "autobuilderMergeAuthority": {
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-26T20:34:04+00:00"
+      },
+      "autobuilderPacket": {
+        "version": 1,
+        "sliceId": "MSOS-ImpliedRange-Product-Slice002",
+        "layerPreset": "PPE_UI",
+        "buildBranch": "build/auto/MSOS-ImpliedRange-Product-Slice002",
+        "declaredPlane": "PRODUCT-PLANE",
+        "workerMode": "local-agent",
+        "maxAttempts": 2,
+        "susMinutes": 90,
+        "hardMinutes": 240,
+        "allowedPaths": [
+          "src/viz/implied_range.py",
+          "src/viz/options_market_read.py",
+          "src/viz/display_payload_server.py",
+          "src/engine/implied_distribution.py",
+          "docs/API/IMPLIED_RANGE_V1.md",
+          "docs/API/implied-range.openapi.yaml",
+          "tests/test_implied_range_api.py",
+          "tests/test_implied_range_numerics.py",
+          "tests/fixtures/implied_range/"
+        ],
+        "acceptanceCriteria": [
+          "GET /v1/implied-range accepts BTC or ETH, an explicit supported listed expiry, and an optional positive strike with deterministic machine-readable validation errors.",
+          "Reuse existing Options Horizon / Options Market Read calculation and market-data/cache infrastructure; do not create a second options engine, producer, or cache.",
+          "Return asset, expiry, as_of UTC, spot, implied_forward, atm_iv, median, p25, p75, one_sigma_low, one_sigma_high, quality status/flags, method, and informational-only disclaimer when available.",
+          "When strike is supplied, probability_above and probability_below remain in [0,1] and sum to 1 within numerical tolerance.",
+          "Represent stale, degraded, missing, and unavailable source conditions honestly without invented financial values.",
+          "Cover known-good BTC and ETH, degraded-data, unavailable-source, schema, and numerical invariants with tests.",
+          "Publish OpenAPI and direct HTTP documentation independent of Qatom; existing /v1/options-market-read behavior remains backward compatible."
+        ],
+        "validation": {
+          "profile_id": "ppe-ci-pytest-v1"
+        }
       }
     }
   ]
