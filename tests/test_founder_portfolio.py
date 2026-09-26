@@ -1195,3 +1195,27 @@ def test_engineering_os_lane_metadata_fails_closed_on_dispatch_rule_drift(tmp_pa
 
     errors = validate_registry(repo)
     assert "engineering_os: dispatch requires COMMITTED backlog class" in errors
+
+def test_portfolio_exposes_engineering_os_lane_view_without_claiming_lane_native_queues(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _minimal_repo(tmp_path)
+    snapshot = collect_portfolio(repo)
+    os_view = snapshot["engineering_os"]
+
+    assert {lane["lane_id"] for lane in os_view["lanes"]} == {
+        "factory",
+        "msos",
+        "api_distribution",
+        "structured_launchpad",
+        "labs",
+    }
+    assert all(lane["lane_native_queue_isolation"] is False for lane in os_view["lanes"])
+    assert next(lane for lane in os_view["lanes"] if lane["lane_id"] == "structured_launchpad")[
+        "implementation_wip_limit"
+    ] == 0
+    assert os_view["dispatch_rule"]["requires_backlog_class"] == "COMMITTED"
+    assert os_view["dispatch_rule"]["requires_native_state"] == "READY_TO_BUILD"
