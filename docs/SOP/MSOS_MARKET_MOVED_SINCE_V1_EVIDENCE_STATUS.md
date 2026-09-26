@@ -2,15 +2,15 @@
 
 ## Status
 
-CHARTERED. Ready for Autobuilder catalog order 13 after terminal order 12 (#5480).
+COMPLETE. Product implementation merged to main via PPE PR #5483; Autobuilder/refill records catalog order 13 as terminal and excluded from rebuild.
 
 ## COORDINATION STATUS
 
 | Slice | Status | Evidence |
 | --- | --- | --- |
 | `MSOS-MarketMovedSince-Control-Slice001` | COMPLETE | Founder-approved charter, queue entry, phase plan, and selection record for Autobuilder catalog order 13. |
-| `MSOS-MarketMovedSince-Product-Slice002` | PENDING | Deterministic last-seen versus now summary on existing Monitor and History surfaces. |
-| `MSOS-MarketMovedSince-Closeout-Slice003` | PENDING | Awaiting product merge. |
+| `MSOS-MarketMovedSince-Product-Slice002` | COMPLETE | Product implementation merged to main via PPE PR #5483. |
+| `MSOS-MarketMovedSince-Closeout-Slice003` | COMPLETE | Queue/backlog/phase-plan closeout aligned after merge #5483. |
 
 ## Owns
 

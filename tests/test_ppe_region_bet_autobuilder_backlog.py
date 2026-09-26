@@ -6,8 +6,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SOP = ROOT / "docs" / "SOP"
 BACKLOG = SOP / "PHASE_CHAPTER_BACKLOG.json"
 
-RUNNABLE_ORDERS = (9, 10, 11, 12, 13, 16, 17)
-DEFERRED_ORDERS = (14, 15)
+RUNNABLE_ORDERS = (9, 10, 11, 12, 13)
+DEFERRED_ORDERS = (14, 15, 16, 17)
 
 
 def _items_by_order() -> dict[int, dict[str, object]]:
@@ -46,7 +46,7 @@ def test_completed_region_bet_frontier_is_recorded() -> None:
     assert rows[12]["status"] == "done"
     assert "#5480" in str(rows[12]["reason"])
     assert rows[13]["chapterId"] == "msos_market_moved_since_v1"
-    assert rows[13]["status"] == "ready"
+    assert rows[13]["status"] == "done"
 
 
 def test_order_09_resolves_stale_draft_to_merged_replacement() -> None:
@@ -109,6 +109,8 @@ def test_archive_gated_orders_stay_deferred_without_blocking_region_bet() -> Non
     rows = _items_by_order()
     assert rows[14]["eligibility"] == "deferred_until_archive_gate"
     assert rows[15]["status"] == "deferred"
+    assert rows[16]["eligibility"] == "deferred_by_engineering_os"
+    assert rows[17]["eligibility"] == "deferred_by_engineering_os"
     for order in DEFERRED_ORDERS:
         assert rows[order].get("packetization") != "just_in_time"
         assert "autobuilderMergeAuthority" not in rows[order]

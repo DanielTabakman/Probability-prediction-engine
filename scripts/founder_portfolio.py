@@ -246,16 +246,19 @@ def _external_source_root(pipe: dict[str, Any]) -> tuple[Path | None, dict[str, 
 
 
 def _ready_queue_items(repo: Path) -> list[dict[str, Any]]:
-    data, _ = _load_json(repo / "docs/SOP/PHASE_QUEUE.json")
+    queue_data, _ = _load_json(repo / "docs/SOP/PHASE_QUEUE.json")
     out: list[dict[str, Any]] = []
-    for index, item in enumerate((data or {}).get("items") or []):
+    seen: set[str] = set()
+    queue_items = (queue_data or {}).get("items") or []
+    for index, item in enumerate(queue_items):
         if not isinstance(item, dict):
             continue
         status = str(item.get("status") or "").strip().upper()
         if status != "READY":
             continue
+        work_item_id = Path(str(item.get("planPath") or "")).stem.replace("_relay", "")
         work = {
-            "work_item_id": Path(str(item.get("planPath") or "")).stem.replace("_relay", ""),
+            "work_item_id": work_item_id,
             "title": str(item.get("reason") or item.get("planPath") or "").strip(),
             "native_state": status,
             "state": "READY_TO_BUILD",
@@ -271,8 +274,79 @@ def _ready_queue_items(repo: Path) -> list[dict[str, Any]]:
             work["selected_native_dispatchable"] = packet.get("dispatchable")
             work["allowed_product_paths"] = packet.get("allowed_product_paths")
         out.append(work)
-    return out
+        if work_item_id:
+            seen.add(work_item_id)
 
+    backlog_data, _ = _load_json(repo / "docs/SOP/PHASE_CHAPTER_BACKLOG.json")
+    for backlog_index, item in enumerate((backlog_data or {}).get("items") or []):
+        if not isinstance(item, dict):
+            continue
+        work_item_id = str(item.get("chapterId") or "").strip()
+        status = str(item.get("status") or "").strip().upper()
+        packet = item.get("autobuilderPacket")
+        if (
+            status != "READY"
+            or not work_item_id
+            or work_item_id in seen
+            or not isinstance(packet, dict)
+        ):
+            continue
+        slice_id = str(packet.get("sliceId") or "").strip()
+        allowed_paths = [
+            str(path)
+            for path in packet.get("allowedPaths") or []
+            if isinstance(path, str) and path.strip()
+        ]
+        acceptance = [
+            str(value)
+            for value in packet.get("acceptanceCriteria") or []
+            if isinstance(value, str) and value.strip()
+        ]
+        dispatch_blockers: list[str] = []
+        if not slice_id:
+            dispatch_blockers.append("autobuilderPacket.sliceId is missing")
+        if not allowed_paths:
+            dispatch_blockers.append("autobuilderPacket.allowedPaths is empty")
+        if not acceptance:
+            dispatch_blockers.append("autobuilderPacket.acceptanceCriteria is empty")
+        work = {
+            "work_item_id": work_item_id,
+            "title": str(item.get("reason") or work_item_id).strip(),
+            "native_state": status,
+            "state": "READY_TO_BUILD",
+            "trace": f"docs/SOP/PHASE_CHAPTER_BACKLOG.json#{work_item_id}",
+            "evidence": "manual",
+            "selection": _selection_metadata(
+                item,
+                age_index=len(queue_items) + backlog_index,
+            ),
+            "native_prerequisites": {
+                "read_only": True,
+                "source": "ppe_backlog_autobuilder_packet",
+                "generated_at": _utc_now(),
+                "source_plan": None,
+                "selected_native_slice": slice_id or None,
+                "allowed_product_paths": allowed_paths,
+                "dispatchable": not dispatch_blockers,
+                "dispatch_blockers": dispatch_blockers,
+                "evidence": {
+                    "source_files": [
+                        _evidence_source_file(
+                            repo,
+                            "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                        )
+                    ],
+                },
+                "statuses": {},
+            },
+            "source_plan": None,
+            "selected_native_slice": slice_id or None,
+            "selected_native_dispatchable": not dispatch_blockers,
+            "allowed_product_paths": allowed_paths,
+        }
+        out.append(work)
+        seen.add(work_item_id)
+    return out
 
 def _native_prerequisites_for_ready_item(repo: Path, queue_item: dict[str, Any]) -> dict[str, Any] | None:
     plan_rel = _safe_rel(queue_item.get("planPath"))
@@ -971,7 +1045,7 @@ def _ppe_next_action(
     return {
         "state": "UNFILLED",
         "action_type": "evidence check",
-        "summary": "No READY PPE queue item found in PHASE_QUEUE.json.",
+        "summary": "No READY PPE queue or bounded backlog packet found.",
         "evidence": "manual",
     }
 
