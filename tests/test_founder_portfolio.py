@@ -16,6 +16,7 @@ CANON = [
     "docs/SOP/FOUNDER_PIPELINE_COMMANDS_V1.md",
     "docs/SOP/PIPELINE_CREATION_SOP_V1.md",
     "docs/SOP/SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md",
+    "docs/SOP/ENGINEERING_OPERATING_SYSTEM_V1.md",
 ]
 OPTIONS_A_ID = "options_horizon_comparison_v1"
 OPTIONS_B_ID = "options_expression_fit_ranking_v1"
@@ -1162,3 +1163,60 @@ def test_unsupported_build_next_does_not_dispatch() -> None:
     )
     assert proc.returncode == 2
     assert "unsupported or non-read-only command" in proc.stderr
+
+def test_engineering_os_lane_metadata_is_canonical(tmp_path: Path) -> None:
+    from scripts.founder_portfolio_registry import load_registry, validate_registry
+
+    repo = _minimal_repo(tmp_path)
+    assert validate_registry(repo) == []
+    data = load_registry(repo)
+    os_meta = data["engineering_os"]
+
+    assert {lane["lane_id"] for lane in os_meta["lanes"]} == {
+        "factory",
+        "msos",
+        "api_distribution",
+        "structured_launchpad",
+        "labs",
+    }
+    assert set(os_meta["backlog_classes"]) == {"RESEARCH", "CANDIDATE", "COMMITTED"}
+    assert os_meta["dispatch_rule"]["requires_backlog_class"] == "COMMITTED"
+    assert os_meta["dispatch_rule"]["requires_native_state"] == "READY_TO_BUILD"
+
+
+def test_engineering_os_lane_metadata_fails_closed_on_dispatch_rule_drift(tmp_path: Path) -> None:
+    from scripts.founder_portfolio_registry import _load_registry_cached, validate_registry
+
+    repo = _minimal_repo(tmp_path)
+    registry_path = repo / "config/founder_pipeline_registry.json"
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    payload["engineering_os"]["dispatch_rule"]["requires_backlog_class"] = "CANDIDATE"
+    registry_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    _load_registry_cached.cache_clear()
+
+    errors = validate_registry(repo)
+    assert "engineering_os: dispatch requires COMMITTED backlog class" in errors
+
+def test_portfolio_exposes_engineering_os_lane_view_without_claiming_lane_native_queues(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _minimal_repo(tmp_path)
+    snapshot = collect_portfolio(repo)
+    os_view = snapshot["engineering_os"]
+
+    assert {lane["lane_id"] for lane in os_view["lanes"]} == {
+        "factory",
+        "msos",
+        "api_distribution",
+        "structured_launchpad",
+        "labs",
+    }
+    assert all(lane["lane_native_queue_isolation"] is False for lane in os_view["lanes"])
+    assert next(lane for lane in os_view["lanes"] if lane["lane_id"] == "structured_launchpad")[
+        "implementation_wip_limit"
+    ] == 0
+    assert os_view["dispatch_rule"]["requires_backlog_class"] == "COMMITTED"
+    assert os_view["dispatch_rule"]["requires_native_state"] == "READY_TO_BUILD"

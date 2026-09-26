@@ -1184,6 +1184,69 @@ def _autobuilder_next_action(
     }
 
 
+
+def _engineering_os_lane_view(
+    registry: dict[str, Any],
+    pipelines_snapshot: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Return a read-only logical-lane view without inventing lane-native runtime state."""
+    metadata = registry.get("engineering_os") if isinstance(registry.get("engineering_os"), dict) else {}
+    by_pipeline = {
+        str(item.get("pipeline_id") or ""): item
+        for item in pipelines_snapshot
+        if isinstance(item, dict)
+    }
+    lanes: list[dict[str, Any]] = []
+    for lane in metadata.get("lanes") or []:
+        if not isinstance(lane, dict):
+            continue
+        pipeline_ids = [str(item) for item in lane.get("pipeline_ids") or []]
+        pipeline_states = []
+        for pipeline_id in pipeline_ids:
+            pipe = by_pipeline.get(pipeline_id)
+            if pipe is None:
+                pipeline_states.append(
+                    {
+                        "pipeline_id": pipeline_id,
+                        "state": "BLOCKED",
+                        "native_state": "MISSING",
+                        "evidence": "missing",
+                    }
+                )
+                continue
+            action = pipe.get("next_action") if isinstance(pipe.get("next_action"), dict) else {}
+            pipeline_states.append(
+                {
+                    "pipeline_id": pipeline_id,
+                    "state": pipe.get("state"),
+                    "native_state": pipe.get("native_state"),
+                    "evidence": action.get("evidence") or "missing",
+                }
+            )
+        lanes.append(
+            {
+                "lane_id": lane.get("lane_id"),
+                "display_name": lane.get("display_name"),
+                "mode": lane.get("mode"),
+                "implementation_wip_limit": lane.get("implementation_wip_limit"),
+                "pipeline_ids": pipeline_ids,
+                "pipeline_states": pipeline_states,
+                "lane_native_queue_isolation": False,
+                "note": (
+                    "Logical lane metadata only. Running/queued/ready truth remains pipeline-native "
+                    "until a lane-specific adapter is accepted."
+                ),
+            }
+        )
+    return {
+        "version": metadata.get("version"),
+        "canon": metadata.get("canon"),
+        "backlog_classes": metadata.get("backlog_classes") or [],
+        "lifecycle_states": metadata.get("lifecycle_states") or [],
+        "dispatch_rule": metadata.get("dispatch_rule") or {},
+        "lanes": lanes,
+    }
+
 def collect_portfolio(repo: Path, excluded_work_item_ids: list[str] | None = None) -> dict[str, Any]:
     repo = repo.resolve()
     errors = validate_registry(repo)
@@ -1246,6 +1309,7 @@ def collect_portfolio(repo: Path, excluded_work_item_ids: list[str] | None = Non
             "source": "config/founder_pipeline_registry.json",
         },
         "pipelines": snapshots,
+        "engineering_os": _engineering_os_lane_view(registry, snapshots),
         "selection_context": selection_context,
         "recommended_next_action": _recommend_next(snapshots, selection_context=selection_context),
     }
@@ -1483,6 +1547,17 @@ def format_whats_next(snapshot: dict[str, Any]) -> str:
     )
     if rec.get("selection_explanation"):
         lines.append(f"Selection: {rec['selection_explanation'].get('why')}")
+    lines.append("")
+    lines.append("Engineering OS lanes:")
+    for lane in (snapshot.get("engineering_os") or {}).get("lanes") or []:
+        states = ", ".join(
+            f"{item.get('pipeline_id')}={item.get('state')}"
+            for item in lane.get("pipeline_states") or []
+        ) or "no pipeline evidence"
+        lines.append(
+            f"- {lane.get('lane_id')}: mode={lane.get('mode')} "
+            f"wip={lane.get('implementation_wip_limit')} ({states})"
+        )
     lines.append("")
     lines.append("Pipelines:")
     for pipe in snapshot.get("pipelines") or []:
