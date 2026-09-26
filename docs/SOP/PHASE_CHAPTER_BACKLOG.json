@@ -985,12 +985,7 @@
       "dependsOn": [
         "region_bet_monitor_value_v1"
       ],
-      "packetization": "just_in_time",
-      "planPath": "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json",
-      "autobuilderMergeAuthority": {
-        "class": "AUTO_MERGE_WHEN_GREEN",
-        "declaredAt": "2026-09-16T03:19:31+00:00"
-      }
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_manage_adjust_v1_relay.json"
     },
     {
       "chapterId": "region_bet_learning_closeout_v1",
@@ -1003,12 +998,7 @@
       "dependsOn": [
         "region_bet_monitor_value_v1"
       ],
-      "packetization": "just_in_time",
-      "planPath": "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json",
-      "autobuilderMergeAuthority": {
-        "class": "AUTO_MERGE_WHEN_GREEN",
-        "declaredAt": "2026-09-16T03:19:31+00:00"
-      }
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_learning_closeout_v1_relay.json"
     },
     {
       "chapterId": "msos_implied_range_api_v1",
@@ -1046,7 +1036,10 @@
           "docs/API/implied-range.openapi.yaml",
           "tests/test_implied_range_api.py",
           "tests/test_implied_range_numerics.py",
-          "tests/fixtures/implied_range/"
+          "tests/fixtures/implied_range/btc.json",
+          "tests/fixtures/implied_range/eth.json",
+          "tests/fixtures/implied_range/degraded.json",
+          "tests/fixtures/implied_range/unavailable.json"
         ],
         "acceptanceCriteria": [
           "GET /v1/implied-range accepts BTC or ETH, an explicit supported listed expiry, and an optional positive strike with deterministic machine-readable validation errors.",
