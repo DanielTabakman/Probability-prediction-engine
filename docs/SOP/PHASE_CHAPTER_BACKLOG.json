@@ -939,10 +939,10 @@
     },
     {
       "chapterId": "msos_market_moved_since_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 13. Deterministic last-seen versus now summary vs saved workflow/last-seen snapshot. No prediction or trade recommendation. Do not rebuild order 12 (#5480).",
+      "reason": "[DONE] Autobuilder order 13 merged to main as PPE PR #5483. Refill exclusion is terminal; do not rebuild.",
       "autobuilderCatalogOrder": 13,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -976,12 +976,12 @@
     },
     {
       "chapterId": "region_bet_manage_adjust_v1",
-      "status": "blocked",
+      "status": "deferred",
       "priority": "medium",
       "focusPlaybookTier": "P2",
-      "reason": "[MEDIUM BLOCKED] Autobuilder intent order 16. Paper-only educational management layer (alive/improving/deteriorating/invalidated/expired; hold/exit/roll/adjust/add note). No live broker execution or advice. Dependency: region_bet_monitor_value_v1.",
+      "reason": "[DEFERRED] Historical Autobuilder order 16. Engineering OS v1 prioritizes Factory hardening, MSOS simplification, and API/Distribution work before additional Region Bet expansion. Preserve the charter; do not auto-materialize.",
       "autobuilderCatalogOrder": 16,
-      "eligibility": "blocked_until_predecessor_terminal",
+      "eligibility": "deferred_by_engineering_os",
       "dependsOn": [
         "region_bet_monitor_value_v1"
       ],
@@ -994,12 +994,12 @@
     },
     {
       "chapterId": "region_bet_learning_closeout_v1",
-      "status": "blocked",
+      "status": "deferred",
       "priority": "medium",
       "focusPlaybookTier": "P2",
-      "reason": "[MEDIUM BLOCKED] Autobuilder intent order 17. Extend/reuse trader review/postmortem for Region Bets (view/region/timing/expression/what-changed). Dependency: region_bet_monitor_value_v1.",
+      "reason": "[DEFERRED] Historical Autobuilder order 17. Engineering OS v1 prioritizes Factory hardening, MSOS simplification, and API/Distribution work before additional Region Bet expansion. Preserve the charter; do not auto-materialize.",
       "autobuilderCatalogOrder": 17,
-      "eligibility": "blocked_until_predecessor_terminal",
+      "eligibility": "deferred_by_engineering_os",
       "dependsOn": [
         "region_bet_monitor_value_v1"
       ],
@@ -1008,6 +1008,26 @@
       "autobuilderMergeAuthority": {
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-16T03:19:31+00:00"
+      }
+    },
+    {
+      "chapterId": "msos_implied_range_api_v1",
+      "status": "ready",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_implied_range_api_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_IMPLIED_RANGE_API_V1_SELECTION.md",
+      "canonRef": "DanielTabakman/Probability-prediction-engine#5501",
+      "reason": "[HIGH READY] Engineering OS API / Distribution priority. Add GET /v1/implied-range as an additive BTC/ETH machine primitive by reusing existing Options Horizon / Options Market Read infrastructure; no second options engine or cache.",
+      "autobuilderCatalogOrder": 18,
+      "eligibility": "buildable_via_autobuilder_catalog",
+      "dependsOn": [
+        "msos_market_moved_since_v1"
+      ],
+      "packetization": "just_in_time",
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-09-26T20:34:04+00:00"
       }
     }
   ]
