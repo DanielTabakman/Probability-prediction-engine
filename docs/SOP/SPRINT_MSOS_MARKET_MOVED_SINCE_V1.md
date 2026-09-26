@@ -2,7 +2,7 @@
 
 ## COORDINATION STATUS
 
-READY_TO_BUILD for Autobuilder catalog order 13. Depends on terminal `msos_session_resume_v1` (catalog order 12 / PR #5480). Catalog order 11 (`region_bet_monitor_value_v1` / PR #5478) is also terminal. This charter does not authorize Autobuilder runtime mutation, refill intervention, live execution, manage/adjust, learning closeout, causal claims, or rewriting session-resume persistence.
+COMPLETE for Autobuilder catalog order 13. Product is on `main` via PR #5483. Depends on terminal `msos_session_resume_v1` (catalog order 12 / PR #5480). Catalog order 11 (`region_bet_monitor_value_v1` / PR #5478) is also terminal. This charter does not authorize Autobuilder runtime mutation, refill intervention, live execution, manage/adjust, learning closeout, causal claims, or rewriting session-resume persistence. Do not re-BUILD.
 
 ## Goal
 

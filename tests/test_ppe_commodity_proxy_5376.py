@@ -32,7 +32,8 @@ def test_issue_50_no_longer_selects_uso_acceptance_witness(monkeypatch) -> None:
     ppe = next(pipe for pipe in snapshot["pipelines"] if pipe["pipeline_id"] == "ppe")
 
     assert "ppe_commodity_proxy_tier1_v1" not in [item["work_item_id"] for item in ppe["ready_work"]]
-    assert snapshot["recommended_next_action"]["work_item_id"] == "msos_market_moved_since_v1"
+    assert snapshot["recommended_next_action"].get("work_item_id") != "ppe_commodity_proxy_tier1_v1"
+    assert snapshot["recommended_next_action"].get("work_item_id") != "msos_market_moved_since_v1"
 
 
 def test_uso_packet_remains_bounded_but_not_ready() -> None:

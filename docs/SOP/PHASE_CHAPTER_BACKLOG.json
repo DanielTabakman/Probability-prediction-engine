@@ -939,10 +939,10 @@
     },
     {
       "chapterId": "msos_market_moved_since_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH READY] Autobuilder order 13. Deterministic last-seen versus now summary vs saved workflow/last-seen snapshot. No prediction or trade recommendation. Do not rebuild order 12 (#5480).",
+      "reason": "[DONE] Catalog order 13 merged as PPE PR #5483 (7389d01); last-seen versus now on Monitor and History. Closeout recorded; do not rebuild. Orders 14-17 stay uncataloged.",
       "autobuilderCatalogOrder": 13,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -956,23 +956,6 @@
         "class": "AUTO_MERGE_WHEN_GREEN",
         "declaredAt": "2026-09-16T03:19:31+00:00"
       }
-    },
-    {
-      "chapterId": "options_market_read_partner_acceptance_v1",
-      "status": "queued",
-      "priority": "high",
-      "focusPlaybookTier": "P1",
-      "reason": "[HIGH PLANNED] Make Options Market Read v1.3 integration-ready for Qatom with a frozen additive contract, repeatable staging/production conformance, explicit public-access controls, and rollback evidence.",
-      "eligibility": "planned_partner_acceptance_gate",
-      "dependsOn": [
-        "msos_market_moved_since_v1"
-      ],
-      "packetization": "just_in_time",
-      "planPath": "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json",
-      "selectionRecord": "docs/SOP/POST_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_SELECTION.md",
-      "canonRef": "docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md",
-      "holdReason": "Do not select before the current READY chapter is terminal and Tuesday partner-control decisions are recorded.",
-      "reactivationCondition": "Terminal current chapter plus recorded Qatom call-shape, authentication, rate-limit, CORS, alert-destination, and telemetry decisions."
     },
     {
       "chapterId": "region_bet_manage_adjust_v1",
