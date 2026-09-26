@@ -1,0 +1,101 @@
+{
+  "name": "msos_implied_range_api_v1",
+  "title": "MSOS Implied Range API v1",
+  "baselineBranch": "main",
+  "selectionRecord": "docs/SOP/POST_MSOS_IMPLIED_RANGE_API_V1_SELECTION.md",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_IMPLIED_RANGE_API_V1.md",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Engineering Operating System v1 / PPE #5501 / Autobuilder #202.",
+    "purpose": "Expose a narrow reusable options-implied range primitive through the existing MSOS/PPE API stack without duplicating financial math or infrastructure."
+  },
+  "productScope": {
+    "direction": "API / Distribution",
+    "job": "implied_range",
+    "stableId": "msos_implied_range_api_v1",
+    "summary": "Add GET /v1/implied-range for BTC/ETH explicit expiry and optional strike probabilities, reusing the existing options-implied distribution producer.",
+    "informationalOnly": true
+  },
+  "acceptanceCriteria": [
+    "GET /v1/implied-range accepts BTC or ETH, an explicit supported listed expiry, and an optional positive strike with deterministic machine-readable validation errors.",
+    "The implementation reuses existing Options Horizon / Options Market Read calculation and market-data/cache infrastructure; it does not create a second options pricing engine, producer, or cache.",
+    "Successful responses expose asset, expiry, as_of UTC, spot, implied_forward, atm_iv, median, p25, p75, one_sigma_low, one_sigma_high, quality status/flags, method, and an informational-only disclaimer.",
+    "When strike is supplied, probability_above and probability_below are each in [0,1] and sum to 1 within numerical tolerance.",
+    "Distribution ordering is coherent and missing/degraded/stale upstream data is represented honestly as degraded/unavailable rather than fabricated.",
+    "Known-good BTC and ETH fixtures, degraded-data fixture, unavailable-source fixture, schema tests, and numerical regression tests pass.",
+    "OpenAPI and direct HTTP documentation exist independently of Qatom; Qatom-specific marketplace/payment configuration is not required for direct endpoint tests.",
+    "Existing /v1/options-market-read and Options Horizon behavior remain backward compatible."
+  ],
+  "authority": {
+    "allowedProductPaths": [
+      "src/viz/implied_range.py",
+      "src/viz/options_market_read.py",
+      "src/viz/display_payload_server.py",
+      "src/engine/implied_distribution.py",
+      "docs/API/IMPLIED_RANGE_V1.md",
+      "docs/API/implied-range.openapi.yaml",
+      "tests/test_implied_range_api.py",
+      "tests/test_implied_range_numerics.py",
+      "tests/fixtures/implied_range/"
+    ],
+    "forbiddenPaths": [
+      "Qatom application source or marketplace configuration",
+      "a second market-data producer or cache",
+      "live brokerage or order placement",
+      "portfolio management or custody",
+      "individualized trade recommendations",
+      "wildcard API routing unrelated to /v1/implied-range"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "MSOS-ImpliedRange-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/MSOS-ImpliedRange-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-ImpliedRange-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_IMPLIED_RANGE_API_V1.md",
+      "buildBranch": "build/auto/MSOS-ImpliedRange-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/implied_range.py",
+        "src/viz/options_market_read.py",
+        "src/viz/display_payload_server.py",
+        "src/engine/implied_distribution.py",
+        "docs/API/IMPLIED_RANGE_V1.md",
+        "docs/API/implied-range.openapi.yaml",
+        "tests/test_implied_range_api.py",
+        "tests/test_implied_range_numerics.py",
+        "tests/fixtures/implied_range/"
+      ]
+    },
+    {
+      "sliceId": "MSOS-ImpliedRange-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "buildBranch": "build/auto/MSOS-ImpliedRange-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_implied_range_api_v1",
+        "chapterTitle": "MSOS Implied Range API v1",
+        "chapterStatus": "COMPLETE",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}
