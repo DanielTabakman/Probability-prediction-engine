@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-09-21T02:56:29Z · **Archived chapters:** 72
+**Generated:** 2026-09-21T02:56:29Z · **Archived chapters:** 73
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -79,4 +79,4 @@
 | `region_bet_risk_expression_bridge_v1` | `docs/SOP/POST_REGION_BET_RISK_EXPRESSION_BRIDGE_V1_SELECTION.md` | `docs/SOP/REGION_BET_RISK_EXPRESSION_BRIDGE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/region_bet_risk_expression_bridge_v1_relay.json` |
 | `repo_housekeeping_v1` | `docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md` | `docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json` |
 
-Regenerate: `python scripts/generate_chapter_doc_index.py --write` · canon: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)
+Regenerate: `python scripts/generate_chapter_doc_index.py --write` · canon: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)\n| `msos_market_moved_since_v1` | `docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md` | `docs/SOP/MSOS_MARKET_MOVED_SINCE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json` |
