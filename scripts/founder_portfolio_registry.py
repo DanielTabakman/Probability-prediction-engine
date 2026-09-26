@@ -37,6 +37,34 @@ NORMALIZED_STATES = {
     "COMPLETE",
 }
 
+ENGINEERING_OS_LANES = {
+    "factory",
+    "msos",
+    "api_distribution",
+    "structured_launchpad",
+    "labs",
+}
+ENGINEERING_OS_BACKLOG_CLASSES = {"RESEARCH", "CANDIDATE", "COMMITTED"}
+ENGINEERING_OS_LIFECYCLE_STATES = {
+    "BACKLOG",
+    "TRIAGE",
+    "CHARTERED",
+    "ACCEPTANCE_DEFINED",
+    "READY_TO_BUILD",
+    "RUNNING",
+    "TESTING",
+    "REVIEW",
+    "STAGING",
+    "RELEASED",
+    "MONITORING",
+    "COMPLETE",
+    "AWAITING_FOUNDER",
+    "BLOCKED",
+    "REJECTED",
+    "SUPERSEDED",
+}
+ENGINEERING_OS_LANE_MODES = {"PRODUCTION", "INCUBATION", "RESEARCH"}
+
 
 @lru_cache(maxsize=4)
 def _load_registry_cached(path_str: str) -> dict[str, Any]:
@@ -99,6 +127,61 @@ def validate_registry(repo: Path | None = None) -> list[str]:
             if not (repo / rel).is_file():
                 errors.append(f"missing canon file {rel}")
 
+    engineering_os = _require_dict(errors, "engineering_os", data, "engineering_os")
+    if engineering_os:
+        if engineering_os.get("version") != 1:
+            errors.append("engineering_os: version must be 1")
+        os_canon = str(engineering_os.get("canon") or "").strip()
+        if not os_canon:
+            errors.append("engineering_os: canon must be a non-empty string")
+        elif not (repo / os_canon).is_file():
+            errors.append(f"engineering_os: missing canon file {os_canon}")
+
+        backlog_classes = engineering_os.get("backlog_classes")
+        if set(backlog_classes or []) != ENGINEERING_OS_BACKLOG_CLASSES:
+            errors.append("engineering_os: backlog_classes must exactly match canonical classes")
+
+        lifecycle_states = engineering_os.get("lifecycle_states")
+        if set(lifecycle_states or []) != ENGINEERING_OS_LIFECYCLE_STATES:
+            errors.append("engineering_os: lifecycle_states must exactly match canonical states")
+
+        dispatch_rule = _require_dict(errors, "engineering_os", engineering_os, "dispatch_rule")
+        if dispatch_rule:
+            if dispatch_rule.get("requires_backlog_class") != "COMMITTED":
+                errors.append("engineering_os: dispatch requires COMMITTED backlog class")
+            if dispatch_rule.get("requires_native_state") != "READY_TO_BUILD":
+                errors.append("engineering_os: dispatch requires READY_TO_BUILD native state")
+
+        lane_rows = engineering_os.get("lanes")
+        if not isinstance(lane_rows, list):
+            errors.append("engineering_os: lanes must be an array")
+            lane_rows = []
+        lane_ids: set[str] = set()
+        for lane in lane_rows:
+            if not isinstance(lane, dict):
+                errors.append("engineering_os: lane entries must be objects")
+                continue
+            lane_id = str(lane.get("lane_id") or "").strip()
+            owner = f"engineering_os lane {lane_id or '<missing>'}"
+            if lane_id not in ENGINEERING_OS_LANES:
+                errors.append(f"{owner}: invalid lane_id")
+            if lane_id in lane_ids:
+                errors.append(f"{owner}: duplicate lane_id")
+            lane_ids.add(lane_id)
+            if not str(lane.get("display_name") or "").strip():
+                errors.append(f"{owner}: missing display_name")
+            pipeline_ids = lane.get("pipeline_ids")
+            if not isinstance(pipeline_ids, list) or not pipeline_ids:
+                errors.append(f"{owner}: pipeline_ids must be a non-empty array")
+            mode = str(lane.get("mode") or "").strip()
+            if mode not in ENGINEERING_OS_LANE_MODES:
+                errors.append(f"{owner}: invalid mode {mode}")
+            wip = lane.get("implementation_wip_limit")
+            if not isinstance(wip, int) or wip < 0:
+                errors.append(f"{owner}: implementation_wip_limit must be a non-negative integer")
+        if lane_ids != ENGINEERING_OS_LANES:
+            errors.append("engineering_os: lanes must exactly match canonical lane ids")
+
     ids: set[str] = set()
     aliases: set[str] = set()
     for pipe in pipelines(repo):
@@ -155,6 +238,16 @@ def validate_registry(repo: Path | None = None) -> list[str]:
             errors.append(f"{owner}: only ppe may be build-next eligible in this rollout")
         if authority and not str(authority.get("portfolio_registry_owner") or "").strip():
             errors.append(f"{owner}: missing portfolio_registry_owner")
+
+    engineering_os = data.get("engineering_os") if isinstance(data.get("engineering_os"), dict) else {}
+    for lane in engineering_os.get("lanes") or []:
+        if not isinstance(lane, dict):
+            continue
+        for pipeline_id in lane.get("pipeline_ids") or []:
+            if str(pipeline_id) not in ids:
+                errors.append(
+                    f"engineering_os lane {lane.get('lane_id')}: unknown pipeline_id {pipeline_id}"
+                )
 
     if "ppe" not in ids:
         errors.append("registry must include ppe")
