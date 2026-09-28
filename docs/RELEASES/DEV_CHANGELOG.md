@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-28
 
-_No merges to `main`._
+- `517be9d2` — docs: save Battery Launchpad proposal v0.1
+- `b031abc1` — Control-plane: dev changelog
 
 ## 2026-09-27
 
