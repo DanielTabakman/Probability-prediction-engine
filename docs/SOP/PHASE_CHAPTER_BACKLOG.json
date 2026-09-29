@@ -944,6 +944,10 @@
       "focusPlaybookTier": "P1",
       "reason": "[DONE] Autobuilder order 13 merged to main as PPE PR #5483. Refill exclusion is terminal; do not rebuild.",
       "autobuilderCatalogOrder": 13,
+      "relatedPullRequests": [
+        "DanielTabakman/Probability-prediction-engine#5483"
+      ],
+      "autobuilderItemTerminal": true,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "msos_session_resume_v1"
