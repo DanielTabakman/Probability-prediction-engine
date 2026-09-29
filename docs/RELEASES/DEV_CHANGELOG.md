@@ -2,8 +2,15 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-29
+
+- `dded5438` — Merge pull request #5503 from DanielTabakman/control-plane/order13-autobuilder-terminal
+- `3f5bf182` — test: pin order 13 terminal merge evidence
+- `f906c9a0` — control-plane: mark order 13 terminal for Autobuilder (`docs/SOP/`)
+
 ## 2026-09-28
 
+- `adb518ab` — Control-plane: dev changelog
 - `517be9d2` — docs: save Battery Launchpad proposal v0.1
 - `b031abc1` — Control-plane: dev changelog
 
