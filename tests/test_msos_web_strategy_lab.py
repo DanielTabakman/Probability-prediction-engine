@@ -233,7 +233,7 @@ def test_nav_enables_strategy_lab() -> None:
     assert "disabled: true" not in nav.split("strategy-lab")[1].split("monitor")[0]
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert "moduleCards" in cc
+    assert "resolveHeroPrimary" in cc
     assert "buildStrategyLabPathWithAsset" in cc
 
 

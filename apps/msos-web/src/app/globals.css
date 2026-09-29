@@ -3991,6 +3991,16 @@ button.btn:disabled {
   color: var(--muted);
 }
 
+.command-more-tools a {
+  color: var(--text);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.command-more-tools a:hover {
+  color: var(--teal);
+}
+
 .command-resume {
   margin-top: 4px;
 }

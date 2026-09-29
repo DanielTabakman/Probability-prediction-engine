@@ -146,7 +146,7 @@ Financial meanings stay as they are. Fit ranking stays educational. Nothing in t
 ## First bounded slice
 
 **Id:** `msos_command_center_one_next_action_v1`  
-**Not started.** Waiting for approval.
+**Status:** Approved and implemented on this branch. Scope remains `/command-center` only.
 
 ### Before → after
 
