@@ -29,7 +29,7 @@ STORYBOARD_SCREENS: tuple[tuple[str, str, str, tuple[str, ...], tuple[str, ...]]
         "02_command_center",
         "/command-center",
         "command-center/page.tsx",
-        ("app-shell", "topline", "command-hero", "module-card-grid"),
+        ("app-shell", "topline", "command-hero", "command-more-tools"),
         ("CommandCenterContent.tsx",),
     ),
     (

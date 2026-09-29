@@ -1,15 +1,13 @@
 import Link from "next/link";
 
 import {
-  assetAwareModuleHref,
-  buildOptionsHorizonPath,
   buildStrategyLabPathWithAsset,
   DEFAULT_CROSS_MODULE_ASSET,
 } from "@/components/AppNav";
 import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
 import { buildCalibrationStrip, type CalibrationStrip } from "@/lib/monitorHistoryFeed";
 import type { WorkflowSummary, WorkflowSummaryWorkItem } from "@/lib/msosWorkflowStore";
-import { moduleCards, plannedModules } from "@/data/commandCenterFixtures";
+import { plannedModules, secondaryNavItems } from "@/data/commandCenterFixtures";
 import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
@@ -111,13 +109,11 @@ function buildResumeItems(summary: CommandCenterSummary, workflow: WorkflowSumma
 }
 
 export function CommandCenterContent({ summary, workflow }: Props) {
-  const navAssetId = DEFAULT_CROSS_MODULE_ASSET;
   const calibrationStrip = buildCalibrationStrip(summary);
   const heroPrimary = resolveHeroPrimary(summary, workflow, calibrationStrip);
   const heroStat = heroStatLine(summary, workflow);
   const resumeItems = buildResumeItems(summary, workflow);
   const hasResume = resumeItems.length > 0;
-  const horizonHref = buildOptionsHorizonPath(navAssetId);
 
   return (
     <>
@@ -152,28 +148,22 @@ export function CommandCenterContent({ summary, workflow }: Props) {
           <Link href={heroPrimary.href} className="btn slim primary">
             {heroPrimary.cta}
           </Link>
-          <Link href={horizonHref} className="command-hero-secondary">
-            Options Horizon
-          </Link>
           <Link href={MSOS_ROUTES.history} className="command-hero-secondary">
             History
           </Link>
         </div>
       </section>
 
-      <section className="module-card-grid" aria-label="Open a tool">
-        {moduleCards.map((card) => (
-          <Link key={card.title} href={assetAwareModuleHref(card.href, navAssetId)} className="module-card panel">
-            <div className="module-card-mark" aria-hidden="true">
-              {card.mark}
-            </div>
-            <h2>{card.title}</h2>
-            <p>{card.description}</p>
-            <span className="module-card-cta btn slim primary">{card.cta}</span>
-            {card.live ? <span className="module-card-badge tiny-pill teal">Live</span> : null}
-          </Link>
-        ))}
-      </section>
+      <details className="command-more-tools planned-modules panel compact">
+        <summary>More tools</summary>
+        <ul className="planned-modules-list">
+          {secondaryNavItems.map((item) => (
+            <li key={item.id}>
+              <Link href={item.href}>{item.label}</Link>
+            </li>
+          ))}
+        </ul>
+      </details>
 
       <details className="planned-modules panel compact">
         <summary>More modules coming</summary>

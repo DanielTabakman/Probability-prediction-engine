@@ -24,14 +24,19 @@ def test_app_nav_builds_asset_aware_horizon_and_lab_paths() -> None:
     assert "region" in nav.lower()
 
 
-def test_command_center_links_to_options_horizon_with_asset() -> None:
+def test_command_center_links_to_options_horizon_from_more_tools() -> None:
     content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(
         encoding="utf-8"
     )
-    assert "buildOptionsHorizonPath" in content
-    assert "assetAwareModuleHref" in content
-    assert "Options Horizon" in content
+    fixtures = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
+    assert "secondaryNavItems" in content
+    assert "More tools" in content
+    assert "command-more-tools" in content
+    assert 'href: "/options-horizon"' in fixtures
+    assert "Options Horizon" in fixtures
+    assert "buildOptionsHorizonPath" not in content
     assert "command-hero-secondary" in content
+    assert "History" in content
 
 
 def test_strategy_lab_horizon_nav_toolbar_and_tour_hook() -> None:
