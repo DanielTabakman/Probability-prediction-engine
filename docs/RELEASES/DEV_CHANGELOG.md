@@ -4,6 +4,11 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-29
 
+- `0ae5d099` — Merge pull request #5504 from DanielTabakman/msos/5490-ui-simplification-audit
+- `efa66057` — product(msos-ui): allow Command Center witness updates in the MSOS UI layer (`docs/SOP/`)
+- `81909f1a` — product(msos-ui): one next action on Command Center (`apps/msos-web/`)
+- `10fd9356` — docs: MSOS UI simplification audit for #5490 (`docs/SOP/`)
+- `52fd83a1` — Control-plane: dev changelog
 - `dded5438` — Merge pull request #5503 from DanielTabakman/control-plane/order13-autobuilder-terminal
 - `3f5bf182` — test: pin order 13 terminal merge evidence
 - `f906c9a0` — control-plane: mark order 13 terminal for Autobuilder (`docs/SOP/`)
