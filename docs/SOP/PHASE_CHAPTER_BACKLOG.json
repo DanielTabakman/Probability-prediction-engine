@@ -963,11 +963,11 @@
     },
     {
       "chapterId": "options_market_read_partner_acceptance_v1",
-      "status": "queued",
+      "status": "ready",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH PLANNED] Make Options Market Read v1.3 integration-ready for Qatom with a frozen additive contract, repeatable staging/production conformance, explicit public-access controls, and rollback evidence.",
-      "eligibility": "planned_partner_acceptance_gate",
+      "reason": "[HIGH READY] Finish Options Market Read v1.3 partner/Qatom acceptance using the recorded 2026-09-30 integration-control defaults, staged/production conformance, rollback, monitoring, and external witness.",
+      "eligibility": "ready_partner_acceptance",
       "dependsOn": [
         "msos_market_moved_since_v1"
       ],
@@ -975,8 +975,7 @@
       "planPath": "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_SELECTION.md",
       "canonRef": "docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md",
-      "holdReason": "Do not select before the current READY chapter is terminal and Tuesday partner-control decisions are recorded.",
-      "reactivationCondition": "Terminal current chapter plus recorded Qatom call-shape, authentication, rate-limit, CORS, alert-destination, and telemetry decisions."
+      "readyReason": "Upstream order 13 is terminal and partner-control decisions are recorded in docs/API/QATOM_OPTIONS_MARKET_READ_PARTNER_DECISIONS_V1.md."
     },
     {
       "chapterId": "region_bet_manage_adjust_v1",
@@ -1006,21 +1005,17 @@
     },
     {
       "chapterId": "msos_implied_range_api_v1",
-      "status": "ready",
-      "priority": "high",
+      "status": "deferred",
+      "priority": "low",
       "focusPlaybookTier": "P1",
       "canonRef": "DanielTabakman/Probability-prediction-engine#5501",
-      "reason": "[HIGH READY] Engineering OS API / Distribution priority. Add GET /v1/implied-range as an additive BTC/ETH machine primitive by reusing existing Options Horizon / Options Market Read infrastructure; no second options engine or cache.",
+      "reason": "[DEFERRED] Standalone implied-range endpoint is an internal primitive, not an approved Qatom product slot under API_LANE_CHARTER_V1. Do not auto-materialize. Reuse its calculations inside approved products when needed.",
       "autobuilderCatalogOrder": 18,
-      "eligibility": "buildable_via_autobuilder_catalog",
+      "eligibility": "deferred_by_api_product_policy",
       "dependsOn": [
         "msos_market_moved_since_v1"
       ],
       "packetization": "just_in_time",
-      "autobuilderMergeAuthority": {
-        "class": "AUTO_MERGE_WHEN_GREEN",
-        "declaredAt": "2026-09-26T20:34:04+00:00"
-      },
       "autobuilderPacket": {
         "version": 1,
         "sliceId": "MSOS-ImpliedRange-Product-Slice002",
@@ -1057,7 +1052,9 @@
         "validation": {
           "profile_id": "ppe-ci-pytest-v1"
         }
-      }
+      },
+      "deferredReason": "Superseded as a standalone public API by the 2026-09-30 product-slot policy: APIs are created for approved user-facing products, not calculations.",
+      "reactivationCondition": "Explicit founder approval of implied range as a distinct user-facing product, or a selected product charter that needs bounded internal implied-range implementation without consuming a Qatom slot."
     }
   ]
 }

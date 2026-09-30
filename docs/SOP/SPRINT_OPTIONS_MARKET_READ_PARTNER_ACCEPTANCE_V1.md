@@ -2,9 +2,14 @@
 
 ## COORDINATION STATUS
 
-**HIGH / PLANNED — NOT SELECTED.** Keep `msos_market_moved_since_v1` as the sole
-READY active chapter. Promote this chapter only after that chapter is terminal
-and the Tuesday Qatom meeting records the open partner-control decisions.
+**HIGH / READY CANDIDATE.** `msos_market_moved_since_v1` is terminal on current
+canon (product PR #5483 merged; queue/backlog DONE). Founder delegation on
+2026-09-30 recorded the remaining partner-control defaults in
+`docs/API/QATOM_OPTIONS_MARKET_READ_PARTNER_DECISIONS_V1.md`.
+
+If `ACTIVE_PHASE_MANIFEST.json` still reports the prior chapter as READY, treat
+that as stale control-plane state and reconcile it through the existing closeout/
+selection machinery. Do not rebuild order 13.
 
 ## Goal
 
@@ -44,14 +49,16 @@ a promotion/rollback receipt that does not depend on verbal memory.
   explicitly undecided; the worker must not invent one.
 - Prove staging-first promotion, production health, and bounded rollback.
 
-## Tuesday decision inputs
+## Partner-control decisions
 
-1. Where in Qatom will the answer appear, and which fields will be rendered?
-2. Will Qatom call from its backend or directly from a browser/client?
-3. Is partner authentication required before wider release?
-4. What rate limit and service expectation are appropriate for the preview?
-5. Where should failed uptime checks alert a human?
-6. Which non-identifying usage counters are useful, if any?
+The former Tuesday decision gate is resolved by
+`docs/API/QATOM_OPTIONS_MARKET_READ_PARTNER_DECISIONS_V1.md`.
+
+Default integration shape is server-to-server HTTPS GET, current public
+unauthenticated read-only preview, no widened CORS, no new preview SLA, existing
+GitHub Actions failure alerting, and no user-level telemetry. The lane may make
+the smallest reversible non-product adjustment if direct Qatom evidence requires
+it, recording the change in GitHub.
 
 ## Allowed product paths
 

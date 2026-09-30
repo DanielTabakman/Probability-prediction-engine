@@ -308,7 +308,7 @@
       "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
       "plan_path": "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json",
       "program_doc": null,
-      "queue_status": "PLANNED",
+      "queue_status": "READY",
       "selection": "docs/SOP/POST_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md"
     },
@@ -2883,7 +2883,7 @@
       "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
       "plan_path": "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json",
       "program_doc": null,
-      "queue_status": "PLANNED",
+      "queue_status": "READY",
       "selection": "docs/SOP/POST_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md"
     },
@@ -6058,7 +6058,7 @@
       "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
       "plan_path": "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json",
       "program_doc": null,
-      "queue_status": "PLANNED",
+      "queue_status": "READY",
       "selection": "docs/SOP/POST_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md"
     },

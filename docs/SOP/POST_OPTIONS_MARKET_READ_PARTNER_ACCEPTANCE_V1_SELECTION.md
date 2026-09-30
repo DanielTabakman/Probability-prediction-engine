@@ -2,33 +2,36 @@
 
 ## COORDINATION STATUS
 
-**NOT SELECTED — HIGH / PLANNED.** This record charters the likely next
-partner-facing slice without replacing the active
-`msos_market_moved_since_v1` READY chapter.
+**READY — HIGH.** The prior `msos_market_moved_since_v1` chapter is terminal,
+the stale active manifest is reconciled to COMPLETE in the same control-plane
+change, and partner-control defaults are recorded. Use the existing PPE
+selection machinery to activate this chapter.
 
 ## Why it is next-worthy
 
-- The founder has a Tuesday Qatom meeting and asked for a usable, testable
-  partner handoff rather than a raw JSON demonstration.
+- The founder wants a usable, testable Qatom/partner handoff rather than a raw
+  JSON demonstration.
 - The BTC v1.3 primitive, staging topology, console, and monitoring already
   exist, so the remaining work is bounded acceptance—not speculative product
   redesign.
 - Closing partner controls and a repeatable conformance witness reduces launch
   risk without introducing recommendations, execution, or another asset.
 
-## Why it is not READY yet
+## Why it is READY now
 
-- The current READY chapter retains queue ownership until terminal closeout.
-- Qatom must confirm consumer placement and backend-versus-browser calling
-  shape.
-- Authentication, rate limit, CORS, alert destination, and privacy-safe usage
-  telemetry need explicit decisions rather than guessed defaults.
+- The prior `msos_market_moved_since_v1` chapter is terminal: product PR #5483
+  merged and queue/backlog mark it DONE.
+- Founder delegation on 2026-09-30 records the partner-control defaults in
+  `docs/API/QATOM_OPTIONS_MARKET_READ_PARTNER_DECISIONS_V1.md`.
+- Any remaining work is bounded partner acceptance: conformance, documentation
+  parity, staging/production promotion evidence, rollback, monitoring, and an
+  external request/response witness.
 
 ## Promotion condition
 
-Promote this queue row from PLANNED to READY only when the active chapter is
-terminal and the Tuesday decision inputs in
-`docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md` are recorded.
+Satisfied on 2026-09-30: the upstream chapter is terminal and the integration
+controls are recorded. The queue row is READY. Selection should now occur
+through the normal PPE control-plane mechanism.
 
 ## Scope boundary
 

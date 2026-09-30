@@ -2,7 +2,11 @@
 
 This directory is the canonical documentation home for the MSOS/PPE API / Distribution lane.
 
-Start with **[API_LANE_CHARTER_V1.md](API_LANE_CHARTER_V1.md)** for the lane mission, boundaries, Qatom five-slot policy, definition of done, storage map and operating flow.
+Start with **[API_LANE_CHARTER_V1.md](API_LANE_CHARTER_V1.md)** for the lane mission and **[API_LANE_AUTONOMOUS_OPERATOR_V1.md](API_LANE_AUTONOMOUS_OPERATOR_V1.md)** for the self-driving execution loop used by the API Cursor/Codex lane.
+
+## Cursor / agent entry point
+
+For day-to-day autonomous lane work, load [API_LANE_AUTONOMOUS_OPERATOR_V1.md](API_LANE_AUTONOMOUS_OPERATOR_V1.md). It is authorized to reconcile stale state, finish the selected API product, and continue to the next eligible API product using the existing PPE control plane and factory.
 
 ## Source-of-truth rule
 
@@ -34,6 +38,7 @@ See the charter for the rule governing when a slot may be consumed.
 - [OPTIONS_MARKET_READ_V1.md](OPTIONS_MARKET_READ_V1.md) — public product/API contract
 - [options-market-read.openapi.yaml](options-market-read.openapi.yaml) — OpenAPI
 - [QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md](QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md) — Qatom/partner handoff
+- [QATOM_OPTIONS_MARKET_READ_PARTNER_DECISIONS_V1.md](QATOM_OPTIONS_MARKET_READ_PARTNER_DECISIONS_V1.md) — founder-delegated integration controls for partner acceptance
 - [OPTIONS_MARKET_READ_STAGING_PLAN_V1.md](OPTIONS_MARKET_READ_STAGING_PLAN_V1.md) — staging topology and promotion gate
 - [OPTIONS_MARKET_READ_UPTIME_V1.md](OPTIONS_MARKET_READ_UPTIME_V1.md) — uptime/conformance agreement
 
