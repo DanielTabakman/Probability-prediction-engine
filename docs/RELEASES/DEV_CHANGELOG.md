@@ -4,7 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-30
 
-_No merges to `main`._
+- `60da9486` — docs(api): establish API / Distribution lane canon
+- `d2f6c5b1` — Market Thesis read-only workflow (#5491) (#5505) (`docs/SOP/`)
+- `1aaeb360` — Control-plane: dev changelog
 
 ## 2026-09-29
 
