@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-30
 
+- `fd9c86d8` — control(api): make API lane self-driving (`docs/SOP/`)
+- `39fc1059` — product: sync market thesis from Strategy Lab confirm (#5491) (#5509) (`apps/msos-web/`)
+- `a7d91f15` — Control-plane: dev changelog
 - `60da9486` — docs(api): establish API / Distribution lane canon
 - `d2f6c5b1` — Market Thesis read-only workflow (#5491) (#5505) (`docs/SOP/`)
 - `1aaeb360` — Control-plane: dev changelog
