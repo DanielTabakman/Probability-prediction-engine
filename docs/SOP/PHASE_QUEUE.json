@@ -637,13 +637,13 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[HIGH NEXT] Options Market Read v1.3 partner acceptance after the current READY chapter; freeze compatibility, prove staged/production conformance, and record Qatom integration controls without inventing them.",
+      "status": "READY",
+      "reason": "[HIGH READY] Options Market Read v1.3 partner acceptance: upstream chapter terminal; founder-delegated Qatom partner-control defaults recorded 2026-09-30. Freeze compatibility, prove staged/production conformance, external acceptance, monitoring, and rollback.",
       "selectionPrep": "docs/SOP/POST_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1_SELECTION.md",
       "founderPriority": "HIGH",
       "workerMode": "local-agent",
       "focusPlaybookTier": "P1",
-      "holdReason": "Keep PLANNED until msos_market_moved_since_v1 is terminal and the Tuesday Qatom meeting records call shape, auth, rate-limit, CORS, alerting, and telemetry decisions."
+      "readyReason": "Dependency msos_market_moved_since_v1 is terminal and docs/API/QATOM_OPTIONS_MARKET_READ_PARTNER_DECISIONS_V1.md resolves the former partner-control gate."
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
