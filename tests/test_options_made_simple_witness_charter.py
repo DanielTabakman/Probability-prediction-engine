@@ -9,7 +9,7 @@ from scripts.founder_portfolio import collect_portfolio
 
 REPO = Path(__file__).resolve().parents[1]
 A_ID = "options_horizon_comparison_v1"
-API_ID = "msos_implied_range_api_v1"
+API_ID = "options_market_read_partner_acceptance_v1"
 A_PLAN = "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json"
 B_PLAN = "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json"
 RB_PLAN = "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json"
@@ -79,13 +79,15 @@ def test_order_12_queue_row_is_done_after_closeout() -> None:
     assert "#5480" in closed["doneReason"]
 
 
-def test_legacy_phase_queue_has_no_ready_frontier_after_order_13_closeout(monkeypatch) -> None:
+def test_phase_queue_selects_market_read_partner_acceptance_after_order_13_closeout(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
-    assert _ready_queue_items() == []
+    ready = _ready_queue_items()
+    assert len(ready) == 1
+    assert ready[0]["planPath"] == "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json"
 
 
-def test_founder_portfolio_recommends_backlog_native_implied_range(monkeypatch) -> None:
+def test_founder_portfolio_recommends_market_read_partner_acceptance(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     snapshot = collect_portfolio(REPO)
@@ -95,11 +97,10 @@ def test_founder_portfolio_recommends_backlog_native_implied_range(monkeypatch) 
     assert ready_ids == [API_ID]
     assert snapshot["recommended_next_action"]["work_item_id"] == API_ID
     work = next(item for item in ppe["ready_work"] if item["work_item_id"] == API_ID)
-    assert work["source_plan"] is None
-    assert work["selected_native_slice"] == "MSOS-ImpliedRange-Product-Slice002"
-    assert work["selected_native_dispatchable"] is True
-    assert "src/viz/implied_range.py" in work["allowed_product_paths"]
-    assert "docs/API/implied-range.openapi.yaml" in work["allowed_product_paths"]
+    assert work["source_plan"] == "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json"
+    assert work["selected_native_slice"] == "OptionsMarketRead-PartnerAcceptance-Product-Slice002"
+    assert "docs/API/OPTIONS_MARKET_READ_V1.md" in work["allowed_product_paths"]
+    assert "tests/test_options_market_read_partner_acceptance.py" in work["allowed_product_paths"]
 
 
 def test_a_and_b_touch_sets_are_disjoint_and_b_forbids_a_paths() -> None:
