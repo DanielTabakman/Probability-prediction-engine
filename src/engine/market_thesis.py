@@ -658,8 +658,11 @@ def _market_fact(citation: Mapping[str, Any]) -> str:
     payload = citation.get("payload") or {}
     metrics = payload.get("metrics") if isinstance(payload.get("metrics"), Mapping) else {}
     middle = metrics.get("middle_50_range") if isinstance(metrics, Mapping) else None
-    if isinstance(middle, Mapping) and "low" in middle and "high" in middle:
-        return f"middle 50 range {_num(middle['low'])} to {_num(middle['high'])}"
+    if isinstance(middle, Mapping):
+        low = middle.get("low", middle.get("low_price"))
+        high = middle.get("high", middle.get("high_price"))
+        if low is not None and high is not None:
+            return f"middle 50 range {_num(low)} to {_num(high)}"
     if "one_sigma_move_usd" in payload:
         return f"one-sigma move {_num(payload['one_sigma_move_usd'])} USD"
     computed = payload.get("computed") if isinstance(payload.get("computed"), Mapping) else {}

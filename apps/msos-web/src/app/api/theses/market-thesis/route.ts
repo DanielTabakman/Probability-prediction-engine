@@ -6,6 +6,12 @@ import {
   uncertaintyFromVolMult,
   type MarketThesisDocument,
 } from "@/lib/marketThesis";
+import {
+  comparisonRowsFromRanking,
+  fetchExpressionFitRankingPayload,
+  fetchOptionsMarketReadPayload,
+  marketThesisApplyUrl,
+} from "@/lib/marketThesisUpstream";
 import { requireProtectedIdentity } from "@/lib/msosIdentity";
 import {
   getCurrentMarketThesis,
@@ -15,25 +21,12 @@ import {
 
 export const runtime = "nodejs";
 
-const PUBLIC_APPLY_PATH =
-  process.env.NEXT_PUBLIC_PPE_MARKET_THESIS_APPLY_URL?.trim() ||
-  "/ppe-display-api/market-thesis/apply.json";
-
-function applyUpstreamUrl(): string {
-  const serverUrl = process.env.PPE_DISPLAY_API_SERVER_URL?.trim();
-  if (serverUrl) {
-    const base = serverUrl.replace(/\/display\.json(\?.*)?$/i, "");
-    return `${base}/market-thesis/apply.json`;
-  }
-  return PUBLIC_APPLY_PATH;
-}
-
 type ApplyResult =
   | { ok: true; document: MarketThesisDocument; workflow_state: string }
   | { ok: false; status: number; code?: string; error: string };
 
 async function applyMarketThesisEvent(body: Record<string, unknown>): Promise<ApplyResult> {
-  const response = await fetch(applyUpstreamUrl(), {
+  const response = await fetch(marketThesisApplyUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(body),
@@ -59,6 +52,123 @@ async function applyMarketThesisEvent(body: Record<string, unknown>): Promise<Ap
     document: payload.document,
     workflow_state: payload.workflow_state || payload.document.workflow_state,
   };
+}
+
+async function attachBtcEvidenceIfPossible(
+  document: MarketThesisDocument,
+  expiryDate: string | null,
+): Promise<MarketThesisDocument> {
+  if (document.workflow_state !== "horizon_bound") return document;
+  if (document.asset.asset_id.toUpperCase() !== "BTC") return document;
+  const omr = await fetchOptionsMarketReadPayload(document.asset.asset_id, expiryDate);
+  if (!omr) return document;
+  const citation = {
+    citation_id: "omr-btc",
+    primitive: "options_market_read",
+    endpoint: "/v1/options-market-read",
+    schema_version: omr.schema_version ?? "1.3",
+    ruleset_version: omr.ruleset_version ?? "options-market-read.v1.3",
+    as_of_utc: String(omr.as_of || omr.as_of_utc || new Date().toISOString()),
+    request: {
+      asset_id: "BTC",
+      ...(expiryDate ? { expiry_date: expiryDate.slice(0, 10) } : {}),
+    },
+    payload: omr,
+  };
+  const attached = await applyMarketThesisEvent({
+    document,
+    event: "attach_evidence",
+    payload: { citations: [citation] },
+  });
+  if (!attached.ok) return document;
+  const disagreed = await applyMarketThesisEvent({
+    document: attached.document,
+    event: "record_disagreement",
+    payload: { citation_id: "omr-btc" },
+  });
+  return disagreed.ok ? disagreed.document : attached.document;
+}
+
+async function attachExpressionComparison(
+  document: MarketThesisDocument,
+  body: Record<string, unknown>,
+): Promise<ApplyResult> {
+  let working = document;
+  const expiryDate =
+    (typeof body.expiryDate === "string" && body.expiryDate) ||
+    (typeof working.horizon?.["target_date"] === "string"
+      ? String(working.horizon["target_date"])
+      : typeof working.horizon?.["expiry_date"] === "string"
+        ? String(working.horizon["expiry_date"])
+        : null);
+
+  if (working.workflow_state === "horizon_bound") {
+    working = await attachBtcEvidenceIfPossible(working, expiryDate);
+  }
+  if (working.workflow_state !== "disagreement_recorded") {
+    return {
+      ok: false,
+      status: 409,
+      code: "illegal_transition",
+      error: `expression comparison requires disagreement_recorded (have ${working.workflow_state})`,
+    };
+  }
+
+  const belief = working.user_belief || {};
+  const direction =
+    belief.direction === "long" || belief.direction === "short" || belief.direction === "neutral"
+      ? belief.direction
+      : "long";
+  const statement = typeof belief.statement === "string" ? belief.statement : "";
+  const horizonDays =
+    typeof body.horizonDays === "number"
+      ? body.horizonDays
+      : typeof working.horizon?.["target_bucket_days"] === "number"
+        ? Number(working.horizon["target_bucket_days"])
+        : null;
+  const ranking = await fetchExpressionFitRankingPayload({
+    assetId: working.asset.asset_id,
+    direction,
+    belief: statement,
+    targetHorizonDays: horizonDays,
+    maxLossUsd: typeof body.maxLossUsd === "number" ? body.maxLossUsd : null,
+    payoffPreference:
+      typeof body.payoffPreference === "string" ? body.payoffPreference : "defined_risk",
+    expiry: expiryDate,
+    horizon: horizonDays !== null && horizonDays >= 270 ? "12m" : horizonDays !== null && horizonDays <= 120 ? "3m" : "any",
+  });
+  if (!ranking) {
+    return {
+      ok: false,
+      status: 503,
+      code: "illegal_transition",
+      error: "expression fit ranking upstream unavailable",
+    };
+  }
+  const rows = comparisonRowsFromRanking(ranking);
+  const ranked = await applyMarketThesisEvent({
+    document: working,
+    event: "rank_expressions",
+    payload: {
+      max_loss_usd: typeof body.maxLossUsd === "number" ? body.maxLossUsd : null,
+      payoff_preference:
+        typeof body.payoffPreference === "string" ? body.payoffPreference : "defined_risk",
+      ranking_payload: ranking,
+      rows,
+      ...(rows.length === 0
+        ? { empty_reason: "No educational fit candidates were available for this thesis." }
+        : {}),
+    },
+  });
+  if (!ranked.ok) return ranked;
+
+  const frozenAt =
+    (typeof body.frozenAtUtc === "string" && body.frozenAtUtc) || new Date().toISOString();
+  return applyMarketThesisEvent({
+    document: ranked.document,
+    event: "save_artifact",
+    payload: { frozen_at_utc: frozenAt },
+  });
 }
 
 export async function GET(request: Request) {
@@ -96,6 +206,35 @@ export async function PUT(request: Request) {
         validated.document,
         identity.email,
         validated.document.links?.thesis_record_id ?? null,
+      );
+      return NextResponse.json({ document: saved });
+    }
+
+    if (action === "attach_expression_comparison") {
+      const existing = await getCurrentMarketThesis(identity.email);
+      if (!existing) {
+        return NextResponse.json({ error: "market thesis not started" }, { status: 404 });
+      }
+      const attached = await attachExpressionComparison(existing, body);
+      if (!attached.ok) {
+        return NextResponse.json(
+          { error: attached.error, code: attached.code, document: existing },
+          { status: attached.status },
+        );
+      }
+      const expressionId =
+        typeof body.expressionRecordId === "string" ? body.expressionRecordId : undefined;
+      const document = {
+        ...attached.document,
+        links: {
+          ...attached.document.links,
+          ...(expressionId ? { expression_record_id: expressionId } : {}),
+        },
+      };
+      const saved = await upsertCurrentMarketThesis(
+        document,
+        identity.email,
+        document.links?.thesis_record_id ?? null,
       );
       return NextResponse.json({ document: saved });
     }
@@ -254,6 +393,8 @@ export async function PUT(request: Request) {
         document = revisedHorizon.document;
       }
     }
+
+    document = await attachBtcEvidenceIfPossible(document, expiryDate);
 
     document = {
       ...document,

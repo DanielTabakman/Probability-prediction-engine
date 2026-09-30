@@ -759,11 +759,27 @@ def create_display_payload_wsgi_app(
 
         from src.viz.cross_venue_research_boundary import handle_cross_venue_research_wsgi_path
         from src.viz.market_thesis_boundary import handle_market_thesis_wsgi_path
+        from src.viz.options_expression_fit_ranking_boundary import (
+            handle_options_expression_fit_ranking_wsgi_path,
+        )
         from src.viz.options_market_read import handle_options_market_read_wsgi_path
 
         market_thesis = handle_market_thesis_wsgi_path(path, environ)
         if market_thesis is not None:
             status, body = market_thesis
+            start_response(
+                status,
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
+
+        fit_ranking = handle_options_expression_fit_ranking_wsgi_path(path, environ)
+        if fit_ranking is not None:
+            status, body = fit_ranking
             start_response(
                 status,
                 [

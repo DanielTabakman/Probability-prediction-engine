@@ -1,6 +1,6 @@
 # Market Thesis workflow v1 — inventory, schema, and state machine
 
-**Status:** Sequence steps 1–3 on main. Step 5 UI slice in progress: Strategy Lab confirm syncs a `market_thesis` document through `/api/theses/market-thesis` and the display-api apply boundary. Step 4 (public machine catalog) remains with the API lane.  
+**Status:** Sequence steps 1–3 on main. Step 5 UI in progress on the Strategy Lab path: confirm syncs belief/horizon (and BTC Options Market Read disagreement when available); plan-paper-trade attaches Python expression-fit comparison and can freeze the artifact. Step 4 (public machine catalog) remains with the API lane.  
 **Issue:** [#5491](https://github.com/DanielTabakman/Probability-prediction-engine/issues/5491)  
 **Parent:** #5488  
 **Sequence covered:** steps 1–3 (inventory, canonical schema / state machine, read-only validator).  
