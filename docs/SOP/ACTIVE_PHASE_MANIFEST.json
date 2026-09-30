@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MARKET_MOVED_SINCE_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md",
+  "phasePlanPath": "",
+  "sprintSpecPath": "",
+  "selectionRecord": "",
   "status": "COMPLETE",
-  "notes": "reconciled 2026-09-30: msos_market_moved_since_v1 product PR #5483 is merged; PHASE_QUEUE and PHASE_CHAPTER_BACKLOG are terminal/DONE; do not rebuild. Existing selection machinery may advance to the next READY chapter.",
+  "notes": "reconciled 2026-09-30: prior msos_market_moved_since_v1 is terminal (PR #5483; queue/backlog DONE). Manifest cleared so normal selection machinery can activate the next READY API chapter; do not rebuild order 13.",
   "workerMode": "local-agent"
 }
