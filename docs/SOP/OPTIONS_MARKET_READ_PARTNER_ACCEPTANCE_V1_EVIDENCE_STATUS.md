@@ -28,7 +28,6 @@ stale state through existing PPE closeout/selection machinery before selection.
 
 - Green conformance matrix against the exact staged revision.
 - Green production promotion receipt with unchanged v1.3 compatibility.
-- Alert-destination and privacy-safe telemetry decisions.
 - A tested, bounded rollback receipt.
 
 ## Does not own
