@@ -21,6 +21,7 @@ import {
   regionBetFrozenSnapshotKey,
 } from "@/lib/regionBetPayoff";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
+import type { MarketThesisDocument } from "@/lib/marketThesis";
 import { normalizeOwnerEmail } from "@/lib/msosIdentityCore";
 import { scopeOwnerId } from "@/lib/msosSession";
 
@@ -48,11 +49,17 @@ export type StoredRegionBet = RegionBetContract & {
   ownerEmail?: string | null;
 };
 
+export type StoredMarketThesis = MarketThesisDocument & {
+  ownerEmail?: string | null;
+  linkedThesisRecordId?: string | null;
+};
+
 type OwnerPointers = {
   thesisId: string | null;
   expressionId: string | null;
   horizonRegionId: string | null;
   regionBetId: string | null;
+  marketThesisId: string | null;
 };
 
 type WorkflowStoreFile = {
@@ -61,6 +68,7 @@ type WorkflowStoreFile = {
   expressions: StoredExpression[];
   horizonRegions?: StoredHorizonRegion[];
   regionBets?: StoredRegionBet[];
+  marketTheses?: StoredMarketThesis[];
   currentThesisId: string | null;
   currentExpressionId: string | null;
   currentByOwner?: Record<string, OwnerPointers>;
@@ -92,6 +100,7 @@ const EMPTY_STORE: WorkflowStoreFile = {
   expressions: [],
   horizonRegions: [],
   regionBets: [],
+  marketTheses: [],
   currentThesisId: null,
   currentExpressionId: null,
   currentByOwner: {},
@@ -129,6 +138,7 @@ function normalizeOwnerPointers(raw: Partial<OwnerPointers> | undefined): OwnerP
     expressionId: typeof raw?.expressionId === "string" ? raw.expressionId : null,
     horizonRegionId: typeof raw?.horizonRegionId === "string" ? raw.horizonRegionId : null,
     regionBetId: typeof raw?.regionBetId === "string" ? raw.regionBetId : null,
+    marketThesisId: typeof raw?.marketThesisId === "string" ? raw.marketThesisId : null,
   };
 }
 
@@ -139,6 +149,9 @@ function normalizeStore(raw: Partial<WorkflowStoreFile>): WorkflowStoreFile {
     ? (raw.horizonRegions as StoredHorizonRegion[])
     : [];
   const regionBets = Array.isArray(raw.regionBets) ? (raw.regionBets as StoredRegionBet[]) : [];
+  const marketTheses = Array.isArray(raw.marketTheses)
+    ? (raw.marketTheses as StoredMarketThesis[])
+    : [];
   const currentByOwner: Record<string, OwnerPointers> = {};
   for (const [key, pointers] of Object.entries(raw.currentByOwner ?? {})) {
     currentByOwner[key] = normalizeOwnerPointers(pointers);
@@ -149,6 +162,7 @@ function normalizeStore(raw: Partial<WorkflowStoreFile>): WorkflowStoreFile {
       expressionId: typeof raw.currentExpressionId === "string" ? raw.currentExpressionId : null,
       horizonRegionId: null,
       regionBetId: null,
+      marketThesisId: null,
     };
   }
   return {
@@ -157,6 +171,7 @@ function normalizeStore(raw: Partial<WorkflowStoreFile>): WorkflowStoreFile {
     expressions,
     horizonRegions,
     regionBets,
+    marketTheses,
     currentThesisId: typeof raw.currentThesisId === "string" ? raw.currentThesisId : null,
     currentExpressionId: typeof raw.currentExpressionId === "string" ? raw.currentExpressionId : null,
     currentByOwner,
@@ -325,6 +340,7 @@ export async function upsertCurrentThesis(
     expressionId: pointers.expressionId,
     horizonRegionId: pointers.horizonRegionId,
     regionBetId: pointers.regionBetId,
+    marketThesisId: pointers.marketThesisId,
   });
   await writeStore({
     ...nextStore,
@@ -369,6 +385,7 @@ export async function upsertCurrentExpression(
     expressionId: next.id,
     horizonRegionId: pointers.horizonRegionId,
     regionBetId: pointers.regionBetId,
+    marketThesisId: pointers.marketThesisId,
   });
   await writeStore({
     ...nextStore,
@@ -411,6 +428,7 @@ export async function appendPaperTrade(
     expressionId: next.id,
     horizonRegionId: pointers.horizonRegionId,
     regionBetId: pointers.regionBetId,
+    marketThesisId: pointers.marketThesisId,
   });
   await writeStore({
     ...nextStore,
@@ -493,6 +511,7 @@ export async function deletePaperTrade(ownerEmail: string, tradeId: string): Pro
     expressionId,
     horizonRegionId: pointers.horizonRegionId,
     regionBetId: pointers.regionBetId,
+    marketThesisId: pointers.marketThesisId,
   });
   await writeStore({ ...nextStore, expressions });
   return true;
@@ -528,6 +547,7 @@ export async function restorePaperTrade(
     expressionId: pointers.expressionId ?? trade.id,
     horizonRegionId: pointers.horizonRegionId,
     regionBetId: pointers.regionBetId,
+    marketThesisId: pointers.marketThesisId,
   });
   await writeStore({ ...nextStore, expressions });
   return withEffectiveStatus(restored);
@@ -554,6 +574,7 @@ export async function clearPaperTrades(ownerEmail: string): Promise<number> {
     expressionId,
     horizonRegionId: pointers.horizonRegionId,
     regionBetId: pointers.regionBetId,
+    marketThesisId: pointers.marketThesisId,
   });
   await writeStore({ ...nextStore, expressions });
   return toRemove.size;
@@ -646,6 +667,7 @@ export async function upsertHorizonRegion(
     expressionId: pointers.expressionId,
     horizonRegionId: next.id,
     regionBetId: pointers.regionBetId,
+    marketThesisId: pointers.marketThesisId,
   });
   await writeStore({
     ...nextStore,
@@ -787,10 +809,67 @@ export async function upsertRegionBet(
     expressionId: pointers.expressionId,
     horizonRegionId: pointers.horizonRegionId,
     regionBetId: next.id,
+    marketThesisId: pointers.marketThesisId,
   });
   await writeStore({
     ...nextStore,
     regionBets,
+  });
+  return next;
+}
+
+function marketThesisOwnerMatches(row: StoredMarketThesis, ownerEmail: string): boolean {
+  return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
+}
+
+export async function getCurrentMarketThesis(
+  ownerEmail: string,
+): Promise<StoredMarketThesis | null> {
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  if (!pointers.marketThesisId) return null;
+  return (
+    (store.marketTheses ?? []).find(
+      (row) => row.id === pointers.marketThesisId && marketThesisOwnerMatches(row, ownerEmail),
+    ) ?? null
+  );
+}
+
+export async function upsertCurrentMarketThesis(
+  document: MarketThesisDocument,
+  ownerEmail: string,
+  linkedThesisRecordId?: string | null,
+): Promise<StoredMarketThesis> {
+  if (!document || typeof document !== "object" || typeof document.id !== "string") {
+    throw new Error("invalid market thesis document");
+  }
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  const existing = pointers.marketThesisId
+    ? (store.marketTheses ?? []).find(
+        (row) => row.id === pointers.marketThesisId && marketThesisOwnerMatches(row, ownerEmail),
+      )
+    : undefined;
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
+  const next: StoredMarketThesis = {
+    ...document,
+    id: existing?.id ?? document.id,
+    ownerEmail: owner,
+    linkedThesisRecordId:
+      linkedThesisRecordId ?? existing?.linkedThesisRecordId ?? document.links?.thesis_record_id ?? null,
+  };
+  const marketTheses = (store.marketTheses ?? []).filter((row) => row.id !== next.id);
+  marketTheses.push(next);
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId: pointers.expressionId,
+    horizonRegionId: pointers.horizonRegionId,
+    regionBetId: pointers.regionBetId,
+    marketThesisId: next.id,
+  });
+  await writeStore({
+    ...nextStore,
+    marketTheses,
   });
   return next;
 }
@@ -846,6 +925,19 @@ export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowS
       tag: currentExpression.lifecycle === "simulated" ? "Simulated" : "Planned",
       detail: currentExpression.planSummary,
       tagTone: currentExpression.lifecycle === "simulated" ? "teal" : undefined,
+    });
+  }
+  const currentMarketThesis = pointers.marketThesisId
+    ? (store.marketTheses ?? []).find(
+        (row) => row.id === pointers.marketThesisId && marketThesisOwnerMatches(row, ownerEmail),
+      )
+    : undefined;
+  if (currentMarketThesis) {
+    currentWork.push({
+      name: `Market thesis · ${currentMarketThesis.asset.asset_id}`,
+      tag: String(currentMarketThesis.workflow_state).split("_").join(" "),
+      detail: "Evidence-backed comparison document",
+      tagTone: currentMarketThesis.workflow_state === "artifact_saved" ? "teal" : "amber",
     });
   }
 

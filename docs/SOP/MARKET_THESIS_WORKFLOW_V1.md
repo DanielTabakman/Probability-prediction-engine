@@ -1,6 +1,6 @@
 # Market Thesis workflow v1 — inventory, schema, and state machine
 
-**Status:** Sequence steps 1–3. The read-only validator is `src/engine/market_thesis.py`. Machine API (step 4) and simplified UI (step 5) are not in this slice.  
+**Status:** Sequence steps 1–3 on main. Step 5 UI slice in progress: Strategy Lab confirm syncs a `market_thesis` document through `/api/theses/market-thesis` and the display-api apply boundary. Step 4 (public machine catalog) remains with the API lane.  
 **Issue:** [#5491](https://github.com/DanielTabakman/Probability-prediction-engine/issues/5491)  
 **Parent:** #5488  
 **Sequence covered:** steps 1–3 (inventory, canonical schema / state machine, read-only validator).  
