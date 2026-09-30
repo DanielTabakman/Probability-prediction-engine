@@ -35,7 +35,7 @@ Start here when navigating the Probability Prediction Engine repo.
 |-------|-----------|----------|
 | **SOP / workflow** | [`SOP/`](SOP/) | Operating rules, relay, steward protocol, sprints, evidence status, phase plans (`SOP/PHASE_PLANS/`) |
 | **Vision** | [`VISION/`](VISION/) | MVP1 master canon, vision templates |
-| **Deploy** | [`DEPLOY/`](DEPLOY/) | Production and early-customer runbooks |
+| **Deploy** | [`DEPLOY/`](DEPLOY/) | Production and early-customer runbooks |\n| **API / Distribution** | [`API/`](API/) | API lane charter, product contracts, OpenAPI, partner/Qatom handoffs |
 | **Agents** | [`agents/`](agents/) | Role briefs (app engineer, QA smoke, etc.) |
 | **Control plane prompts** | [`CONTROL_PLANE/PROMPTS/`](CONTROL_PLANE/PROMPTS/) | Manager/worker prompt standards |
 
@@ -56,7 +56,7 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 - [`PRODUCT_THESIS.md`](PRODUCT_THESIS.md) — north star
 - [`SEMANTIC_CONTRACTS.md`](SEMANTIC_CONTRACTS.md) — market-implied vs belief vs disagreement
 - [`IMPLIED_LAB_SMOKE.md`](IMPLIED_LAB_SMOKE.md) — Playwright UI smoke procedures
-- [`API/OPTIONS_MARKET_READ_V1.md`](API/OPTIONS_MARKET_READ_V1.md) — `GET /v1/options-market-read`
+- [`API/README.md`](API/README.md) — API / Distribution lane home and product-slot map\n- [`API/API_LANE_CHARTER_V1.md`](API/API_LANE_CHARTER_V1.md) — lane boundaries, five-slot Qatom policy, definition of done\n- [`API/OPTIONS_MARKET_READ_V1.md`](API/OPTIONS_MARKET_READ_V1.md) — `GET /v1/options-market-read`
 - [`API/OPTIONS_MARKET_READ_STAGING_PLAN_V1.md`](API/OPTIONS_MARKET_READ_STAGING_PLAN_V1.md) — isolated staging topology and promotion gate
 - [`API/QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md`](API/QATOM_OPTIONS_MARKET_READ_HANDOFF_V1.md) — one-page partner integration handoff
 
