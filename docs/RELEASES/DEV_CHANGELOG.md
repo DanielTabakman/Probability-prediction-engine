@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-30
+
+_No merges to `main`._
+
 ## 2026-09-29
 
+- `cdcd723f` — Control-plane: dev changelog
 - `c9a14205` — Control-plane: dev changelog
 - `0ae5d099` — Merge pull request #5504 from DanielTabakman/msos/5490-ui-simplification-audit
 - `efa66057` — product(msos-ui): allow Command Center witness updates in the MSOS UI layer (`docs/SOP/`)
