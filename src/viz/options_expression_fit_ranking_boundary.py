@@ -167,7 +167,11 @@ def handle_options_expression_fit_ranking_wsgi_path(
     path: str,
     environ: dict[str, Any],
 ) -> tuple[str, bytes] | None:
-    if (path.rstrip("/") or "/") != OPTIONS_EXPRESSION_FIT_RANKING_HTTP_PATH:
+    normalized = path.rstrip("/") or "/"
+    if normalized not in {
+        OPTIONS_EXPRESSION_FIT_RANKING_HTTP_PATH,
+        "/options-expression-fit-ranking.json",
+    }:
         return None
     try:
         payload = build_options_expression_fit_ranking_response(environ)

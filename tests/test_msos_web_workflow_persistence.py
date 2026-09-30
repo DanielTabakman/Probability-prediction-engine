@@ -36,20 +36,39 @@ def test_thesis_api_routes_exist() -> None:
     assert "loadWorkflowSummary" in summary_route
     assert "sync_from_confirm" in market_thesis_route
     assert "upsertCurrentMarketThesis" in market_thesis_route
-    assert "market-thesis/apply.json" in market_thesis_route
+    assert "marketThesisApplyUrl" in market_thesis_route
+    assert "attach_expression_comparison" in market_thesis_route
 
 
 def test_confirm_syncs_market_thesis_document() -> None:
     panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(
         encoding="utf-8"
     )
+    expression = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
+        encoding="utf-8"
+    )
     lib = (MSOS_WEB / "src" / "lib" / "marketThesis.ts").read_text(encoding="utf-8")
+    upstream = (MSOS_WEB / "src" / "lib" / "marketThesisUpstream.ts").read_text(encoding="utf-8")
     store = (MSOS_WEB / "src" / "lib" / "msosWorkflowStore.ts").read_text(encoding="utf-8")
+    route = (
+        MSOS_WEB / "src" / "app" / "api" / "theses" / "market-thesis" / "route.ts"
+    ).read_text(encoding="utf-8")
     assert "syncMarketThesisFromConfirm" in panel
     assert "Market thesis:" in panel
+    assert "attachMarketThesisExpressionComparison" in expression
+    assert "attach_expression_comparison" in route
+    assert "attachBtcEvidenceIfPossible" in route or "fetchOptionsMarketReadPayload" in route
+    assert "comparisonRowsFromRanking" in upstream
     assert "MARKET_THESIS_PERSISTENCE_LABEL" in lib
     assert "upsertCurrentMarketThesis" in store
     assert "marketTheses" in store
+
+
+def test_expression_fit_ranking_mounted_on_display_boundary() -> None:
+    embed = (
+        Path(__file__).resolve().parents[1] / "src" / "viz" / "embed_display_boundary.py"
+    ).read_text(encoding="utf-8")
+    assert "handle_options_expression_fit_ranking_wsgi_path" in embed
 
 
 def test_persistence_libs_call_server_api() -> None:

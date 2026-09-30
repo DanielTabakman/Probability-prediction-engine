@@ -33,6 +33,11 @@ import {
   type PaperTradeMarkSnapshot,
 } from "@/lib/expressionPersistence";
 import {
+  attachMarketThesisExpressionComparison,
+  fetchMarketThesisDocument,
+  type MarketThesisDocument,
+} from "@/lib/marketThesis";
+import {
   fetchStrategySuggestion,
   type StrategySuggestionPayload,
 } from "@/lib/ppeStrategySuggestion";
@@ -145,16 +150,19 @@ export function ExpressionPlanningPanel() {
   const [savePending, setSavePending] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  const [marketThesis, setMarketThesis] = useState<MarketThesisDocument | null>(null);
   const { currency, formatMoney } = useDisplayCurrency();
 
   useEffect(() => {
     void Promise.all([
       fetchThesisRecord(defaultThesisRecord),
       fetchExpressionRecord(defaultExpressionRecord),
-    ]).then(([loadedThesis, expression]) => {
+      fetchMarketThesisDocument(),
+    ]).then(([loadedThesis, expression, thesisDoc]) => {
       setThesis(loadedThesis);
       setThesisConfirmed(loadedThesis.lifecycle === "confirmed");
       setRecord(expression);
+      setMarketThesis(thesisDoc);
       setHydrated(true);
     });
   }, []);
@@ -308,6 +316,19 @@ export function ExpressionPlanningPanel() {
     setRecord(result.expression);
     if (result.ok) {
       setLastSavedAt(result.expression.savedAt ?? result.expression.updatedAt);
+      const thesisSync = await attachMarketThesisExpressionComparison({
+        expiryDate: next.expiryDate ?? expiry,
+        horizonDays: thesis.horizonDays,
+        maxLossUsd: summary?.max_loss_usd ?? null,
+        payoffPreference: "defined_risk",
+      });
+      if (thesisSync.ok) {
+        setMarketThesis(thesisSync.document ?? null);
+      } else if (thesisSync.error) {
+        setSaveError(
+          `Paper trade saved. Market thesis comparison: ${thesisSync.error}`,
+        );
+      }
     } else if (result.authRequired) {
       stashPendingPaperTrade(next);
       stashPostAuthReturnPath(planPath);
@@ -571,6 +592,12 @@ export function ExpressionPlanningPanel() {
                   {EXPRESSION_PERSISTENCE_LABEL} {displayCurrencyDisclaimer(currency)}
                 </p>
               ) : null}
+              <p className="micro" aria-label="Market thesis workflow state">
+                Market thesis:{" "}
+                {marketThesis
+                  ? String(marketThesis.workflow_state).split("_").join(" ")
+                  : "not started"}
+              </p>
             </div>
           </ContextRail>
         </section>

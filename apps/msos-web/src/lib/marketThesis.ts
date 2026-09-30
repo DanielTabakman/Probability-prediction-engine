@@ -115,6 +115,41 @@ export async function syncMarketThesisFromConfirm(input: {
   }
 }
 
+export async function attachMarketThesisExpressionComparison(input: {
+  expressionRecordId?: string | null;
+  expiryDate?: string | null;
+  horizonDays?: number | null;
+  maxLossUsd?: number | null;
+  payoffPreference?: string;
+}): Promise<{ ok: boolean; document?: MarketThesisDocument; error?: string }> {
+  if (typeof window === "undefined") {
+    return { ok: false, error: "browser only" };
+  }
+  try {
+    const response = await fetch("/api/theses/market-thesis", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ action: "attach_expression_comparison", ...input }),
+    });
+    const payload = (await response.json()) as {
+      document?: MarketThesisDocument;
+      error?: string;
+      code?: string;
+    };
+    if (!response.ok || !payload.document) {
+      return {
+        ok: false,
+        error: payload.error || payload.code || "failed to attach expression comparison",
+        document: payload.document,
+      };
+    }
+    return { ok: true, document: payload.document };
+  } catch {
+    return { ok: false, error: "failed to attach expression comparison" };
+  }
+}
+
 export function directionFromForwardMult(forwardMult: number): "long" | "short" | "neutral" {
   if (forwardMult > 1.002) return "long";
   if (forwardMult < 0.998) return "short";
