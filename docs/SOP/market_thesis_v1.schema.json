@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketstructureos.com/schemas/market-thesis.v1.json",
+  "title": "Market Thesis v1",
+  "description": "Serializable MSOS market thesis. User belief, market-implied evidence, and derived comparison are separate objects. Execution is out of scope. workflow_state is derived; see docs/SOP/MARKET_THESIS_WORKFLOW_V1.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "id",
+    "revision",
+    "workflow_state",
+    "asset",
+    "user_belief",
+    "horizon",
+    "market_evidence",
+    "disagreement",
+    "expression_comparison",
+    "artifact",
+    "prior_artifacts",
+    "links",
+    "authority"
+  ],
+  "properties": {
+    "schema_version": { "const": "market-thesis.v1" },
+    "kind": { "const": "market_thesis" },
+    "id": { "type": "string", "minLength": 1 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "workflow_state": {
+      "enum": [
+        "draft",
+        "belief_captured",
+        "horizon_bound",
+        "evidence_attached",
+        "disagreement_recorded",
+        "expressions_ranked",
+        "artifact_saved"
+      ]
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id"],
+      "properties": {
+        "asset_id": { "type": "string", "minLength": 1 },
+        "symbol": { "type": "string" },
+        "venue": { "type": "string" }
+      }
+    },
+    "user_belief": {
+      "description": "Null in draft. Required, and complete, from belief_captured onward.",
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/user_belief" }]
+    },
+    "horizon": {
+      "description": "Null before horizon_bound.",
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/horizon" }]
+    },
+    "market_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["citations"],
+      "properties": {
+        "citations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence_citation" }
+        }
+      }
+    },
+    "disagreement": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/disagreement" }]
+    },
+    "expression_comparison": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/expression_comparison" }]
+    },
+    "artifact": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/artifact" }]
+    },
+    "prior_artifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/artifact" }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "thesis_record_id": { "type": "string" },
+        "horizon_region_id": { "type": "string" },
+        "region_bet_id": { "type": "string" },
+        "expression_record_id": { "type": "string" }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["execution", "recommendation_status"],
+      "properties": {
+        "execution": { "const": "out_of_scope" },
+        "recommendation_status": {
+          "const": "educational_comparison_not_recommendation"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "user_belief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "direction", "statement", "magnitude", "uncertainty", "assumptions"],
+      "properties": {
+        "source": { "const": "user" },
+        "direction": { "enum": ["long", "short", "neutral"] },
+        "statement": { "type": "string", "minLength": 1 },
+        "magnitude": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "enum": ["price_band", "percent_move", "qualitative"] },
+            "price_min_usd": { "type": "number" },
+            "price_max_usd": { "type": "number" },
+            "percent_move": { "type": "number" },
+            "qualitative_label": { "type": "string" }
+          }
+        },
+        "uncertainty": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": {
+              "enum": [
+                "wider_than_market",
+                "narrower_than_market",
+                "similar_to_market",
+                "unspecified"
+              ]
+            },
+            "note": { "type": "string" }
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "text"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "text": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "legacy_strategy_lab": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "thesis_record_id": { "type": "string" },
+            "forward_mult": { "type": "number" },
+            "vol_mult": { "type": "number" },
+            "thesis_range_pct": { "type": "number" }
+          }
+        }
+      }
+    },
+    "horizon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "enum": ["listed_expiry", "bucket", "price_time_region"] },
+        "target_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "expiry_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "target_bucket_days": { "enum": [30, 60, 90, 180, 365] },
+        "linked_expiry_ts": { "type": "integer" },
+        "region": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["time_start_utc", "time_end_utc", "price_min_usd", "price_max_usd"],
+          "properties": {
+            "time_start_utc": { "type": "string", "minLength": 1 },
+            "time_end_utc": { "type": "string", "minLength": 1 },
+            "price_min_usd": { "type": "number" },
+            "price_max_usd": { "type": "number" }
+          }
+        }
+      }
+    },
+    "evidence_citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["citation_id", "primitive", "endpoint", "as_of_utc", "request"],
+      "properties": {
+        "citation_id": { "type": "string", "minLength": 1 },
+        "primitive": {
+          "enum": [
+            "options_market_read",
+            "options_horizon_comparison",
+            "horizon_region_implied_mass"
+          ]
+        },
+        "endpoint": { "type": "string", "minLength": 1 },
+        "schema_version": { "type": ["string", "number"] },
+        "ruleset_version": { "type": "string" },
+        "as_of_utc": { "type": "string", "minLength": 1 },
+        "request": { "type": "object" },
+        "payload": { "type": "object" },
+        "payload_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "disagreement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "user_side", "market_side_citation_id", "summary", "read_only"],
+      "properties": {
+        "method": { "const": "belief_vs_cited_evidence.v1" },
+        "user_side": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "market_side_citation_id": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "read_only": { "const": true }
+      }
+    },
+    "money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "amount_usd": { "type": ["number", "null"] },
+        "label": { "type": "string" },
+        "status": { "enum": ["estimated", "unavailable"] },
+        "bounded": { "type": "boolean" }
+      }
+    },
+    "comparison_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "label",
+        "source_primitive",
+        "cost",
+        "max_loss",
+        "time_horizon",
+        "payoff_shape",
+        "failure_modes",
+        "recommendation_status"
+      ],
+      "properties": {
+        "candidate_id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "source_primitive": { "enum": ["exposure_paths", "strategy_suggestion"] },
+        "rank": { "type": "integer", "minimum": 1 },
+        "score": { "type": "number" },
+        "cost": { "$ref": "#/$defs/money" },
+        "max_loss": { "$ref": "#/$defs/money" },
+        "time_horizon": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label"],
+          "properties": {
+            "days": { "type": ["integer", "null"] },
+            "label": { "type": "string", "minLength": 1 }
+          }
+        },
+        "payoff_shape": { "type": "string", "minLength": 1 },
+        "failure_modes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "recommendation_status": { "const": "educational_fit_not_recommendation" }
+      }
+    },
+    "expression_comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ranking_kind", "recommendation_status", "rows"],
+      "properties": {
+        "ranking_kind": { "const": "options_expression_fit_ranking" },
+        "recommendation_status": { "const": "educational_fit_not_recommendation" },
+        "preferences": { "type": "object" },
+        "ranking_payload": { "type": "object" },
+        "rows": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/comparison_row" }
+        },
+        "empty_reason": { "type": "string" }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frozen_at_utc", "content_sha256", "shareable", "execution"],
+      "properties": {
+        "frozen_at_utc": { "type": "string", "minLength": 1 },
+        "content_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "shareable": { "const": true },
+        "execution": { "const": "out_of_scope" }
+      }
+    }
+  }
+}
