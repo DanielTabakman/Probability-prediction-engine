@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MARKET_MOVED_SINCE_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_MARKET_MOVED_SINCE_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Autobuilder catalog order 13: MSOS market-moved-since after terminal 12 (#5480).",
+  "status": "COMPLETE",
+  "notes": "reconciled 2026-09-30: msos_market_moved_since_v1 product PR #5483 is merged; PHASE_QUEUE and PHASE_CHAPTER_BACKLOG are terminal/DONE; do not rebuild. Existing selection machinery may advance to the next READY chapter.",
   "workerMode": "local-agent"
 }
