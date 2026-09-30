@@ -16,13 +16,15 @@ partner-facing slice without replacing the active
 - Closing partner controls and a repeatable conformance witness reduces launch
   risk without introducing recommendations, execution, or another asset.
 
-## Why it is not READY yet
+## Why it is READY now
 
-- The current READY chapter retains queue ownership until terminal closeout.
-- Qatom must confirm consumer placement and backend-versus-browser calling
-  shape.
-- Authentication, rate limit, CORS, alert destination, and privacy-safe usage
-  telemetry need explicit decisions rather than guessed defaults.
+- The prior `msos_market_moved_since_v1` chapter is terminal: product PR #5483
+  merged and queue/backlog mark it DONE.
+- Founder delegation on 2026-09-30 records the partner-control defaults in
+  `docs/API/QATOM_OPTIONS_MARKET_READ_PARTNER_DECISIONS_V1.md`.
+- Any remaining work is bounded partner acceptance: conformance, documentation
+  parity, staging/production promotion evidence, rollback, monitoring, and an
+  external request/response witness.
 
 ## Promotion condition
 
