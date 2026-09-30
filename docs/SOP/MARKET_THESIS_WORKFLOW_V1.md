@@ -1,13 +1,13 @@
 # Market Thesis workflow v1 — inventory, schema, and state machine
 
-**Status:** Audit and specification only. No workflow implementation in this pass.  
+**Status:** Sequence steps 1–3. The read-only validator is `src/engine/market_thesis.py`. Machine API (step 4) and simplified UI (step 5) are not in this slice.  
 **Issue:** [#5491](https://github.com/DanielTabakman/Probability-prediction-engine/issues/5491)  
 **Parent:** #5488  
-**Sequence covered:** steps 1–2 only (inventory and canonical schema / state machine).  
-**As-of:** 2026-09-29  
+**Sequence covered:** steps 1–3 (inventory, canonical schema / state machine, read-only validator).  
+**As-of:** 2026-09-30  
 **Machine schema:** [`market_thesis_v1.schema.json`](market_thesis_v1.schema.json)
 
-This document is the contract for later steps. Step 3 (smallest read-only workflow), step 4 (machine API), and step 5 (simplified UI) are not authorized here.
+This document is the contract for the thesis object. Step 4 (machine API) and step 5 (simplified UI) are not in this slice.
 
 Execution and brokerage stay outside v1. The thesis document never gains an order, venue ticket, or “executed” state.
 
@@ -328,9 +328,9 @@ Not dependencies of the schema:
 
 ## First implementation slice
 
-This is sequence step 3, and it is not in this pass.
+Sequence step 3 is the read-only validator in `src/engine/market_thesis.py`, with `tests/test_horizon_market_thesis.py` and the canned BTC document `tests/test_horizon_market_thesis_btc.json`. Optional workflow-store persist is not part of that module.
 
-Smallest read-only slice:
+The slice is:
 
 1. Pure Python validator and `derive_state` for `market-thesis.v1`, with the illegal-event codes above. No network in the state function.
 2. One BTC fixture document that embeds canned Options Market Read, horizon comparison, exposure, and expression-fit payloads already produced by those primitives.
@@ -339,7 +339,7 @@ Smallest read-only slice:
 
 Still out of that slice: new HTTP route, MSOS page, TypeScript scoring, live order language, and retiring Region Bet or Strategy Lab confirm.
 
-Suggested layer when that slice is chartered: `ppe-core` for the pure module and tests. UI stays a later `msos-shell` slice.
+Layer for this module: `ppe-core`. UI stays a later `msos-shell` slice.
 
 ---
 
