@@ -34,6 +34,14 @@ import {
   type ThesisLifecycle,
   withLifecycle,
 } from "@/lib/thesisPersistence";
+import {
+  MARKET_THESIS_PERSISTENCE_LABEL,
+  directionFromForwardMult,
+  fetchMarketThesisDocument,
+  syncMarketThesisFromConfirm,
+  uncertaintyFromVolMult,
+  type MarketThesisDocument,
+} from "@/lib/marketThesis";
 import { DEMO_FOOTER, WORKSPACE_SAVED_LABEL } from "@/lib/publicCopy";
 
 export function ThesisConfirmationPanel() {
@@ -41,15 +49,17 @@ export function ThesisConfirmationPanel() {
   const assetId = useResolvedLabAssetId({ thesisAssetId: record.assetId });
   const [hydrated, setHydrated] = useState(false);
   const [persistError, setPersistError] = useState<string | null>(null);
+  const [marketThesis, setMarketThesis] = useState<MarketThesisDocument | null>(null);
   const [displayPayload, setDisplayPayload] = useState<DisplayPayload | null>(null);
   const [tuning, setTuning] = useState<BeliefTuning>(loadStoredBeliefTuning());
   const [expiry, setExpiry] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
-      const [loaded, payload] = await Promise.all([
+      const [loaded, payload, thesisDoc] = await Promise.all([
         fetchThesisRecord(defaultThesisRecord),
         fetchDisplayPayloadClient(assetId),
+        fetchMarketThesisDocument(),
       ]);
       const storedExpiry =
         loadStoredStrategyLabExpiry() ||
@@ -62,6 +72,7 @@ export function ThesisConfirmationPanel() {
       setDisplayPayload(payload);
       setTuning(storedTuning);
       setExpiry(storedExpiry);
+      setMarketThesis(thesisDoc);
       setRecord({ ...loaded, ...draft, lifecycle: loaded.lifecycle, updatedAt: loaded.updatedAt });
       setHydrated(true);
     })();
@@ -96,7 +107,26 @@ export function ThesisConfirmationPanel() {
     const ok = await persistThesisRecord(next);
     if (!ok) {
       setPersistError("Could not save to server — stored locally only.");
+      return;
     }
+    const sync = await syncMarketThesisFromConfirm({
+      assetId: next.assetId || assetId,
+      symbol: next.instrument,
+      statement: `${restatement.prefix} ${restatement.emphasis} ${restatement.suffix} ${restatement.horizon}.`,
+      direction: directionFromForwardMult(tuning.forward_mult),
+      magnitudePercent: next.thesisRangePct,
+      uncertaintyKind: uncertaintyFromVolMult(tuning.vol_mult),
+      expiryDate: expiry || next.expiryDate || null,
+      horizonDays: next.horizonDays,
+      forwardMult: tuning.forward_mult,
+      volMult: tuning.vol_mult,
+      thesisRangePct: next.thesisRangePct,
+    });
+    if (!sync.ok) {
+      setPersistError(sync.error || "Strategy Lab view saved; market thesis sync failed.");
+      return;
+    }
+    setMarketThesis(sync.document ?? null);
   }
 
   const isConfirmed = record.lifecycle === "confirmed";
@@ -214,8 +244,15 @@ export function ThesisConfirmationPanel() {
               </span>
             )}
             <p className="micro persistence-note">{THESIS_PERSISTENCE_LABEL}</p>
+            <p className="micro persistence-note">{MARKET_THESIS_PERSISTENCE_LABEL}</p>
             <p className="micro" aria-label="Thesis lifecycle status">
               Status: {activeLifecycle}
+            </p>
+            <p className="micro" aria-label="Market thesis workflow state">
+              Market thesis:{" "}
+              {marketThesis
+                ? String(marketThesis.workflow_state).split("_").join(" ")
+                : "not started"}
             </p>
             {persistError ? (
               <p className="micro degraded-feed-note" role="alert">

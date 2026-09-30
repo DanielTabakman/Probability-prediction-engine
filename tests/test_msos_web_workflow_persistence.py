@@ -24,6 +24,9 @@ def test_thesis_api_routes_exist() -> None:
     summary_route = (
         MSOS_WEB / "src" / "app" / "api" / "theses" / "summary" / "route.ts"
     ).read_text(encoding="utf-8")
+    market_thesis_route = (
+        MSOS_WEB / "src" / "app" / "api" / "theses" / "market-thesis" / "route.ts"
+    ).read_text(encoding="utf-8")
     assert "export async function GET" in thesis_route
     assert "export async function PUT" in thesis_route
     assert "requireProtectedIdentity" in thesis_route
@@ -31,6 +34,22 @@ def test_thesis_api_routes_exist() -> None:
     assert "identity.email" in thesis_route
     assert "upsertCurrentExpression" in expression_route
     assert "loadWorkflowSummary" in summary_route
+    assert "sync_from_confirm" in market_thesis_route
+    assert "upsertCurrentMarketThesis" in market_thesis_route
+    assert "market-thesis/apply.json" in market_thesis_route
+
+
+def test_confirm_syncs_market_thesis_document() -> None:
+    panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    lib = (MSOS_WEB / "src" / "lib" / "marketThesis.ts").read_text(encoding="utf-8")
+    store = (MSOS_WEB / "src" / "lib" / "msosWorkflowStore.ts").read_text(encoding="utf-8")
+    assert "syncMarketThesisFromConfirm" in panel
+    assert "Market thesis:" in panel
+    assert "MARKET_THESIS_PERSISTENCE_LABEL" in lib
+    assert "upsertCurrentMarketThesis" in store
+    assert "marketTheses" in store
 
 
 def test_persistence_libs_call_server_api() -> None:
