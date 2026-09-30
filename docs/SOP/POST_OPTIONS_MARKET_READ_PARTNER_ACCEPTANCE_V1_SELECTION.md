@@ -2,14 +2,15 @@
 
 ## COORDINATION STATUS
 
-**NOT SELECTED — HIGH / PLANNED.** This record charters the likely next
-partner-facing slice without replacing the active
-`msos_market_moved_since_v1` READY chapter.
+**READY — HIGH.** The prior `msos_market_moved_since_v1` chapter is terminal,
+the stale active manifest is reconciled to COMPLETE in the same control-plane
+change, and partner-control defaults are recorded. Use the existing PPE
+selection machinery to activate this chapter.
 
 ## Why it is next-worthy
 
-- The founder has a Tuesday Qatom meeting and asked for a usable, testable
-  partner handoff rather than a raw JSON demonstration.
+- The founder wants a usable, testable Qatom/partner handoff rather than a raw
+  JSON demonstration.
 - The BTC v1.3 primitive, staging topology, console, and monitoring already
   exist, so the remaining work is bounded acceptance—not speculative product
   redesign.
@@ -28,9 +29,9 @@ partner-facing slice without replacing the active
 
 ## Promotion condition
 
-Promote this queue row from PLANNED to READY only when the active chapter is
-terminal and the Tuesday decision inputs in
-`docs/SOP/SPRINT_OPTIONS_MARKET_READ_PARTNER_ACCEPTANCE_V1.md` are recorded.
+Satisfied on 2026-09-30: the upstream chapter is terminal and the integration
+controls are recorded. The queue row is READY. Selection should now occur
+through the normal PPE control-plane mechanism.
 
 ## Scope boundary
 
