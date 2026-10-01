@@ -2,8 +2,14 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-10-01
+
+_No merges to `main`._
+
 ## 2026-09-30
 
+- `0d538c8b` — product: attach thesis evidence and expression comparison (#5491) (#5510) (`apps/msos-web/`)
+- `5c9f7466` — Control-plane: dev changelog
 - `fd9c86d8` — control(api): make API lane self-driving (`docs/SOP/`)
 - `39fc1059` — product: sync market thesis from Strategy Lab confirm (#5491) (#5509) (`apps/msos-web/`)
 - `a7d91f15` — Control-plane: dev changelog
