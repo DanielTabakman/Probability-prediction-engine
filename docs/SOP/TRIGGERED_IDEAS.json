@@ -64,6 +64,106 @@
           "ppe_thread_capture"
         ]
       }
+    },
+    {
+      "id": "in_flight_ssh_log_tail_when_stale",
+      "title": "SSH log-tail when stuck and local desktop logs stale",
+      "summary": "When in-flight monitor detects stuck and local desktop logs are unchanged for ~15m, run one bounded SSH tail of VM relay/build logs (not an open-ended poll). Complements local log-tail already shipped; only when desktop logs are stale so operator is not blind to VM-side progress.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "in-flight",
+          "operator",
+          "SSH",
+          "vm",
+          "stuck",
+          "log-tail"
+        ]
+      }
+    },
+    {
+      "id": "vm_mirror_merge_ntfy_during_inflight",
+      "title": "ntfy when vm-mirror PR merges during wait_for_vm",
+      "summary": "During wait_for_vm / BUILD_IN_FLIGHT, desktop may stay blind until pull. Notify via ntfy when an ops/vm-mirror PR merges so operator knows mirror status advanced without watching GitHub. Ops polish only \u2014 not a product chapter.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "vm-mirror",
+          "wait_for_vm",
+          "in-flight",
+          "ntfy",
+          "operator",
+          "mirror"
+        ]
+      }
+    },
+    {
+      "id": "frontier_preflight_repo_state_consolidation",
+      "title": "Consolidate frontier_preflight into ppe_repo_state",
+      "summary": "Post repo-state SSOT (PR #1939): fold remaining frontier_preflight checks into ppe_repo_state severity ladder / recovery transaction so mixed-plane preflight has one SSOT. Do not re-park factory FC-3/FC-5 gate/dispatch work already on factory surfaces.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "repo_state",
+          "frontier_preflight",
+          "mixed-plane",
+          "recovery"
+        ]
+      },
+      "notFor": [
+        "factory_fc3_gate_enforce; factory_fc5_slice_starters; factory SSOT/dispatch/worktrees already covered post-split"
+      ]
+    },
+    {
+      "id": "founder_surface_recovery_simplify",
+      "title": "Simplify founder surface for recovery preflight",
+      "summary": "After repo-state SSOT: trim founder/operator surface recovery wording so mixed-plane/recovery parks to operator without checklist sprawl; align FOUNDER_OPERATOR_SURFACE with severity ladder + park scaffolding from PR #1939.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "founder_surface",
+          "recovery",
+          "mixed-plane",
+          "OPERATOR_STATUS"
+        ]
+      },
+      "notFor": [
+        "factory FC roadmap Tier 2-5 duplicates of factory SSOT/dispatch"
+      ]
+    },
+    {
+      "id": "milestone_gate_v2_phases_3_5_next_build_resolved_umbrella_tracke",
+      "title": "Milestone gate v2 phases 3-5 (NEXT_BUILD_RESOLVED + umbrella tracker + merge-time markers)",
+      "summary": "Pre-split thread designed milestone gate v2. Phases 1-2 (actionable clock, ACTIVE_CHAPTER_GATE/STEERING_CANDIDATE_STALE/CLOSEOUT_REGISTRY_DEBT, post_relay_continue reconcile) were implemented on a recovery branch but ppe_milestone_gate.py is absent after autobuilder/MSOS split \u2014 do not re-land as ad-hoc product. Revisit as control-plane/factory chapter: Phase 3 NEXT_BUILD_RESOLVED.json + steward doc sync; Phase 4 umbrella milestone tracker separate from relay BUILD; Phase 5 marker+registry at product merge. Drop if PIPELINE_HEALTH / chapter coordination already covers this on main.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "pipeline health",
+          "milestone gate",
+          "closeoutOnlyChapterIds",
+          "FACTORY"
+        ]
+      }
     }
   ]
 }
