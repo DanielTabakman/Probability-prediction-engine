@@ -1055,6 +1055,46 @@
       },
       "deferredReason": "Superseded as a standalone public API by the 2026-09-30 product-slot policy: APIs are created for approved user-facing products, not calculations.",
       "reactivationCondition": "Explicit founder approval of implied range as a distinct user-facing product, or a selected product charter that needs bounded internal implied-range implementation without consuming a Qatom slot."
+    },
+    {
+      "chapterId": "factory_canary_001_options_market_read_error_contract_v1",
+      "status": "READY",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "canonRef": "DanielTabakman/Probability-prediction-engine#5514",
+      "reason": "[FACTORY CANARY 001 READY] Add deterministic regression coverage for the existing Options Market Read WSGI JSON error contract. Test-only payload; do not widen scope.",
+      "autobuilderCatalogOrder": 19,
+      "eligibility": "buildable_via_autobuilder_catalog",
+      "dependsOn": [],
+      "packetization": "just_in_time",
+      "autobuilderPacket": {
+        "version": 1,
+        "sliceId": "Factory-Canary-001-OptionsMarketRead-ErrorContract",
+        "layerPreset": "PPE_UI",
+        "buildBranch": "build/auto/Factory-Canary-001-OptionsMarketRead-ErrorContract",
+        "declaredPlane": "PRODUCT-PLANE",
+        "workerMode": "local-agent",
+        "maxAttempts": 2,
+        "susMinutes": 30,
+        "hardMinutes": 90,
+        "allowedPaths": [
+          "tests/test_options_market_read.py"
+        ],
+        "acceptanceCriteria": [
+          "Add WSGI-route regression coverage proving invalid target_date returns 400 Bad Request with Content-Type application/json; charset=utf-8 and error.code invalid_date.",
+          "Add WSGI-route regression coverage proving unsupported asset returns 422 Unprocessable Entity with Content-Type application/json; charset=utf-8 and error.code unsupported_asset.",
+          "Do not change production behavior. If the existing HTTP contract does not satisfy these assertions, stop and report rather than widening allowed paths.",
+          "Existing Options Market Read tests remain green and repository lint/validation for the touched file remains green.",
+          "Use no network calls, live market data, fixture mutation, or production-source changes."
+        ],
+        "validation": {
+          "profile_id": "ppe-ci-pytest-v1"
+        }
+      },
+      "autobuilderMergeAuthority": {
+        "class": "AUTO_MERGE_WHEN_GREEN",
+        "declaredAt": "2026-10-05T21:04:47Z"
+      }
     }
   ]
 }
