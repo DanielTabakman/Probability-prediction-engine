@@ -10,6 +10,7 @@ from scripts.founder_portfolio import collect_portfolio
 REPO = Path(__file__).resolve().parents[1]
 A_ID = "options_horizon_comparison_v1"
 API_ID = "options_market_read_partner_acceptance_v1"
+CANARY_ID = "factory_canary_001_options_market_read_error_contract_v1"
 A_PLAN = "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json"
 B_PLAN = "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json"
 RB_PLAN = "docs/SOP/PHASE_PLANS/msos_market_moved_since_v1_relay.json"
@@ -94,7 +95,7 @@ def test_founder_portfolio_recommends_market_read_partner_acceptance(monkeypatch
     ppe = _pipeline(snapshot)
     ready_ids = [item["work_item_id"] for item in ppe["ready_work"]]
 
-    assert ready_ids == [API_ID]
+    assert ready_ids == [API_ID, CANARY_ID]
     assert snapshot["recommended_next_action"]["work_item_id"] == API_ID
     work = next(item for item in ppe["ready_work"] if item["work_item_id"] == API_ID)
     assert work["source_plan"] == "docs/SOP/PHASE_PLANS/options_market_read_partner_acceptance_v1_relay.json"
