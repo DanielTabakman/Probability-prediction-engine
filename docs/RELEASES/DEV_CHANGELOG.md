@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-10-06
 
+- `f364bd2b` — Control-plane: dev changelog
 - `e4429390` — Merge pull request #5515 from DanielTabakman/factory/canary-001-admission
 - `367596e5` — Update witness charter expectations for Canary 001
 - `d5024314` — Update founder portfolio expectations for Canary 001
