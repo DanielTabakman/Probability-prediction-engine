@@ -2,9 +2,16 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-10-06
+
+- `e4429390` — Merge pull request #5515 from DanielTabakman/factory/canary-001-admission
+- `367596e5` — Update witness charter expectations for Canary 001
+- `d5024314` — Update founder portfolio expectations for Canary 001
+
 ## 2026-10-05
 
-_No merges to `main`._
+- `c3746e9a` — Control-plane: dev changelog
+- `22606f7c` — Admit Factory Canary 001 to PPE backlog (`docs/SOP/`)
 
 ## 2026-10-04
 
