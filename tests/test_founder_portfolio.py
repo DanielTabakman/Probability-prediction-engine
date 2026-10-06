@@ -21,6 +21,7 @@ CANON = [
 OPTIONS_A_ID = "options_horizon_comparison_v1"
 OPTIONS_B_ID = "options_expression_fit_ranking_v1"
 API_READY_ID = "options_market_read_partner_acceptance_v1"
+CANARY_READY_ID = "factory_canary_001_options_market_read_error_contract_v1"
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -587,7 +588,7 @@ def test_issue_5374_reconciled_items_do_not_reappear_after_options_made_simple_s
     }
     ready_ids = {item["work_item_id"] for item in ppe["ready_work"]}
 
-    assert ready_ids == {API_READY_ID}
+    assert ready_ids == {API_READY_ID, CANARY_READY_ID}
     assert ready_ids.isdisjoint(reconciled_ids)
     assert snapshot["recommended_next_action"]["work_item_id"] not in reconciled_ids
 
@@ -1048,7 +1049,7 @@ def test_selection_context_without_exclusions_preserves_region_bet_recommendatio
         "scope": "request",
         "effect": "exclusions remove matching READY candidates from recommendation eligibility only; ready_work is unchanged",
     }
-    assert [item["work_item_id"] for item in ppe["ready_work"]] == [API_READY_ID]
+    assert [item["work_item_id"] for item in ppe["ready_work"]] == [API_READY_ID, CANARY_READY_ID]
     assert snapshot["recommended_next_action"]["work_item_id"] == API_READY_ID
 
 
@@ -1062,7 +1063,7 @@ def test_selection_context_excluding_merged_options_a_is_unmatched_and_recommend
     ready_ids = [item["work_item_id"] for item in ppe["ready_work"]]
     rec = snapshot["recommended_next_action"]
 
-    assert ready_ids == [API_READY_ID]
+    assert ready_ids == [API_READY_ID, CANARY_READY_ID]
     assert rec["work_item_id"] == API_READY_ID
     assert rec["selection_context"] == snapshot["selection_context"]
     assert rec["selection_explanation"]["selection_context"] == snapshot["selection_context"]
