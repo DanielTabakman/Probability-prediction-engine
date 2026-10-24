@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.ppe_ide_build_starter import prune_starters_for_completed_chapters
 from scripts.ppe_token_audit import (
     ALWAYS_ON_CHAR_TARGET,
     append_history_snapshot,
@@ -32,6 +33,30 @@ class TestPpeTokenAudit(unittest.TestCase):
         orch.mkdir(parents=True)
         (orch / "IDE_BUILD_STARTER_Test-Slice001.md").write_text("\n".join(["line"] * 50), encoding="utf-8")
 
+    def write_completed_chapter_plan(self) -> Path:
+        plan_rel = Path("docs/SOP/PHASE_PLANS/Completed_relay.json")
+        evidence_rel = Path("docs/SOP/CHAPTER_EVIDENCE/Completed.md")
+        plan_path = self.repo / plan_rel
+        evidence_path = self.repo / evidence_rel
+        plan_path.parent.mkdir(parents=True, exist_ok=True)
+        evidence_path.parent.mkdir(parents=True, exist_ok=True)
+        plan_path.write_text(
+            json.dumps(
+                {
+                    "slices": [
+                        {"sliceId": "Test-Slice001"},
+                        {
+                            "sliceId": "Completed-Closeout",
+                            "closeout": {"evidenceDoc": evidence_rel.as_posix()},
+                        },
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        evidence_path.write_text("## Chapter status\n\n**COMPLETE**\n", encoding="utf-8")
+        return self.repo / "artifacts" / "orchestrator" / "IDE_BUILD_STARTER_Test-Slice001.md"
+
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
@@ -52,6 +77,28 @@ class TestPpeTokenAudit(unittest.TestCase):
         rows = read_history(self.repo)
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["verdict"], report.verdict)
+
+    def test_build_token_audit_reports_stale_starter_read_only(self) -> None:
+        starter = self.write_completed_chapter_plan()
+        before = starter.read_bytes()
+
+        report = build_token_audit(self.repo)
+
+        self.assertEqual(report.stale_starter_ids, ["Test-Slice001"])
+        self.assertTrue(starter.is_file())
+        self.assertEqual(starter.read_bytes(), before)
+        data = report.to_dict()
+        self.assertEqual(len(data["starters"]), 1)
+        self.assertEqual(data["starters"][0]["slice_id"], "Test-Slice001")
+        self.assertEqual(data["always_on_total_chars"], sum(row.chars for row in report.rules if row.always_apply))
+
+    def test_explicit_prune_removes_completed_chapter_starter(self) -> None:
+        starter = self.write_completed_chapter_plan()
+
+        removed = prune_starters_for_completed_chapters(self.repo)
+
+        self.assertEqual(removed, ["Test-Slice001"])
+        self.assertFalse(starter.exists())
 
 
 if __name__ == "__main__":
