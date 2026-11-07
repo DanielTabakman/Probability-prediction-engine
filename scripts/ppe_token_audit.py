@@ -150,9 +150,9 @@ def audit_starters(repo: Path) -> list[StarterAuditRow]:
 
 
 def audit_stale_starters(repo: Path) -> list[str]:
-    from scripts.ppe_ide_build_starter import prune_starters_for_completed_chapters
+    from scripts.ppe_ide_build_starter import find_starters_for_completed_chapters
 
-    return prune_starters_for_completed_chapters(repo)
+    return find_starters_for_completed_chapters(repo)
 
 
 def audit_build_worker(repo: Path) -> dict[str, Any]:
