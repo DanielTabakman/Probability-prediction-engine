@@ -2,9 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
-## 2026-11-07
+## 2026-11-08
 
 _No merges to `main`._
+
+## 2026-11-07
+
+- `92ba2eda` — Control-plane: dev changelog
 
 ## 2026-11-06
 
