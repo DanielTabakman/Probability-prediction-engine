@@ -1,0 +1,115 @@
+.shell {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+  padding: 24px;
+  color: #e9f4fb;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(37, 201, 183, 0.1), transparent 28rem),
+    radial-gradient(circle at 8% 78%, rgba(59, 130, 246, 0.07), transparent 27rem),
+    #070e15;
+}
+.shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(221, 248, 245, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(221, 248, 245, 0.025) 1px, transparent 1px);
+  background-size: 54px 54px;
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent 85%);
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+.layout {
+  max-width: 1040px;
+  min-height: calc(100vh - 48px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.top, .identity, .location, .sectionHeading, .linkCard, .saveButton, .footer {
+  display: flex;
+  align-items: center;
+}
+.top { justify-content: space-between; gap: 16px; padding: 10px 0 23px; border-bottom: 1px solid rgba(208, 241, 241, 0.12); }
+.identity { gap: 13px; }
+.mark { font-weight: 850; font-size: 24px; letter-spacing: -0.09em; }
+.markDot { color: #48e1ce; }
+.topLabel, .location, .eyebrow, .sectionHeading > span, .footer, .pending {
+  letter-spacing: 0.16em;
+  font-size: 10px;
+  font-weight: 800;
+}
+.topLabel, .location { color: #8da9b8; }
+.location { gap: 8px; white-space: nowrap; }
+.locationDot { width: 6px; height: 6px; background: #53e8cd; border-radius: 50%; box-shadow: 0 0 10px rgba(67,231,211,.75); }
+.content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.07fr) minmax(0, .93fr);
+  gap: clamp(40px, 7vw, 100px);
+  align-items: center;
+  padding: 64px 0 74px;
+}
+.eyebrow { color: #50d8c7; display: flex; align-items: center; gap: 13px; }
+.line { width: 28px; height: 1px; background: #50d8c7; }
+.monogram {
+  width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(75,226,209,.3); border-radius: 24px; margin: 35px 0 25px;
+  color: #70eee0; font-size: 38px; font-weight: 750; letter-spacing: -0.09em;
+  background: linear-gradient(135deg, rgba(63,211,193,.16), rgba(10,25,37,.6));
+  box-shadow: inset 0 1px rgba(234,255,255,.09), 0 20px 65px rgba(0,0,0,.26);
+}
+.hero h1 { margin: 0; font-size: clamp(47px, 5vw, 72px); font-weight: 800; letter-spacing: -0.07em; line-height: 1.04; }
+.hero h1 span { display: block; color: #5ce4d5; }
+.role { margin: 21px 0 0; color: #d7e8f1; font-size: 16px; font-weight: 600; }
+.role span { margin: 0 6px; color: #4acbbd; }
+.intro { max-width: 405px; margin: 21px 0 0; font-size: 16px; line-height: 1.75; color: #92adbd; }
+.linksSection { border: 1px solid rgba(182,225,229,.13); background: linear-gradient(155deg, rgba(14, 30, 43, .87), rgba(9, 19, 28, .92)); border-radius: 26px; padding: 28px; box-shadow: 0 35px 90px rgba(0,0,0,.28); }
+.sectionHeading { justify-content: space-between; gap: 14px; margin: 0 0 21px; }
+.sectionHeading h2 { font-size: 21px; font-weight: 750; margin: 0; letter-spacing: -.045em; }
+.sectionHeading > span { color: #67899b; font-size: 9px; }
+.linkList { display: flex; flex-direction: column; gap: 10px; }
+.linkCard { text-decoration: none; color: inherit; gap: 14px; padding: 13px 14px; min-height: 82px; border-radius: 15px; border: 1px solid rgba(188,218,229,.095); background: #101f2c; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
+a.linkCard:hover { background: #172b3b; border-color: rgba(80,218,199,.4); transform: translateY(-1px); }
+.linkCard:focus-visible, .saveButton:focus-visible, .footer a:focus-visible { outline: 2px solid #5ce4d5; outline-offset: 4px; }
+.linkIcon { display: flex; flex: 0 0 48px; width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 12px; font-weight: 850; font-size: 22px; }
+.linkedin { background: rgba(45,129,223,.15); color: #76b8ff; letter-spacing: -.06em; }
+.whatsapp { background: rgba(29,192,110,.13); color: #5ce7a2; font-size: 27px; }
+.msos { background: rgba(82,217,201,.12); color: #60dfd1; font-size: 24px; }
+.linkCopy { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.linkCopy strong { font-size: 15px; font-weight: 740; }
+.linkCopy small { font-size: 12px; color: #87a3b5; }
+.arrow { margin-left: auto; color: #6d93a5; display: flex; align-items: center; }
+.pending { color: #6e8c98; margin-left: auto; font-size: 9px; }
+.unavailable { opacity: .62; cursor: default; }
+.saveButton { justify-content: center; gap: 10px; margin-top: 21px; padding: 17px; border-radius: 14px; background: #60e6d4; color: #062323; text-decoration: none; font-weight: 800; font-size: 14px; transition: background .18s ease; }
+.saveButton:hover { background: #9af2e5; }
+.saveButton > svg:last-child { margin-left: auto; }
+.saveButton > svg:first-child { margin-left: auto; }
+.saveHint { text-align: center; color: #7292a3; font-size: 11px; margin: 11px 0 0; }
+.footer { gap: 16px; justify-content: space-between; border-top: 1px solid rgba(208,241,241,.10); padding: 23px 0 7px; color: #648191; font-size: 9px; }
+.footer a { text-decoration: none; color: #9cb6c3; }
+.footer a:hover { color: #5ce4d5; }
+@media (max-width: 760px) {
+  .shell { padding: 15px 20px; }
+  .layout { min-height: calc(100vh - 30px); }
+  .content { display: flex; flex-direction: column; align-items: stretch; gap: 39px; padding: 38px 0 48px; }
+  .monogram { width: 76px; height: 76px; margin: 26px 0 20px; border-radius: 19px; font-size: 30px; }
+  .hero h1 { font-size: clamp(46px, 10vw, 64px); }
+  .intro { margin-top: 16px; line-height: 1.62; font-size: 15px; }
+  .linksSection { padding: 19px; border-radius: 22px; }
+  .topLabel { font-size: 9px; }
+  .location { font-size: 9px; }
+  .footer { align-items: flex-start; line-height: 1.6; }
+}
+@media (max-width: 380px) {
+  .topLabel { display: none; }
+  .linkCard { padding: 10px; gap: 11px; }
+  .sectionHeading > span { display: none; }
+  .footer { font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .linkCard, .saveButton { transition: none; }
+  a.linkCard:hover { transform: none; }
+}
