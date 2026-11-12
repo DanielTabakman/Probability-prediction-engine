@@ -118,7 +118,7 @@ export default function ConnectPage() {
         </div>
 
         <footer className={styles.footer}>
-          <span>BUILT TO CONNECT, NOT TO COLLECT</span>
+          <span>A SIMPLE WAY TO STAY CONNECTED</span>
           <a href={PRODUCT_URL} target="_blank" rel="noopener noreferrer">MARKETSTRUCTUREOS.COM <span aria-hidden="true">↗</span></a>
         </footer>
       </div>
