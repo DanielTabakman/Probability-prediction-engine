@@ -18,6 +18,7 @@ services:
       - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+      - MSOS_CONNECT_WHATSAPP_NUMBER=${MSOS_CONNECT_WHATSAPP_NUMBER:-}
     volumes:
       - msos_web_data:/data
       - ppe_snapshots:/ppe-snapshots:ro
@@ -57,6 +58,7 @@ services:
       - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+      - MSOS_CONNECT_WHATSAPP_NUMBER=${MSOS_CONNECT_WHATSAPP_NUMBER:-}
     depends_on:
       - ppe_display_api_staging
     volumes:
