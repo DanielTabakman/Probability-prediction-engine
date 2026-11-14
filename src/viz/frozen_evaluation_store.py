@@ -10,7 +10,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from src.viz.frozen_evaluation_record import summary_line_for_record
+from src.viz.frozen_evaluation_record import (
+    build_snapshot_review_payload,
+    summary_line_for_record,
+    validate_frozen_evaluation_record,
+)
 
 REVIEW_STATUSES: tuple[str, ...] = (
     "pending",
@@ -371,13 +375,14 @@ def list_completed_review_snapshots(
     for row in cur.fetchall():
         r = dict(row)
         rec_json = r.pop("record_json")
+        record = validate_frozen_evaluation_record(json.loads(rec_json))
         out.append(
             {
                 "snapshot_id": r["snapshot_id"],
                 "created_at": r.get("created_at"),
                 "expiry": r.get("expiry"),
                 "summary_line": r.get("summary_line"),
-                "record": json.loads(rec_json),
+                "record": record,
                 "review": {
                     "id": r["review_row_id"],
                     "review_status": r["review_status"],
@@ -393,11 +398,12 @@ def list_completed_review_snapshots(
 
 def insert_record(conn: sqlite3.Connection, record: dict[str, Any]) -> str:
     init_schema(conn)
-    rid = str(record["snapshot_id"])
-    created = str(record["created_at_utc"])
-    exp = str(record.get("expiry") or "")
-    summary = summary_line_for_record(record)
-    owner_email = normalize_owner_email(record.get("owner_email") if isinstance(record.get("owner_email"), str) else None)
+    rec = validate_frozen_evaluation_record(record)
+    rid = str(rec["snapshot_id"])
+    created = str(rec["created_at_utc"])
+    exp = str(rec.get("expiry") or "")
+    summary = summary_line_for_record(rec)
+    owner_email = normalize_owner_email(rec.get("owner_email") if isinstance(rec.get("owner_email"), str) else None)
     conn.execute(
         """
         INSERT INTO frozen_evaluations
@@ -409,7 +415,7 @@ def insert_record(conn: sqlite3.Connection, record: dict[str, Any]) -> str:
             created,
             exp,
             summary,
-            json.dumps(record, separators=(",", ":"), ensure_ascii=False),
+            json.dumps(rec, separators=(",", ":"), sort_keys=True, ensure_ascii=False),
             owner_email,
         ),
     )
@@ -458,7 +464,16 @@ def get_by_id(conn: sqlite3.Connection, snapshot_id: str) -> dict[str, Any] | No
     row = cur.fetchone()
     if not row:
         return None
-    return json.loads(row["record_json"])
+    return validate_frozen_evaluation_record(json.loads(row["record_json"]))
+
+
+def get_snapshot_review_payload(conn: sqlite3.Connection, snapshot_id: str) -> dict[str, Any] | None:
+    """Minimal snapshot_review_v1 payload for Python-owned contract tests and consumers."""
+    record = get_by_id(conn, snapshot_id)
+    if record is None:
+        return None
+    review = get_review_for_snapshot(conn, snapshot_id) or {}
+    return build_snapshot_review_payload(record=record, review=review)
 
 
 def open_store(path: Path | None = None) -> sqlite3.Connection:
