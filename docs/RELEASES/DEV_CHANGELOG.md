@@ -2,9 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
-## 2026-11-16
+## 2026-11-17
 
 _No merges to `main`._
+
+## 2026-11-16
+
+- `dbde3935` — Control-plane: dev changelog
 
 ## 2026-11-15
 
