@@ -5,6 +5,10 @@
 **Repository:** DanielTabakman/Probability-prediction-engine
 **Inputs:** Product discussion and v0.8 working blueprint (18 Nov 2026), read-only repository audit, existing market-thesis v1 workflow and MSOS steering documents.
 
+## Near-term operating plan: founder-selected concierge pilot
+
+The **current company experiment** is the human-operated [MSOS Concierge Research Pilot v0](MSOS_CONCIERGE_RESEARCH_PILOT_V0.md): bring one trader's market idea through the research loop; deliver a dated educational scenario brief; follow up; log and prioritize repeatable steps for Investable automation. Start with three participants, not a software-first launch. Keep the advisory/registration boundary explicit and get Ontario legal review before paid, individualized advice. This operational pilot does not itself promote engineering work in the existing relay queue.
+
 ## 1. Executive decision
 
 **Recommendation: CONDITIONAL GO for a small Investable validation slice, NOT a new platform rewrite.**
