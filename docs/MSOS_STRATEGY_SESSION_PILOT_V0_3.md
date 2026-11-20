@@ -1,0 +1,86 @@
+# MSOS Strategy Session Pilot — v0.3 (Jensen — November)
+
+**Date:** 2026-11-20  
+**Status:** Pilot protocol and retrospective; proposed documentation awaiting review/merge. **Not** a shipped MSOS feature, broker execution, or a validated options-pricing engine.  
+**Scope:** Strategy-session product design for MSOS/Strategy Lab. This document does not change existing PPE mathematical contracts, production routes, or build/frontier selection.
+
+## Product boundary
+
+**Trader supplies the thesis; MSOS helps translate it into an options-market-informed expression.** The core guided flow should not require independent fundamental-research or counterfactual validation. A trader may bring research from elsewhere. Market-derived probabilities are **risk-neutral/model-implied**, not forecasts that the thesis is correct.
+
+## Reusable guided workflow and stage gates
+
+| Stage | Question / input | Required output | Exit gate |
+|---|---|---|---|
+| 1. Thesis capture | Underlying, direction/price or range, target date, thesis in user's words, budget, **maximum acceptable loss**; avoid repeating answers already given | Confirmed user-stated thesis with explicit assumptions and revision log | User accepts concise restatement |
+| 2. Options-market read | Underlying/spot, available expirations, bid/ask and sizes, IV by strike and tenor, open interest/volume, quote timestamps, distributions with assumptions | Timestamped market snapshot with data quality; distinguish unavailable/stale fields | Same-time sufficient-quality inputs or clear **simulation-only** downgrade |
+| 3. Candidate construction | What are the practical expressions within constraints? | **Mandatory buy-and-hold underlying benchmark** plus 2–3 reasonable options structures (where applicable), with contract details and sizing | All candidates dimensionally valid and costed from compatible data |
+| 4. Outcome comparison | Same entry/exit assumptions and price scenarios for all candidates; vol/skew/time stress; trading costs | Decision cards: capital, max loss, target P/L and ROI, partial-success/flat/downside cases, capped or uncapped upside, breakevens, sensitivities, liquidity, model probabilities only when justified | Comparable scenarios and assumptions disclosed, no claim of objective 'best' without objective function |
+| 5. Select and save | Which tradeoff fits user's chosen priority? | Reproducible strategy record, rationale, alternative rejection reasons, snapshot provenance, unresolved risks | User selects or explicitly defers; saving confirmed by actual persistence |
+| 6. Theoretical execution (separate) | Paper/order simulation with entry assumptions and hypothetical exit rules | Paper-trade record clearly marked **simulated, not placed**, with simulated fill assumptions | Persistent paper-trade service and tracking are **future work**, not implied by this conversation |
+| Future: live execution | Separate permissions, venue integration, pricing, and order confirmation | Executed order acknowledgment only when broker/venue verifies | Not authorized or built in this pilot |
+
+**Navigation:** state current stage and what's done, next, blocked; do not imply all stages are sequentially blocked by quotes: stages 3/4 can be run as **historical/conditional dry runs** while stage 2 remains provisional. Mark all stage transitions and snapshot versions.
+
+## Required candidate: underlying shares (new from user review)
+
+The baseline must be **buy the underlying and plan to exit at the trader's horizon**. It is not optional decoration; it is the control against which options' incremental value and risk must be explained.
+
+Required stock card: share count (integer/fractional availability), cost, same-date P/L and return, dollar loss under a drop, no fixed expiry or time decay, uncapped price upside, full downside to zero, opportunity cost/capital, currency and any FX effects. Shares can be held beyond the proposed exit, unlike expiring options. Clarify that shares are not 'safe', and that **both stock and long calls have theoretically uncapped upside**, but calls offer leveraged convex exposure at premium/expiration/volatility cost.
+
+Normalize options contracts to **100 shares per standard U.S. equity options contract** (unless adjusted) and show cost per share **and** per contract; do not confuse $13.25/share with $13.25/contract.
+
+## Jensen — November pilot record
+
+**Input:** NVDA recovery to about **$200 by November 2027**, approximately **$1,000 soft capital budget**, user's research/thesis accepted as supplied. January 21, 2028 options evaluated to give ~2 extra months beyond target exit. No real trade placed. These figures are USD.
+
+**Provenance caveat:** Prior session reported NVDA Friday **closing price $125.53**; separately cited Friday **displayed options** of approximately $645 for 170/200 spread, $400 for 180/200 spread, and $1,310 for a 180 call. The stock-close and option premiums are **not a verified common-timestamp executable snapshot**. Do **not** publish those as a broker quote or declare a final trade recommendation.
+
+**New mandatory stock example:** 8 shares at Friday $125.53 reported close = **$1,004.24**; at a $200 exit, proceeds $1,600 and **+$595.76 / +59.3%** before costs/FX/dividends. A $170 exit = +$355.76; a $100 exit = -$204.24; complete loss to $0 = -$1,004.24. Stock has no expiration and also uncapped upside.
+
+**Conditional illustrative option comparisons:** An estimated November 19, 2027 exit with Jan 21, 2028 expiration, 47% constant IV, 4% interest and no dividends/fees (simple Black–Scholes model) gives:
+
+| Candidate | Stated illustrative debit | At NVDA $170 (P/L) | At NVDA $200 (P/L) | Maximum loss / structural limit |
+|---|---:|---:|---:|---|
+| 8 NVDA shares at $125.53 close | $1,004.24 | +$355.76 | +$595.76 | $1,004.24 to zero; upside uncapped |
+| $180–$200 Jan 2028 call debit spread | ~$400 | +$130 | +$751 | $400 premium; upside capped at expiration |
+| $170–$200 Jan 2028 call debit spread | ~$645 | +$300 | +$1,233 | $645 premium; upside capped at expiration |
+| Long $180 Jan 2028 call | ~$1,310 | -$347 | +$1,461 | $1,310 premium; leveraged upside uncapped |
+
+**Important:** These are model-generated scenario values for comparing payoff geometry, not expected profits or fill quotes; exit volatility, volatility skew, time, exercise/assignment specifics, liquidity and trading costs can materially alter results. No model-implied probabilities were reliably calculated for the pilot. The $170/200 spread is a **provisional target-focused candidate**, not an objectively optimal recommendation. A soft budget is **not** the same as consent to lose the full amount.
+
+## Strategy cards: labels must explain tradeoffs
+
+Suggested dynamically assigned labels: **lower capital at risk**, **target-focused payoff**, **leveraged uncapped upside**, and **share ownership benchmark**. Labels are descriptive, not a fixed menu; do not present 'safe' versus 'aggressive' without explicit variables. Every card must show:
+- Total cost/capital or buying power; maximum loss; relevant margin/assignment risks for complex structures.
+- Same-scenario **dollar profit and ROI** and **profit per dollar at risk**; distinguish payout ratio from real probability of profit.
+- What happens if the thesis is only partly right, wrong, late, or overshoots.
+- Capped/uncapped upside and **why** that changes capital efficiency.
+- Time decay, future IV/skew exposure, expiry versus planned exit, and liquidity/spreads/fees.
+- Source timestamp, simulated/indicative/executable status, and currency.
+
+## Product learning: preserve and correct
+
+**Worked:** trader-stated thesis accepted; conversation recovered prior answers instead of restating all questions; stage structure reduced confusion; evaluating multiple capped and uncapped structures produced useful choice; early-exit and volatility stress revealed genuine tradeoffs.
+
+**Needs hardening:** failed to include underlying shares until user requested it; too much research on whether thesis was true; confusion between stages 2/3/4; premature 'optimal' and 'aggressive' labels; uneven market data quality; output that sounded executable with unsynchronized prices; missing source/quote timestamps; accidental conflation of question-flow spec with persisted app functionality.
+
+**Questions to log for each step:** prompt/why, supplied answer (or already known), normalized state delta, assumptions, evidence/tool input, computation/version, decision made or deferred, source of confusion, next branch, stage gate status. Keep a parallel **process log** separate from **strategy records**.
+
+## Explicit backlog, not part of current session
+
+1. Saveable **paper-trade ledger**: immutable hypothesis/market snapshots; simulated entry assumptions; mark-to-market & exit; reason-for-trade versus realized outcome; true hypothetical fill convention; user ownership and private/public access control.
+2. Community sharing after a successful pilot: opt-in strategy/publication state, e.g. Telegram channel or group, with paper-only badges, standardized return bases, timestamps and anti-cherry-picking rules. **Not built or committed to as a launch platform.**
+3. Objective archetypes to revisit later: target-return efficiency, low capital loss, probability of profit, maximum uncapped upside, drawdown sensitivity; don't silently optimize on one metric.
+4. Implementation planning requires a separate selected build slice, acceptance tests, market-data license/venue feasibility, privacy/security review, and snapshot provenance tests.
+
+## Immediate acceptance tests for v0.3
+
+- A second user brings a new asset/price/date: system remembers prior answers, shows stage and next step.
+- It always generates a properly sized **underlying buy/hold baseline** when tradable, and explains if infeasible.
+- All candidates use identical target-date and price scenarios; options have expiration and implied-volatility stress, stock does not.
+- Mixed timestamp quotes trigger **indicated simulation**, not executable prices.
+- Labels show capital, loss, target payout, partial success, capped/uncapped upside and side-by-side stock comparison.
+- No trade is marked paper-filled, saved, live, or published without a verified corresponding persistent event.
+
+**Bottom line:** the **interview/decision spec** is reusable at v0.3; the **implemented and tested workflow** is not yet hardened. Run another complete pilot and verify calculations before promoting this into controlling product canon.
