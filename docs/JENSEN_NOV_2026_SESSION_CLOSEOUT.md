@@ -59,9 +59,15 @@ This exercise did **not** aim to adjudicate Nvidia's fundamental thesis. The pro
 | Telegram sharing, comparison, competition | **Idea only** | Revisit after a working paper ledger; require opt-in publishing and fair timestamp/performance standards |
 | Live broker execution | **Not authorized** | Separate future selection and safeguards |
 
-## Exact next-session opening
+## Addendum 2026-11-20: reopen market-landscape UX before paper execution
 
-**"Continue Jensen — November from the v0.3 closeout. We have a documented thesis and four-way comparison, including eight shares. Do not re-ask the thesis or re-research Nvidia fundamentals. Today we are designing and testing THEORETICAL EXECUTION: how a user selects a candidate, saves a paper entry with timestamped quote/fill assumptions, monitors it, exits it, and compares performance fairly. Paper ledger is not yet implemented; do not claim a fill, saving, or trade until verified."**
+The user chose to **amend Stage 2 first**, then rerun Jensen–November, then refine based on what the walkthrough reveals. The Stage-2 amendment is saved in [the pilot protocol](./MSOS_STRATEGY_SESSION_PILOT_V0_3.md) and the conditional first-pass walkthrough is recorded in [Jensen's market-landscape walkthrough](./JENSEN_NOV_2026_LANDSCAPE_WALKTHROUGH.md), both in this same **draft, unmerged PR**. These are **documentation and model illustrations**, not a deployed interactive UI or an executed trade.
+
+This work is now the **immediate next product validation step**, ahead of theoretical execution/paper-ledger design. Important first-pass findings: stock/option snapshot incompatibility; touch-versus-finish semantics; visually showing relevant expiries and market-implied distributions, no hard-coded 6/12/18 schedule; quote provenance; model versus quoted exposure costs. The newly recorded proposed modifications are **not yet hardened** without guided trader feedback.
+
+## Updated next-session opening
+
+**"Continue Jensen–November by walking the user through the Options Market Landscape as a visible guided experience, using the recorded NVDA $200 by November 2027 thesis, $1,000 soft budget, and the model-only first pass. Check whether the user understands the range and the critical distinction between touching $200 before the date versus finishing at $200 at expiry. Adjust the provisional Stage-2 experience based on observed confusion before moving to paper-execution design. Do not repeat the thesis, claim synchronized executable option quotes, or record any fill or trade."**
 
 ## Closeout rule
 
