@@ -72,3 +72,15 @@ This work is now the **immediate next product validation step**, ahead of theore
 ## Closeout rule
 
 Session design/documentation is complete enough to pause; implementation/testing is **not** complete. No further work required from the trader today. Do not merge draft PR or fabricate persistence, quote verification, paper fills, or broker activity.
+
+## Addendum 2026-11-21: simple-first market briefing / deep-dive option
+
+**Decision from interactive Jensen run 2:** Keep the five options-market lenses (**horizon IV, risk-neutral target-finish probability, full terminal distribution, skew/smile, term structure**) but **explain the overall price distribution before exposing the metrics**, with the trader's target marked and a short narrative. Offer two presentation depths: **Simple** by default (one picture, plain-language story, clear caveat) and **Deep dive** by choice (quantiles, forward/median, skew, expiries, chain data quality, assumptions and sensitivities). Both must share the same validated inputs and distinguish modeled pricing from objective forecasts.
+
+**Stage sequence to preserve:** independent market picture → compare with trader's evolving view → discuss directional/volatility/uncapped-upside preferences → construct candidates with **underlying stock benchmark** → same-horizon P/L comparisons → separate simulated execution; live execution needs independent authorization. Don't push a touch-vs-finish question or menu of strategies before the user understands the distribution.
+
+**Provisional Jensen state for continuation:** Original $200-by-November-2027 NVDA view and ~$1,000 soft capital budget remain on record. Later dialogue explored **+25% (~$156.91 at dated $125.53 reference)**, high price fluctuations, an upper-half ending outcome, and preference for **uncapped upside**; these were brainstorming, not a locked replacement thesis. The trader wanted both an expert conversation and a retail-simple mode, and did not select or place any trade.
+
+**Pricing integrity correction:** "Zero chance" was an incorrect spoken statement. A subsequent **~15% above-$200 at expiry** result was **simplified/model-based and unverified as a synchronized, calibrated market distribution**, not a real-world probability or touch probability. Prior walkthrough's **47%-assumed flat-vol model** is not the same snapshot as the later 50.44% IV discussion; reconcile assumptions and quote timestamps before future calculations.
+
+**Immediate next action for build planning:** Turn the amended draft protocol into a testable **Simple-first market-read UI** with an optional deep-dive disclosure, use coherent quote data or unmistakably labeled illustrative model data, and run one retail comprehension test plus one advanced quantitative/data-quality review before considering promotion to product canon. **Draft PR #5524 remains unmerged pending review.** No app code, paper-trade service, options broker connection, or order execution was created by this addendum.
