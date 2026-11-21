@@ -6,6 +6,10 @@
 
 **User research:** Jensen interactive simulation (2026-11-21). [Pilot protocol](./MSOS_STRATEGY_SESSION_PILOT_V0_3.md) · [Jensen walkthrough](./JENSEN_NOV_2026_LANDSCAPE_WALKTHROUGH.md) · [Handoff](./JENSEN_NOV_2026_SESSION_CLOSEOUT.md).
 
+## 0. Validation order clarified after product-design closeout (2026-11-21)
+
+**The first external test can happen now, before any implementation.** Use the [concierge tester runbook](./MSOS_MARKET_READ_FIRST_CONCIERGE_TEST_V0_1.md) with a clearly labeled fixed model/quote fixture; observe one general investor and one options-savvy participant. A successful concierge session tests **copy and guided decision flow only**. It does not validate numerical surface calibration, real-time market access, integrated app state, automated gating, or trade execution. **Do not defer this learning until Slice A is built; and do not treat it as a build gate if a separately authorized engineer can safely begin Slice A.** Keep human observations and engineering evidence in distinct records.
+
 ## 1. Repo reality — confirmed starting points (main, inspected 2026-11-21)
 
 | Existing surface | Exact owner / code entry | Consequence |
