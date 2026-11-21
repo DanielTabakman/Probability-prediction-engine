@@ -1,7 +1,7 @@
 # MSOS Jensen — November | Session closeout & next-session handoff
 
 **Session:** Friday 2026-11-20 (Toronto)  
-**Status:** Session closed for analysis/product design; **theoretical execution deferred until next session**.  
+**Status (updated 2026-11-21):** Jensen's conversation is **closed as a product-design exercise**. **Paper-trade design and theoretical/live execution are explicitly deferred**, not the automatic next session. The near-term next step is **external concierge UX testing**, followed by selected implementation work.  
 **Companion protocol:** [MSOS Strategy Session Pilot v0.3](./MSOS_STRATEGY_SESSION_PILOT_V0_3.md).  
 **Workflow artifact status:** Draft documentation in PR #5524; not merged, deployed, or integrated into a persistence service.
 
@@ -84,3 +84,24 @@ Session design/documentation is complete enough to pause; implementation/testing
 **Pricing integrity correction:** "Zero chance" was an incorrect spoken statement. A subsequent **~15% above-$200 at expiry** result was **simplified/model-based and unverified as a synchronized, calibrated market distribution**, not a real-world probability or touch probability. Prior walkthrough's **47%-assumed flat-vol model** is not the same snapshot as the later 50.44% IV discussion; reconcile assumptions and quote timestamps before future calculations.
 
 **Immediate next action for build planning:** Turn the amended draft protocol into a testable **Simple-first market-read UI** with an optional deep-dive disclosure, use coherent quote data or unmistakably labeled illustrative model data, and run one retail comprehension test plus one advanced quantitative/data-quality review before considering promotion to product canon. **Draft PR #5524 remains unmerged pending review.** No app code, paper-trade service, options broker connection, or order execution was created by this addendum.
+
+## Final audit addendum — 2026-11-21: first external tester readiness
+
+**Replaces the archival “Updated next-session opening” above as the CURRENT next action.** That earlier entry described a Jensen dry run before the second interactive test, **not** a standing request to continue Jensen or start a paper ledger. Do not ask a new tester to finish Jensen's unanswered trade.
+
+**What the conversational pilot established:** market-read-first *presentation*, flexible thesis-first/market-first intake, Simple default with deeper analysis on demand, five analytical lenses behind one distribution narrative, preserving user revisions, mandatory stock/share benchmark, capped versus uncapped strategy tradeoffs and a distinct execution stage. These are **design decisions** and retrospective observations, not evidence the app shipped.
+
+**Hardening corrections:**
+- A past protocol passage asserted Jensen had chosen **“touch $200”**. This was **never answered**, and the protocol has been corrected to **unresolved touch-versus-finish**. Later +25% and uncapped-upside ideas were exploratory, not final instructions.
+- Earlier speech said “zero chance”; the later **~15%** was an illustrative **terminal-expiry pricing-model** number, not an actual forecast, live chain-derived probability, or first-touch probability. There are two **different modeling assumptions** in the retrospective (47% and 50.44%); do not blend them.
+- “High volatility” does not automatically mean selling options or preferring an iron condor; ask whether the user means realized price variability or exposure to option IV, and distinguish capped upside from uncapped upside.
+- A soft $1,000 buying budget is **not** a $1,000 maximum-loss authorization; actual candidate size and suitability require independent investigation.
+- No broker execution, paper trade fill, saved prototype interaction, verified synchronized NVDA chain, or production-stage enforcement occurred.
+
+**External tester package:** [MSOS Market Read First — concierge test v0.1](./MSOS_MARKET_READ_FIRST_CONCIERGE_TEST_V0_1.md) now contains participant invitation, consent/privacy boundaries, one-question-at-a-time run of show, a numerical **model-only** NVDA fixture, unaided comprehension checks, observation sheet, and explicit test exit/failure criteria. Bring one novice and one experienced trader to observe where the presentation fails, not to validate profits or the live application.
+
+**Engineering package:** [Market Read First implementation packet v0.1](./MSOS_MARKET_READ_FIRST_IMPLEMENTATION_PACKET_V0_1.md) remains a **proposal**, not an active queue selection. It defines the reusable Next.js/PPE boundary, scoped Slice A, provenance/math gating and later persistence. The Options Market Read standalone API v1.3 was observed **BTC-only**, so the Nvidia pilot is not proof of NVDA market-read support.
+
+**Outstanding choices, intentionally not forced on a tester:** approve a UI build slice in the repository's controlling MSOS frontier; reconcile chain data and backend distributions before published advanced metrics; establish session persistence/route gate; separately plan paper trading only if requested. This is **ready for a guided external test**, **not production-hardened trading software**.
+
+**Closeout decision:** End the Jensen simulation; do not resume with another theory round by default. The first real-user study is the next learning step, and software implementation can follow the selected build packet. PR #5524 remains draft/unmerged until reviewed.
