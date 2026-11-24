@@ -4,7 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-11-24
 
-_No merges to `main`._
+- `d6992047` — Control-plane: dev changelog
 
 ## 2026-11-22
 
